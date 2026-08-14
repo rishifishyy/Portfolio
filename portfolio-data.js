@@ -19,20 +19,17 @@ I love tackling complex algorithmic challenges, designing intuitive frontend int
       codolio: "https://codolio.com/profile/rishifishyy"
     },
     skills: [
-      "JavaScript (ES6+)",
-      "TypeScript",
       "React.js",
       "Next.js",
+      "JavaScript (ES6+)",
       "Node.js",
       "Express.js",
       "C++ / Data Structures",
-      "Python",
-      "PostgreSQL",
+      "SQL",
       "MongoDB",
       "Tailwind CSS",
       "Git & GitHub",
-      "REST APIs",
-      "Docker"
+      "REST APIs"
     ]
   },
 
