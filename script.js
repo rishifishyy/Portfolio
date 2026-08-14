@@ -155,9 +155,22 @@ function renderProjects() {
       .map(tech => `<span class="bento-tech-pill">${escapeHtml(tech)}</span>`)
       .join("") + (overflowCount > 0 ? `<span class="bento-tech-pill">+${overflowCount}</span>` : "");
 
+    const isComingSoon = !!project.isComingSoon;
+    const cardClass = isComingSoon ? 'bento-project-card coming-soon-card' : 'bento-project-card';
+    const footerActionText = isComingSoon ? 'In Progress' : 'View project';
+
+    const comingSoonOverlayHtml = isComingSoon ? `
+      <div class="coming-soon-overlay" aria-hidden="true">
+        <div class="coming-soon-badge-anim">
+          <span class="coming-soon-pulse-dot"></span>
+          <span class="coming-soon-text">COMING SOON</span>
+        </div>
+      </div>
+    ` : '';
+
     return `
       <article 
-        class="bento-project-card ${staggerClass}" 
+        class="${cardClass} ${staggerClass}" 
         data-project-id="${escapeHtml(project.id)}"
         tabindex="0"
         role="button"
@@ -171,6 +184,7 @@ function renderProjects() {
             loading="lazy"
           >
           <div class="project-type-badge">${escapeHtml(project.type)}</div>
+          ${comingSoonOverlayHtml}
         </div>
 
         <div class="project-card-body">
@@ -182,7 +196,7 @@ function renderProjects() {
           </div>
 
           <div class="project-card-footer">
-            <span class="view-project-text">View project</span>
+            <span class="view-project-text">${footerActionText}</span>
             <div class="view-arrow-circle" aria-hidden="true">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                 <line x1="7" y1="17" x2="17" y2="7"></line>

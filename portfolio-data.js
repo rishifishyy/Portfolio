@@ -60,90 +60,45 @@ I love tackling complex algorithmic challenges, designing intuitive frontend int
 
   projects: [
     {
-      id: "project-1",
-      title: "DevPulse - Developer Workspace",
-      type: "Full Stack Web App",
-      badge: "Featured",
-      shortDescription: "All-in-one developer productivity hub with real-time markdown notes, task boards, and integrated code playground.",
-      fullDescription: "Built a modern, responsive web application that streamlines daily developer workflows. Includes an interactive live code sandbox, synced markdown documentation, draggable Kanban boards, and persistent storage.",
-      image: "assets/roomsketch-preview.svg",
-      problemStatement: "Developers often bounce between multiple disconnected tools for code scratchpads, documentation, and task tracking, interrupting focus and workflow.",
-      solution: "Created a unified dashboard bringing notes, code execution, and project tracking into one high-performance interface with offline support and lightning-fast load times.",
-      techStack: ["React", "TypeScript", "Node.js", "Tailwind CSS", "PostgreSQL"],
-      role: "Full Stack Developer",
+      id: "ai-exam-notes",
+      title: "AI Exam Notes",
+      type: "AI & Full Stack Web App",
+      badge: "Open Source",
+      shortDescription: "An AI-powered study companion that helps students generate concise exam notes, high-yield summaries, and quick-revision flashcards.",
+      fullDescription: "AI Exam Notes is an intelligent web application designed to accelerate exam preparation. It takes lecture notes, textbook passages, or topic outlines and uses AI to distill them into crisp summaries, formula cheat sheets, and predicted high-probability exam questions.",
+      image: "assets/aiexamnotes-preview.svg",
+      problemStatement: "Students spend hours sifting through lengthy textbook chapters and disjointed lecture slides trying to figure out what actually matters for upcoming exams.",
+      solution: "Engineered an intuitive AI tool that automatically extracts key concepts, organizes high-yield bullet points, and generates structured revision cards in seconds.",
+      techStack: ["React.js", "Node.js", "Express.js", "JavaScript", "Tailwind CSS", "REST APIs", "AI Integration"],
+      role: "Creator & Full Stack Developer",
       outcomes: [
-        "Built responsive UI with keyboard navigation and dark theme first approach",
-        "Implemented real-time local storage persistence and cloud sync API",
-        "Achieved 95+ Lighthouse performance and accessibility scores"
+        "Instant summarization and exam note extraction using AI prompts",
+        "Clean, responsive study interface with copy-to-clipboard and export options",
+        "Open-source repository available on GitHub"
       ],
       links: {
-        live: "https://github.com/rishifishyy",
-        github: "https://github.com/rishifishyy"
+        github: "https://github.com/rishifishyy/aiexamnotes"
       }
     },
     {
-      id: "project-2",
-      title: "AlgoTrack - Coding Stats Tracker",
-      type: "Analytics & API Integration",
-      badge: "Trending",
-      shortDescription: "Interactive coding statistics visualizer aggregating multi-platform problem solving metrics, contest ratings, and streaks.",
-      fullDescription: "A personalized analytics dashboard that connects to competitive coding APIs and profiles (like Codolio, LeetCode, Codeforces) to generate real-time performance insights, topic heatmaps, and consistency trackers.",
-      image: "assets/dexmatrix-preview.svg",
-      problemStatement: "Tracking progress across separate coding platforms is tedious and lacks consolidated visual insight into algorithmic strengths and weaknesses.",
-      solution: "Engineered a unified data pipeline that fetches profile statistics, computes skill distributions, and displays beautiful charts and radar metrics.",
-      techStack: ["JavaScript", "React", "Chart.js", "Express.js", "REST APIs"],
-      role: "Sole Creator",
+      id: "crypto-tracker",
+      title: "Crypto Portfolio Tracker",
+      type: "FinTech / MERN Stack",
+      badge: "Currently Working",
+      isComingSoon: true,
+      shortDescription: "A comprehensive crypto portfolio tracker with real-time pictorial charts, balance breakdown, and automated best vs worst performer analytics.",
+      fullDescription: "Currently developing a full-featured cryptocurrency portfolio tracking dashboard built on the MERN stack. It connects to live crypto market feeds to give users visual representations of their asset allocation, 30-day profit/loss trends, and spotlight alerts for top gainers and biggest losers in their portfolio.",
+      image: "assets/crypto-tracker.png",
+      problemStatement: "Crypto investors holding assets across multiple wallets and exchanges lack a single visual dashboard to see their total balance, asset distribution percentage, and historical ROI performance at a glance.",
+      solution: "Building a responsive MERN application with dynamic donut charts for asset allocation, smooth area graphs for portfolio growth, and automated categorization of best vs worst performing tokens.",
+      techStack: ["MongoDB", "Express.js", "React.js", "Node.js", "Tailwind CSS", "REST APIs", "Chart.js"],
+      role: "Lead Developer (In Active Development)",
       outcomes: [
-        "Consolidated problem solving analytics into intuitive interactive visualizations",
-        "Automated daily sync with rate-limiting and caching layer",
-        "Integrated directly with Codolio profile metrics"
+        "Interactive pictorial charts for portfolio allocation (BTC, ETH, SOL, etc.)",
+        "Real-time asset balance computation with live market price feeds",
+        "Instant tracking of best performers and worst performers over 24h and 30d periods"
       ],
       links: {
-        live: "https://codolio.com/profile/rishifishyy",
-        github: "https://github.com/rishifishyy"
-      }
-    },
-    {
-      id: "project-3",
-      title: "FlowState - Modern UI Component Kit",
-      type: "Frontend Design System",
-      badge: "Design System",
-      shortDescription: "Lightweight, accessible UI component library crafted for sleek dark-mode dashboards and rapid prototyping.",
-      fullDescription: "A comprehensive design system featuring 25+ accessible, composable UI components with subtle micro-animations, glassmorphism utilities, and zero external runtime dependencies.",
-      image: "assets/agentflow-preview.svg",
-      problemStatement: "Existing component libraries are often heavy, bloated, and require extensive customization to match a modern minimalist dark theme aesthetic.",
-      solution: "Crafted modular, semantic components using modern CSS variables, container queries, and clean vanilla JavaScript primitives.",
-      techStack: ["HTML5", "CSS3", "JavaScript", "Design Tokens", "Accessibility"],
-      role: "Frontend Engineer & UI Designer",
-      outcomes: [
-        "Zero dependency footprint with sub-15KB bundle size",
-        "Fully keyboard accessible and screen-reader compliant (ARIA)",
-        "Includes dark mode presets and dynamic theme toggling"
-      ],
-      links: {
-        live: "https://github.com/rishifishyy",
-        github: "https://github.com/rishifishyy"
-      }
-    },
-    {
-      id: "project-4",
-      title: "SmartVault - Secure Digital Storage",
-      type: "Web Application",
-      badge: "Security",
-      shortDescription: "End-to-end client-side encrypted vault for sensitive notes, credentials, and configuration files.",
-      fullDescription: "A secure web vault utilizing Web Crypto API for client-side AES-GCM encryption before storing data locally or syncing with a remote backend.",
-      image: "assets/solwill-preview.svg",
-      problemStatement: "Storing confidential development keys and personal notes on cloud services creates privacy concerns without zero-knowledge client encryption.",
-      solution: "Developed a zero-knowledge web application where data is encrypted in the browser with user-derived keys before any persistence.",
-      techStack: ["JavaScript", "Web Crypto API", "Node.js", "Tailwind CSS"],
-      role: "Developer",
-      outcomes: [
-        "Zero-knowledge architecture with AES-256 client-side encryption",
-        "Seamless offline mode with PWA service worker support",
-        "Simple and clean intuitive user interface"
-      ],
-      links: {
-        live: "https://github.com/rishifishyy",
         github: "https://github.com/rishifishyy"
       }
     }

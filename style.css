@@ -654,6 +654,78 @@ body::before {
   transform: scale(1.04);
 }
 
+/* Coming Soon Blurry & Animated Overlay */
+.coming-soon-card:hover .project-preview-img {
+  filter: blur(5px) brightness(0.6);
+  transform: scale(1.06);
+}
+
+.coming-soon-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  opacity: 0;
+  transform: scale(0.92);
+  transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1), transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  z-index: 5;
+}
+
+.coming-soon-card:hover .coming-soon-overlay {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.coming-soon-badge-anim {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.65rem 1.25rem;
+  background: rgba(9, 9, 11, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(56, 189, 248, 0.4);
+  border-radius: 9999px;
+  box-shadow: 0 0 25px rgba(56, 189, 248, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  animation: pulseCardGlow 2s infinite alternate ease-in-out;
+}
+
+@keyframes pulseCardGlow {
+  0% {
+    box-shadow: 0 0 15px rgba(56, 189, 248, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    border-color: rgba(56, 189, 248, 0.3);
+  }
+  100% {
+    box-shadow: 0 0 30px rgba(56, 189, 248, 0.45), 0 0 10px rgba(129, 140, 248, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+    border-color: rgba(56, 189, 248, 0.7);
+  }
+}
+
+.coming-soon-pulse-dot {
+  width: 8px;
+  height: 8px;
+  background-color: #38bdf8;
+  border-radius: 50%;
+  box-shadow: 0 0 10px #38bdf8;
+  animation: dotBlink 1.4s infinite ease-in-out;
+}
+
+@keyframes dotBlink {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(0.75); }
+}
+
+.coming-soon-text {
+  font-size: 0.825rem;
+  font-weight: 800;
+  letter-spacing: 0.2em;
+  background: linear-gradient(135deg, #38bdf8, #818cf8, #ffffff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
 .project-type-badge {
   position: absolute;
   top: 0.85rem;
