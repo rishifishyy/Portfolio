@@ -428,9 +428,9 @@ let isMusicPlaying = false;
 
 function setupMusicPlayer() {
   const musicConfig = portfolioData.music || {
-    trackTitle: "Lofi Study & Chill Beats",
-    artist: "Coding Vibes",
-    audioSrc: "assets/lofi-track.mp3"
+    trackTitle: "Chill Beat",
+    artist: "Lofi Vibes",
+    audioSrc: "assets/chill-beat.mp3"
   };
 
   const toggleBtn = document.getElementById("music-toggle-btn");

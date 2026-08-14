@@ -33,9 +33,9 @@ I love tackling complex algorithmic challenges, designing intuitive frontend int
   },
 
   music: {
-    trackTitle: "Lofi Study & Chill Beats",
-    artist: "Coding Vibes",
-    audioSrc: "assets/lofi-track.mp3"
+    trackTitle: "Chill Beat",
+    artist: "Lofi Vibes",
+    audioSrc: "assets/chill-beat.mp3"
   },
 
   learningSkills: [
