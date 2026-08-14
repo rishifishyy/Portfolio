@@ -137,7 +137,7 @@ I love to tackle algorithmic challenges and design interactive frontend interfac
     {
       id: "edu-mca",
       degree: "Master of Computer Applications (MCA)",
-      institution: "KIET Group of Institutions",
+      institution: "KIET Group of Institutions, Ghaziabad",
       duration: "Oct 2024 - July 2026",
       score: "CGPA: 7.43",
       icon: "🏛️",
@@ -146,7 +146,7 @@ I love to tackle algorithmic challenges and design interactive frontend interfac
     {
       id: "edu-bca",
       degree: "Bachelor of Computer Applications (BCA)",
-      institution: "I.T.S Mohan Nagar",
+      institution: "I.T.S Mohan Nagar, Ghaziabad",
       duration: "Oct 2021 - July 2024",
       score: "First Division",
       icon: "🏛️",
