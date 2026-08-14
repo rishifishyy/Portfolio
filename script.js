@@ -19,6 +19,7 @@ document.addEventListener("DOMContentLoaded", () => {
   setupModalHandlers();
   setupSmoothScroll();
   setupMusicPlayer();
+  initAmbientParticles();
 });
 
 /**
@@ -531,4 +532,89 @@ function escapeHtml(str) {
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#039;");
+}
+
+/**
+ * Ambient Floating Particles — lightweight canvas effect
+ * Creates tiny glowing dots that drift slowly for a chill lofi vibe
+ */
+function initAmbientParticles() {
+  const canvas = document.createElement("canvas");
+  canvas.id = "ambient-particles";
+  canvas.style.cssText =
+    "position:fixed;inset:0;pointer-events:none;z-index:0;opacity:0.7;";
+  
+  // Insert right after the ambient-bg div
+  const ambientBg = document.querySelector(".ambient-bg");
+  if (ambientBg) {
+    ambientBg.after(canvas);
+  } else {
+    document.body.prepend(canvas);
+  }
+
+  const ctx = canvas.getContext("2d");
+  let w, h;
+
+  function resize() {
+    w = canvas.width = window.innerWidth;
+    h = canvas.height = window.innerHeight;
+  }
+  resize();
+  window.addEventListener("resize", resize);
+
+  // Particle colors — matching the orb palette
+  const colors = [
+    "rgba(56, 189, 248, ",   // cyan
+    "rgba(129, 140, 248, ",  // indigo
+    "rgba(168, 85, 247, ",   // violet
+    "rgba(45, 212, 191, ",   // teal
+    "rgba(255, 255, 255, ",  // white sparkle
+  ];
+
+  // Create particles
+  const PARTICLE_COUNT = 45;
+  const particles = [];
+
+  for (let i = 0; i < PARTICLE_COUNT; i++) {
+    particles.push({
+      x: Math.random() * w,
+      y: Math.random() * h,
+      vx: (Math.random() - 0.5) * 0.3,
+      vy: (Math.random() - 0.5) * 0.3,
+      radius: Math.random() * 2 + 0.5,
+      color: colors[Math.floor(Math.random() * colors.length)],
+      alpha: Math.random() * 0.6 + 0.2,
+      alphaDir: (Math.random() - 0.5) * 0.005,
+    });
+  }
+
+  function animate() {
+    ctx.clearRect(0, 0, w, h);
+
+    for (const p of particles) {
+      // Move
+      p.x += p.vx;
+      p.y += p.vy;
+
+      // Wrap around edges
+      if (p.x < -10) p.x = w + 10;
+      if (p.x > w + 10) p.x = -10;
+      if (p.y < -10) p.y = h + 10;
+      if (p.y > h + 10) p.y = -10;
+
+      // Twinkle
+      p.alpha += p.alphaDir;
+      if (p.alpha > 0.8 || p.alpha < 0.1) p.alphaDir *= -1;
+
+      // Draw
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+      ctx.fillStyle = p.color + p.alpha.toFixed(2) + ")";
+      ctx.fill();
+    }
+
+    requestAnimationFrame(animate);
+  }
+
+  animate();
 }

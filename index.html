@@ -30,6 +30,14 @@
 </head>
 <body>
 
+  <!-- Ambient Chill Background Orbs -->
+  <div class="ambient-bg" aria-hidden="true">
+    <div class="ambient-orb orb-1"></div>
+    <div class="ambient-orb orb-2"></div>
+    <div class="ambient-orb orb-3"></div>
+    <div class="ambient-orb orb-4"></div>
+  </div>
+
   <!-- Top Glassmorphism Navigation Bar -->
   <header class="site-header">
     <div class="container header-inner">
@@ -90,7 +98,7 @@
 
       <!-- Action Buttons: Glare CTA + Social Links (LinkedIn, GitHub, Codolio) -->
       <div class="hero-actions">
-        <a href="mailto:rishinehra@example.com" class="cta-glare-btn" id="cta-contact-btn">
+        <button type="button" class="cta-glare-btn" id="cta-contact-btn" onclick="document.getElementById('contact')?.scrollIntoView({behavior:'smooth'})">
           <span>Get in touch</span>
           <span class="cta-icon">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -98,7 +106,7 @@
               <polyline points="12 5 19 12 12 19"></polyline>
             </svg>
           </span>
-        </a>
+        </button>
 
         <!-- LinkedIn -->
         <a href="https://www.linkedin.com/in/rishi-nehra-78274a1a0/" target="_blank" rel="noopener noreferrer" class="social-icon-btn" id="social-linkedin" title="LinkedIn Profile" aria-label="LinkedIn Profile">
