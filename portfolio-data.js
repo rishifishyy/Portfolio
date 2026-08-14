@@ -7,7 +7,7 @@ const portfolioData = {
     avatarUrl: "assets/avatar.png",
     summary: `I'm a passionate Full-Stack Developer focused on building clean, high-performance web applications and scalable software systems.
 
-I love tackling complex algorithmic challenges, designing intuitive frontend interfaces, and engineering reliable backend services. Always curious and actively learning new technologies.`,
+I love to tackle algorithmic challenges and design interactive frontend interfaces. Always curious and actively learning new technologies.`,
     contact: {
       email: "mailto:rishinehra@example.com",
       github: "https://github.com/rishifishyy",
@@ -19,7 +19,8 @@ I love tackling complex algorithmic challenges, designing intuitive frontend int
       "JavaScript (ES6+)",
       "Node.js",
       "Express.js",
-      "C++ / Data Structures",
+      "C++",
+      "Data Structures",
       "SQL",
       "MongoDB",
       "Tailwind CSS",
