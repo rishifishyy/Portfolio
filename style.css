@@ -1675,13 +1675,14 @@ body::before {
   width: 22px;
   height: 22px;
   border-radius: 50%;
-  background: #09090b;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border: 1px solid rgba(255, 255, 255, 0.18);
+  border: 1.5px solid rgba(255, 255, 255, 0.5);
   flex-shrink: 0;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 0 10px rgba(56, 189, 248, 0.35);
+  overflow: hidden;
+  background: #1e1e24;
 }
 
 .disc-vinyl-mini {
@@ -1689,13 +1690,22 @@ body::before {
   height: 100%;
   border-radius: 50%;
   background: 
-    radial-gradient(circle, #38bdf8 2px, transparent 3px),
-    repeating-radial-gradient(circle, #18181b 0, #18181b 2px, #27272a 2px, #27272a 3px);
+    radial-gradient(circle at center, #ffffff 2.5px, #09090b 3px, #09090b 5.5px, transparent 6px),
+    conic-gradient(
+      from 0deg,
+      #f8fafc 0deg,
+      #38bdf8 50deg,
+      #0f172a 100deg,
+      #f8fafc 180deg,
+      #818cf8 230deg,
+      #0f172a 280deg,
+      #f8fafc 360deg
+    );
   display: block;
 }
 
 .music-toggle-btn.playing .disc-vinyl-mini {
-  animation: spinMiniDisc 3s linear infinite;
+  animation: spinMiniDisc 2.2s linear infinite;
 }
 
 @keyframes spinMiniDisc {
