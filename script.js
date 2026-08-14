@@ -378,17 +378,21 @@ let isMusicPlaying = false;
 
 function setupMusicPlayer() {
   const musicConfig = portfolioData.music || {
-    trackTitle: "Just Chill & Code",
+    idleText: "Play Music",
+    trackTitle: "Just Chill and Code",
     artist: "Lofi Vibes",
     audioSrc: "assets/chill-beat.mp3"
   };
+
+  const idleText = musicConfig.idleText || "Play Music";
+  const playingText = musicConfig.trackTitle || "Just Chill and Code";
 
   const toggleBtn = document.getElementById("music-toggle-btn");
   const btnText = document.getElementById("music-btn-text");
   const playIcon = document.getElementById("nav-play-icon");
   const pauseIcon = document.getElementById("nav-pause-icon");
 
-  if (btnText) btnText.textContent = musicConfig.trackTitle;
+  if (btnText) btnText.textContent = idleText;
 
   try {
     bgAudio = new Audio(musicConfig.audioSrc);
@@ -439,6 +443,10 @@ function setupMusicPlayer() {
       } else {
         toggleBtn.classList.remove("playing");
       }
+    }
+
+    if (btnText) {
+      btnText.textContent = playing ? playingText : idleText;
     }
 
     if (playIcon && pauseIcon) {

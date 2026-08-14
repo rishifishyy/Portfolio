@@ -30,7 +30,8 @@ I love to tackle algorithmic challenges and design interactive frontend interfac
   },
 
   music: {
-    trackTitle: "Just Chill & Code",
+    idleText: "Play Music",
+    trackTitle: "Just Chill and Code",
     artist: "Lofi Vibes",
     audioSrc: "assets/chill-beat.mp3"
   },
