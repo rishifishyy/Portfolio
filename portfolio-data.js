@@ -32,6 +32,13 @@ I love tackling complex algorithmic challenges, designing intuitive frontend int
     ]
   },
 
+  music: {
+    trackTitle: "Lofi Coding & Chill Beats",
+    artist: "YouTube Music",
+    youtubeVideoId: "jfKfPfyJRdk", // Popular 24/7 Lofi Chill coding stream (or customize with any YouTube video/track ID)
+    youtubeMusicUrl: "https://music.youtube.com"
+  },
+
   learningSkills: [
     {
       id: "learn-java",

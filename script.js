@@ -18,6 +18,7 @@ document.addEventListener("DOMContentLoaded", () => {
   renderLearningSkills();
   setupModalHandlers();
   setupSmoothScroll();
+  setupMusicPlayer();
 });
 
 /**
@@ -417,6 +418,135 @@ function setupSmoothScroll() {
       }
     });
   });
+}
+
+/**
+ * 8. YouTube Music Player Controller
+ */
+let ytPlayer = null;
+let isMusicPlaying = false;
+let ytApiReady = false;
+
+function setupMusicPlayer() {
+  const musicConfig = portfolioData.music || {
+    trackTitle: "Lofi Coding & Chill Beats",
+    artist: "YouTube Music",
+    youtubeVideoId: "jfKfPfyJRdk",
+    youtubeMusicUrl: "https://music.youtube.com"
+  };
+
+  const toggleBtn = document.getElementById("music-toggle-btn");
+  const btnText = document.getElementById("music-btn-text");
+  const floatWidget = document.getElementById("music-float-widget");
+  const playBtn = document.getElementById("music-widget-playbtn");
+  const playIcon = document.getElementById("music-play-icon");
+  const pauseIcon = document.getElementById("music-pause-icon");
+  const widgetTitle = document.getElementById("music-widget-title");
+  const widgetStatus = document.getElementById("music-widget-status");
+  const widgetYtLink = document.getElementById("music-widget-ytlink");
+
+  if (widgetTitle) widgetTitle.textContent = musicConfig.trackTitle;
+  if (widgetYtLink && musicConfig.youtubeMusicUrl) widgetYtLink.href = musicConfig.youtubeMusicUrl;
+
+  // Load YouTube IFrame API asynchronously
+  if (!window.YT) {
+    const tag = document.createElement("script");
+    tag.src = "https://www.youtube.com/iframe_api";
+    const firstScriptTag = document.getElementsByTagName("script")[0];
+    firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+  }
+
+  window.onYouTubeIframeAPIReady = function() {
+    ytApiReady = true;
+    initYouTubePlayer(musicConfig.youtubeVideoId);
+  };
+
+  function initYouTubePlayer(videoId) {
+    try {
+      ytPlayer = new YT.Player("yt-player-target", {
+        height: "1",
+        width: "1",
+        videoId: videoId,
+        playerVars: {
+          autoplay: 0,
+          controls: 0,
+          loop: 1,
+          playlist: videoId,
+          playsinline: 1,
+          origin: window.location.origin
+        },
+        events: {
+          onReady: () => {
+            console.log("YouTube Music player ready.");
+          },
+          onStateChange: (event) => {
+            // YT.PlayerState.PLAYING = 1, PAUSED = 2, ENDED = 0
+            if (event.data === 1) {
+              setPlayingUI(true);
+            } else if (event.data === 2 || event.data === 0) {
+              setPlayingUI(false);
+            }
+          }
+        }
+      });
+    } catch (e) {
+      console.warn("YouTube player init warning:", e);
+    }
+  }
+
+  function toggleMusic() {
+    if (!ytPlayer || typeof ytPlayer.playVideo !== "function") {
+      // If player still initializing, retry
+      if (!ytApiReady && window.YT) {
+        initYouTubePlayer(musicConfig.youtubeVideoId);
+      }
+      // Provide immediate fallback feedback
+      setPlayingUI(!isMusicPlaying);
+      return;
+    }
+
+    if (isMusicPlaying) {
+      ytPlayer.pauseVideo();
+      setPlayingUI(false);
+    } else {
+      ytPlayer.playVideo();
+      setPlayingUI(true);
+    }
+  }
+
+  function setPlayingUI(playing) {
+    isMusicPlaying = playing;
+
+    if (toggleBtn) {
+      if (playing) {
+        toggleBtn.classList.add("playing");
+        if (btnText) btnText.textContent = "Pause Music";
+      } else {
+        toggleBtn.classList.remove("playing");
+        if (btnText) btnText.textContent = "Play Music";
+      }
+    }
+
+    if (floatWidget) {
+      if (playing) {
+        floatWidget.classList.add("visible", "playing");
+      } else {
+        floatWidget.classList.remove("playing");
+      }
+    }
+
+    if (playIcon && pauseIcon) {
+      playIcon.style.display = playing ? "none" : "block";
+      pauseIcon.style.display = playing ? "block" : "none";
+    }
+
+    if (widgetStatus) {
+      widgetStatus.textContent = playing ? "YouTube Music • Playing" : "YouTube Music • Paused";
+    }
+  }
+
+  if (toggleBtn) toggleBtn.addEventListener("click", toggleMusic);
+  if (playBtn) playBtn.addEventListener("click", toggleMusic);
 }
 
 /**

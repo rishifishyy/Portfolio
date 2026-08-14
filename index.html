@@ -48,13 +48,21 @@
         </ul>
       </nav>
 
-      <a href="#projects" class="nav-cta" id="header-cta">
-        <span>View Work</span>
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-          <line x1="7" y1="17" x2="17" y2="7"></line>
-          <polyline points="7 7 17 7 17 17"></polyline>
-        </svg>
-      </a>
+      <!-- YouTube Music Player Toggle -->
+      <button class="music-toggle-btn" id="music-toggle-btn" aria-label="Toggle YouTube Music playback" title="Play / Pause Lofi Music">
+        <span class="music-equalizer" id="music-equalizer">
+          <span class="eq-bar eq-bar-1"></span>
+          <span class="eq-bar eq-bar-2"></span>
+          <span class="eq-bar eq-bar-3"></span>
+        </span>
+        <span class="music-btn-text" id="music-btn-text">Play Music</span>
+        <span class="music-yt-badge">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 0C5.376 0 0 5.376 0 12s5.376 12 12 12 12-5.376 12-12S18.624 0 12 0zm-2 15.5v-7l6 3.5-6 3.5z"/>
+          </svg>
+          YT Music
+        </span>
+      </button>
     </div>
   </header>
 
@@ -270,6 +278,40 @@
       </div>
     </div>
   </footer>
+
+  <!-- Floating Glassmorphic YouTube Music Widget -->
+  <aside class="music-float-widget" id="music-float-widget" aria-label="Music Player">
+    <div class="music-widget-inner">
+      <div class="music-widget-disc" id="music-widget-disc">
+        <div class="disc-vinyl"></div>
+      </div>
+      <div class="music-widget-info">
+        <div class="music-widget-title" id="music-widget-title">Lofi Coding &amp; Chill Beats</div>
+        <div class="music-widget-status" id="music-widget-status">YouTube Music • Ready</div>
+      </div>
+      <div class="music-widget-controls">
+        <button class="music-widget-playbtn" id="music-widget-playbtn" aria-label="Play/Pause music">
+          <svg id="music-play-icon" width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+            <polygon points="5 3 19 12 5 21 5 3"></polygon>
+          </svg>
+          <svg id="music-pause-icon" width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style="display: none;">
+            <rect x="6" y="4" width="4" height="16"></rect>
+            <rect x="14" y="4" width="4" height="16"></rect>
+          </svg>
+        </button>
+        <a href="https://music.youtube.com" target="_blank" rel="noopener noreferrer" class="music-widget-ytlink" id="music-widget-ytlink" title="Open on YouTube Music">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 0C5.376 0 0 5.376 0 12s5.376 12 12 12 12-5.376 12-12S18.624 0 12 0zm-2 15.5v-7l6 3.5-6 3.5z"/>
+          </svg>
+        </a>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Invisible YouTube IFrame Container -->
+  <div id="youtube-player-host" style="position: fixed; width: 1px; height: 1px; bottom: 0; left: 0; opacity: 0.001; pointer-events: none; overflow: hidden;">
+    <div id="yt-player-target"></div>
+  </div>
 
   <!-- Scripts -->
   <script src="portfolio-data.js"></script>
