@@ -390,14 +390,10 @@ function setupMusicPlayer() {
 
   const toggleBtn = document.getElementById("music-toggle-btn");
   const btnText = document.getElementById("music-btn-text");
-  const floatWidget = document.getElementById("music-float-widget");
-  const playBtn = document.getElementById("music-widget-playbtn");
-  const playIcon = document.getElementById("music-play-icon");
-  const pauseIcon = document.getElementById("music-pause-icon");
-  const widgetTitle = document.getElementById("music-widget-title");
-  const widgetStatus = document.getElementById("music-widget-status");
+  const playIcon = document.getElementById("nav-play-icon");
+  const pauseIcon = document.getElementById("nav-pause-icon");
 
-  if (widgetTitle) widgetTitle.textContent = musicConfig.trackTitle;
+  if (btnText) btnText.textContent = musicConfig.trackTitle;
 
   try {
     bgAudio = new Audio(musicConfig.audioSrc);
@@ -445,18 +441,8 @@ function setupMusicPlayer() {
     if (toggleBtn) {
       if (playing) {
         toggleBtn.classList.add("playing");
-        if (btnText) btnText.textContent = "Just Chill & Code";
       } else {
         toggleBtn.classList.remove("playing");
-        if (btnText) btnText.textContent = "Play Music";
-      }
-    }
-
-    if (floatWidget) {
-      if (playing) {
-        floatWidget.classList.add("visible", "playing");
-      } else {
-        floatWidget.classList.remove("playing");
       }
     }
 
@@ -464,14 +450,9 @@ function setupMusicPlayer() {
       playIcon.style.display = playing ? "none" : "block";
       pauseIcon.style.display = playing ? "block" : "none";
     }
-
-    if (widgetStatus) {
-      widgetStatus.textContent = playing ? "Now Playing" : "Paused";
-    }
   }
 
   if (toggleBtn) toggleBtn.addEventListener("click", toggleMusic);
-  if (playBtn) playBtn.addEventListener("click", toggleMusic);
 }
 
 function escapeHtml(str) {

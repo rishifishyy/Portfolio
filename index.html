@@ -51,12 +51,24 @@
       </nav>
 
       <button class="music-toggle-btn" id="music-toggle-btn" aria-label="Toggle music playback" title="Play / Pause Music">
+        <span class="nav-music-disc" id="nav-music-disc">
+          <span class="disc-vinyl-mini"></span>
+        </span>
         <span class="music-equalizer" id="music-equalizer">
           <span class="eq-bar eq-bar-1"></span>
           <span class="eq-bar eq-bar-2"></span>
           <span class="eq-bar eq-bar-3"></span>
         </span>
-        <span class="music-btn-text" id="music-btn-text">Play Music</span>
+        <span class="music-btn-text" id="music-btn-text">Just Chill &amp; Code</span>
+        <span class="music-state-icon">
+          <svg id="nav-play-icon" width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+            <polygon points="5 3 19 12 5 21 5 3"></polygon>
+          </svg>
+          <svg id="nav-pause-icon" width="12" height="12" viewBox="0 0 24 24" fill="currentColor" style="display: none;">
+            <rect x="6" y="4" width="4" height="16"></rect>
+            <rect x="14" y="4" width="4" height="16"></rect>
+          </svg>
+        </span>
       </button>
     </div>
   </header>
@@ -252,29 +264,6 @@
       </div>
     </div>
   </footer>
-
-  <aside class="music-float-widget" id="music-float-widget" aria-label="Music Player">
-    <div class="music-widget-inner">
-      <div class="music-widget-disc" id="music-widget-disc">
-        <div class="disc-vinyl"></div>
-      </div>
-      <div class="music-widget-info">
-        <div class="music-widget-title" id="music-widget-title">Just Chill &amp; Code</div>
-        <div class="music-widget-status" id="music-widget-status">Now Playing</div>
-      </div>
-      <div class="music-widget-controls">
-        <button class="music-widget-playbtn" id="music-widget-playbtn" aria-label="Play or pause music">
-          <svg id="music-play-icon" width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-            <polygon points="5 3 19 12 5 21 5 3"></polygon>
-          </svg>
-          <svg id="music-pause-icon" width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style="display: none;">
-            <rect x="6" y="4" width="4" height="16"></rect>
-            <rect x="14" y="4" width="4" height="16"></rect>
-          </svg>
-        </button>
-      </div>
-    </div>
-  </aside>
 
   <script src="portfolio-data.js"></script>
   <script src="script.js"></script>

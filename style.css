@@ -1632,3 +1632,127 @@ body::before {
     display: none; 
   }
 }
+
+.music-toggle-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.45rem 0.95rem;
+  background: rgba(24, 24, 27, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 9999px;
+  color: var(--text-secondary);
+  font-family: inherit;
+  font-size: 0.825rem;
+  font-weight: 600;
+  cursor: pointer;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  user-select: none;
+}
+
+.music-toggle-btn:hover {
+  background: rgba(39, 39, 42, 0.85);
+  border-color: rgba(255, 255, 255, 0.25);
+  color: var(--text-primary);
+  transform: translateY(-1px);
+}
+
+.music-toggle-btn:active {
+  transform: scale(0.97);
+}
+
+.music-toggle-btn.playing {
+  background: rgba(56, 189, 248, 0.12);
+  border-color: rgba(56, 189, 248, 0.4);
+  color: var(--accent-cyan);
+  box-shadow: 0 0 20px rgba(56, 189, 248, 0.15);
+}
+
+.nav-music-disc {
+  position: relative;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #09090b;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  flex-shrink: 0;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+}
+
+.disc-vinyl-mini {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: 
+    radial-gradient(circle, #38bdf8 2px, transparent 3px),
+    repeating-radial-gradient(circle, #18181b 0, #18181b 2px, #27272a 2px, #27272a 3px);
+  display: block;
+}
+
+.music-toggle-btn.playing .disc-vinyl-mini {
+  animation: spinMiniDisc 3s linear infinite;
+}
+
+@keyframes spinMiniDisc {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.music-equalizer {
+  display: inline-flex;
+  align-items: flex-end;
+  gap: 2.5px;
+  height: 12px;
+}
+
+.eq-bar {
+  width: 2.5px;
+  height: 3px;
+  background: currentColor;
+  border-radius: 9999px;
+  transition: height 0.2s ease;
+}
+
+.music-toggle-btn.playing .eq-bar-1 {
+  animation: eqBounce1 0.75s ease-in-out infinite alternate;
+}
+
+.music-toggle-btn.playing .eq-bar-2 {
+  animation: eqBounce2 0.6s ease-in-out infinite alternate 0.15s;
+}
+
+.music-toggle-btn.playing .eq-bar-3 {
+  animation: eqBounce3 0.85s ease-in-out infinite alternate 0.3s;
+}
+
+@keyframes eqBounce1 {
+  0% { height: 3px; }
+  100% { height: 12px; }
+}
+
+@keyframes eqBounce2 {
+  0% { height: 4px; }
+  100% { height: 14px; }
+}
+
+@keyframes eqBounce3 {
+  0% { height: 2px; }
+  100% { height: 10px; }
+}
+
+.music-btn-text {
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+}
+
+.music-state-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.8;
+}
