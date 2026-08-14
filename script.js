@@ -250,10 +250,6 @@ function renderLearningSkills() {
           <div class="learning-title-wrap">
             <div class="learning-title-row">
               <h3 class="learning-title">${escapeHtml(skill.name)}</h3>
-              <span class="learning-badge">
-                <span class="learning-pulse-dot"></span>
-                In Progress
-              </span>
             </div>
             <span class="learning-category">${escapeHtml(skill.category)}</span>
           </div>
