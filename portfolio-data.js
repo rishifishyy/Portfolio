@@ -128,6 +128,27 @@ I love tackling complex algorithmic challenges, designing intuitive frontend int
         github: "https://github.com/rishifishyy"
       }
     }
+  ],
+
+  education: [
+    {
+      id: "edu-mca",
+      degree: "Master of Computer Applications (MCA)",
+      institution: "KIET Group of Institutions",
+      duration: "Oct 2024 - July 2026",
+      score: "CGPA: 7.43",
+      icon: "🎓",
+      description: "Pursuing advanced studies in software systems, database engineering, computer algorithms, and modern application development."
+    },
+    {
+      id: "edu-bca",
+      degree: "Bachelor of Computer Applications (BCA)",
+      institution: "I.T.S Mohan Nagar",
+      duration: "Oct 2021 - July 2024",
+      score: "First Division",
+      icon: "🏛️",
+      description: "Graduated with First Division honors, building strong foundational mastery in data structures, web technologies, and database management."
+    }
   ]
 };
 

@@ -14,6 +14,7 @@ document.addEventListener("DOMContentLoaded", () => {
   renderSkills();
   renderExperience();
   renderProjects();
+  renderEducation();
   renderLearningSkills();
   setupModalHandlers();
   setupSmoothScroll();
@@ -223,7 +224,43 @@ function renderProjects() {
 }
 
 /**
- * 5. Render Skills I Am Learning
+ * 5. Render Education
+ */
+function renderEducation() {
+  const container = document.getElementById("education-list");
+  if (!container || !portfolioData.education) return;
+
+  container.innerHTML = portfolioData.education.map(edu => {
+    return `
+      <div class="education-card" id="${escapeHtml(edu.id)}">
+        <div class="education-header-row">
+          <div class="education-icon-box">
+            <span class="education-icon">${edu.icon || '🎓'}</span>
+          </div>
+          
+          <div class="education-meta">
+            <div class="education-title-row">
+              <div class="education-degree-group">
+                <h3 class="education-degree">${escapeHtml(edu.degree)}</h3>
+                <span class="education-institution">${escapeHtml(edu.institution)}</span>
+              </div>
+              <div class="education-score-chip">${escapeHtml(edu.score)}</div>
+            </div>
+            
+            <div class="education-duration-row">
+              <span class="education-duration">${escapeHtml(edu.duration)}</span>
+            </div>
+            
+            <p class="education-desc">${escapeHtml(edu.description)}</p>
+          </div>
+        </div>
+      </div>
+    `;
+  }).join("");
+}
+
+/**
+ * 6. Render Skills I Am Learning
  */
 function renderLearningSkills() {
   const container = document.getElementById("learning-list");
