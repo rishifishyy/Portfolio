@@ -105,11 +105,15 @@ function renderExperience() {
       .map(t => `<span class="tech-tag">${escapeHtml(t)}</span>`)
       .join("");
 
+    const logoContent = exp.logoUrl 
+      ? `<img src="${escapeHtml(exp.logoUrl)}" alt="${escapeHtml(exp.company)}" class="company-logo-img">`
+      : escapeHtml(exp.logoText || exp.company.substring(0, 2).toUpperCase());
+
     return `
       <div class="experience-card" id="${escapeHtml(exp.id)}">
         <div class="experience-header-row">
           <div class="company-badge" style="background: ${exp.logoColor || 'var(--bg-muted)'};">
-            ${escapeHtml(exp.logoText || exp.company.substring(0, 2).toUpperCase())}
+            ${logoContent}
           </div>
           
           <div class="experience-meta">

@@ -499,8 +499,8 @@ body::before {
 }
 
 .company-badge {
-  width: 3.25rem;
-  height: 3.25rem;
+  width: 3.5rem;
+  height: 3.5rem;
   border-radius: 1rem;
   display: flex;
   align-items: center;
@@ -509,7 +509,17 @@ body::before {
   font-size: 1.1rem;
   color: #ffffff;
   flex-shrink: 0;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  overflow: hidden;
+  border: 1px solid var(--border-card);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+  background-color: #0b0b0e;
+}
+
+.company-logo-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
 }
 
 .experience-meta {

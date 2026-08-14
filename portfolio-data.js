@@ -35,34 +35,26 @@ I love tackling complex algorithmic challenges, designing intuitive frontend int
 
   experiences: [
     {
-      id: "e1",
-      company: "Full Stack Development & Open Source",
-      role: "Software Developer",
-      duration: "Present",
-      summary: "Building modern responsive web apps, interactive developer utilities, and contributing to open source projects across the ecosystem.",
-      technologies: ["React", "TypeScript", "Node.js", "Tailwind CSS"],
-      logoText: "RN",
-      logoColor: "linear-gradient(135deg, #38bdf8, #818cf8)"
+      id: "exp-tcs",
+      company: "Tata Consultancy Services (TCS)",
+      role: "System Engineer",
+      duration: "Placed • Awaiting Joining",
+      summary: "Placed at TCS as a System Engineer (awaiting joining/onboarding). Preparing for enterprise software development, system architecture, and engineering workflows.",
+      technologies: ["System Engineering", "C++", "SQL", "Software Development", "Problem Solving"],
+      logoUrl: "assets/tcs.png",
+      logoText: "TCS",
+      logoColor: "#000000"
     },
     {
-      id: "e2",
-      company: "Competitive Programming & Problem Solving",
-      role: "Active Coder",
-      duration: "2023 - Present",
-      summary: "Consistently solving Data Structures & Algorithms challenges across multiple competitive coding platforms, tracked live on Codolio.",
-      technologies: ["C++", "Algorithms", "DSA", "Problem Solving"],
-      logoText: "CP",
-      logoColor: "linear-gradient(135deg, #10b981, #06b6d4)"
-    },
-    {
-      id: "e3",
-      company: "Independent Web Projects",
-      role: "Frontend Engineer",
-      duration: "2024",
-      summary: "Engineered scalable single-page applications with performant state management, responsive UI/UX, and robust API integrations.",
-      technologies: ["React.js", "JavaScript", "HTML5/CSS3", "REST APIs"],
-      logoText: "DEV",
-      logoColor: "linear-gradient(135deg, #f59e0b, #ec4899)"
+      id: "exp-oasis",
+      company: "Oasis Infobyte",
+      role: "Web Development Intern",
+      duration: "Jun 2025 - Jul 2025",
+      summary: "Worked on various full-stack and frontend web projects that helped master the MERN stack (MongoDB, Express.js, React.js, Node.js), responsive user interfaces, and API integrations.",
+      technologies: ["React.js", "Node.js", "Express.js", "MongoDB", "JavaScript", "HTML5/CSS3"],
+      logoUrl: "assets/oasis-infobyte.png",
+      logoText: "OI",
+      logoColor: "#101820"
     }
   ],
 
