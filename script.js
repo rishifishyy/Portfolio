@@ -127,9 +127,7 @@ function renderProjects() {
   const container = document.getElementById("projects-grid");
   if (!container || !portfolioData.projects) return;
 
-  container.innerHTML = portfolioData.projects.map((project, index) => {
-    const staggerClass = (index % 4 === 1) ? 'bento-stagger-1' : (index % 4 === 3) ? 'bento-stagger-3' : '';
-
+  container.innerHTML = portfolioData.projects.map((project) => {
     const visibleTech = (project.techStack || []).slice(0, 4);
     const overflowCount = (project.techStack || []).length - visibleTech.length;
 
@@ -152,7 +150,7 @@ function renderProjects() {
 
     return `
       <article 
-        class="${cardClass} ${staggerClass}" 
+        class="${cardClass}" 
         data-project-id="${escapeHtml(project.id)}"
         tabindex="0"
         role="button"

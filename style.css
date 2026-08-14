@@ -879,11 +879,8 @@ body::before {
   .projects-bento-grid {
     grid-template-columns: repeat(2, 1fr);
     gap: 2rem;
+    align-items: stretch;
   }
-
-  .bento-stagger-1 { margin-top: 2.25rem; }
-  .bento-stagger-2 { margin-top: 0.5rem; }
-  .bento-stagger-3 { margin-top: 1.5rem; }
 }
 
 .bento-project-card {
