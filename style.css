@@ -557,6 +557,21 @@ body::before {
   color: var(--text-primary);
   letter-spacing: -0.025em;
   line-height: 1.15;
+  cursor: pointer;
+  display: inline-block;
+  user-select: none;
+  transition: text-shadow 0.3s ease, color 0.3s ease;
+}
+
+.hero-name:hover {
+  color: #ffffff;
+  text-shadow: 0 0 20px rgba(56, 189, 248, 0.5), 0 0 35px rgba(129, 140, 248, 0.25);
+}
+
+.scramble-char {
+  color: var(--accent-cyan);
+  font-family: var(--font-mono);
+  font-weight: 700;
 }
 
 .hero-tagline {
