@@ -541,7 +541,7 @@ function setupMusicPlayer() {
     }
 
     if (widgetStatus) {
-      widgetStatus.textContent = playing ? "YouTube Music • Playing" : "YouTube Music • Paused";
+      widgetStatus.textContent = playing ? "Now Playing" : "Paused";
     }
   }
 
