@@ -428,7 +428,7 @@ let isMusicPlaying = false;
 
 function setupMusicPlayer() {
   const musicConfig = portfolioData.music || {
-    trackTitle: "Chill & Code",
+    trackTitle: "Just Chill & Code",
     artist: "Lofi Vibes",
     audioSrc: "assets/chill-beat.mp3"
   };
@@ -491,7 +491,7 @@ function setupMusicPlayer() {
     if (toggleBtn) {
       if (playing) {
         toggleBtn.classList.add("playing");
-        if (btnText) btnText.textContent = "Chill & Code";
+        if (btnText) btnText.textContent = "Just Chill & Code";
       } else {
         toggleBtn.classList.remove("playing");
         if (btnText) btnText.textContent = "Play Music";
