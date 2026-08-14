@@ -421,18 +421,16 @@ function setupSmoothScroll() {
 }
 
 /**
- * 8. YouTube Music Player Controller
+ * 8. HTML5 Background Music Player Controller
  */
-let ytPlayer = null;
+let bgAudio = null;
 let isMusicPlaying = false;
-let ytApiReady = false;
 
 function setupMusicPlayer() {
   const musicConfig = portfolioData.music || {
-    trackTitle: "Lofi Coding & Chill Beats",
-    artist: "YouTube Music",
-    youtubeVideoId: "jfKfPfyJRdk",
-    youtubeMusicUrl: "https://music.youtube.com"
+    trackTitle: "Lofi Study & Chill Beats",
+    artist: "Coding Vibes",
+    audioSrc: "assets/lofi-track.mp3"
   };
 
   const toggleBtn = document.getElementById("music-toggle-btn");
@@ -443,74 +441,47 @@ function setupMusicPlayer() {
   const pauseIcon = document.getElementById("music-pause-icon");
   const widgetTitle = document.getElementById("music-widget-title");
   const widgetStatus = document.getElementById("music-widget-status");
-  const widgetYtLink = document.getElementById("music-widget-ytlink");
 
   if (widgetTitle) widgetTitle.textContent = musicConfig.trackTitle;
-  if (widgetYtLink && musicConfig.youtubeMusicUrl) widgetYtLink.href = musicConfig.youtubeMusicUrl;
 
-  // Load YouTube IFrame API asynchronously
-  if (!window.YT) {
-    const tag = document.createElement("script");
-    tag.src = "https://www.youtube.com/iframe_api";
-    const firstScriptTag = document.getElementsByTagName("script")[0];
-    firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
-  }
+  // Initialize native HTML5 Audio element
+  try {
+    bgAudio = new Audio(musicConfig.audioSrc);
+    bgAudio.loop = true;
+    bgAudio.volume = 0.75;
 
-  window.onYouTubeIframeAPIReady = function() {
-    ytApiReady = true;
-    initYouTubePlayer(musicConfig.youtubeVideoId);
-  };
-
-  function initYouTubePlayer(videoId) {
-    try {
-      ytPlayer = new YT.Player("yt-player-target", {
-        height: "1",
-        width: "1",
-        videoId: videoId,
-        playerVars: {
-          autoplay: 0,
-          controls: 0,
-          loop: 1,
-          playlist: videoId,
-          playsinline: 1,
-          origin: window.location.origin
-        },
-        events: {
-          onReady: () => {
-            console.log("YouTube Music player ready.");
-          },
-          onStateChange: (event) => {
-            // YT.PlayerState.PLAYING = 1, PAUSED = 2, ENDED = 0
-            if (event.data === 1) {
-              setPlayingUI(true);
-            } else if (event.data === 2 || event.data === 0) {
-              setPlayingUI(false);
-            }
-          }
-        }
-      });
-    } catch (e) {
-      console.warn("YouTube player init warning:", e);
-    }
+    bgAudio.addEventListener("play", () => setPlayingUI(true));
+    bgAudio.addEventListener("pause", () => setPlayingUI(false));
+    bgAudio.addEventListener("ended", () => setPlayingUI(false));
+    bgAudio.addEventListener("error", (err) => {
+      console.warn("Audio loading notice:", err);
+    });
+  } catch (e) {
+    console.error("Audio init error:", e);
   }
 
   function toggleMusic() {
-    if (!ytPlayer || typeof ytPlayer.playVideo !== "function") {
-      // If player still initializing, retry
-      if (!ytApiReady && window.YT) {
-        initYouTubePlayer(musicConfig.youtubeVideoId);
-      }
-      // Provide immediate fallback feedback
-      setPlayingUI(!isMusicPlaying);
-      return;
+    if (!bgAudio) {
+      bgAudio = new Audio(musicConfig.audioSrc);
+      bgAudio.loop = true;
+      bgAudio.volume = 0.75;
     }
 
     if (isMusicPlaying) {
-      ytPlayer.pauseVideo();
+      bgAudio.pause();
       setPlayingUI(false);
     } else {
-      ytPlayer.playVideo();
-      setPlayingUI(true);
+      const playPromise = bgAudio.play();
+      if (playPromise !== undefined) {
+        playPromise
+          .then(() => {
+            setPlayingUI(true);
+          })
+          .catch((error) => {
+            console.warn("Audio playback prevented:", error);
+            setPlayingUI(false);
+          });
+      }
     }
   }
 
