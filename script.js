@@ -14,7 +14,7 @@ document.addEventListener("DOMContentLoaded", () => {
   renderSkills();
   renderExperience();
   renderProjects();
-  renderAchievements();
+  renderLearningSkills();
   setupModalHandlers();
   setupSmoothScroll();
 });
@@ -223,27 +223,31 @@ function renderProjects() {
 }
 
 /**
- * 5. Render Achievements & Contributions
+ * 5. Render Skills I Am Learning
  */
-function renderAchievements() {
-  const container = document.getElementById("achievements-list");
-  if (!container || !portfolioData.achievements) return;
+function renderLearningSkills() {
+  const container = document.getElementById("learning-list");
+  if (!container || !portfolioData.learningSkills) return;
 
-  container.innerHTML = portfolioData.achievements.map(item => {
-    const linkHtml = item.link 
-      ? `<a href="${escapeHtml(item.link)}" target="_blank" rel="noopener noreferrer" class="achievement-link">View</a>` 
-      : "";
-
+  container.innerHTML = portfolioData.learningSkills.map(skill => {
     return `
-      <div class="achievement-row" id="${escapeHtml(item.id)}">
-        <div class="achievement-year-badge">${escapeHtml(item.year)}</div>
-        <div class="achievement-content">
-          <div class="achievement-header">
-            <h3 class="achievement-title">${escapeHtml(item.title)}</h3>
-            ${linkHtml}
+      <div class="learning-card" id="${escapeHtml(skill.id)}">
+        <div class="learning-header">
+          <div class="learning-icon-box" style="background: ${skill.color || 'var(--bg-muted)'};">
+            <span class="learning-icon">${skill.icon || '🚀'}</span>
           </div>
-          <p class="achievement-desc">${escapeHtml(item.context)}</p>
+          <div class="learning-title-wrap">
+            <div class="learning-title-row">
+              <h3 class="learning-title">${escapeHtml(skill.name)}</h3>
+              <span class="learning-badge">
+                <span class="learning-pulse-dot"></span>
+                In Progress
+              </span>
+            </div>
+            <span class="learning-category">${escapeHtml(skill.category)}</span>
+          </div>
         </div>
+        <p class="learning-desc">${escapeHtml(skill.description)}</p>
       </div>
     `;
   }).join("");

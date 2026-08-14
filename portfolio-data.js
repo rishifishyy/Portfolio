@@ -20,7 +20,6 @@ I love tackling complex algorithmic challenges, designing intuitive frontend int
     },
     skills: [
       "React.js",
-      "Next.js",
       "JavaScript (ES6+)",
       "Node.js",
       "Express.js",
@@ -32,6 +31,33 @@ I love tackling complex algorithmic challenges, designing intuitive frontend int
       "REST APIs"
     ]
   },
+
+  learningSkills: [
+    {
+      id: "learn-java",
+      name: "Java",
+      category: "Backend & OOP",
+      description: "Deepening concepts in Object-Oriented Architecture, multithreading, data structures, and enterprise backend engineering.",
+      icon: "☕",
+      color: "linear-gradient(135deg, #f97316, #ef4444)"
+    },
+    {
+      id: "learn-nextjs",
+      name: "Next.js",
+      category: "Full Stack Framework",
+      description: "Mastering App Router, React Server Components (RSC), server actions, optimized routing, and edge rendering.",
+      icon: "▲",
+      color: "linear-gradient(135deg, #38bdf8, #818cf8)"
+    },
+    {
+      id: "learn-devops",
+      name: "DevOps",
+      category: "Cloud & CI/CD Pipelines",
+      description: "Exploring containerization with Docker, automated CI/CD GitHub Actions, Linux administration, and scalable cloud deployment.",
+      icon: "⚡",
+      color: "linear-gradient(135deg, #10b981, #06b6d4)"
+    }
+  ],
 
   experiences: [
     {
@@ -101,30 +127,6 @@ I love tackling complex algorithmic challenges, designing intuitive frontend int
       links: {
         github: "https://github.com/rishifishyy"
       }
-    }
-  ],
-
-  achievements: [
-    {
-      id: "a1",
-      year: "2024",
-      title: "Codolio Profile & Problem Solving Milestones",
-      context: "Actively solving competitive programming problems and tracking progress across data structures & algorithms on Codolio.",
-      link: "https://codolio.com/profile/rishifishyy"
-    },
-    {
-      id: "a2",
-      year: "2024",
-      title: "Open Source Contributions & Projects",
-      context: "Building and sharing open-source developer tools, repositories, and modern web application templates on GitHub.",
-      link: "https://github.com/rishifishyy"
-    },
-    {
-      id: "a3",
-      year: "2024",
-      title: "Continuous Learning & Software Engineering",
-      context: "Deepening expertise in full-stack architecture, modern frontend frameworks, and backend system design.",
-      link: null
     }
   ]
 };
