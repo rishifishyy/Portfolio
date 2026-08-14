@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bgDM" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1e1b4b"/>
+      <stop offset="60%" stop-color="#0f172a"/>
+      <stop offset="100%" stop-color="#020617"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="500" fill="url(#bgDM)"/>
+  
+  <!-- Candlesticks / Depth Chart Matrix -->
+  <line x1="80" y1="380" x2="720" y2="380" stroke="#334155" stroke-width="1.5"/>
+  <line x1="80" y1="80" x2="80" y2="380" stroke="#334155" stroke-width="1.5"/>
+
+  <!-- Candlesticks bars -->
+  <!-- Candle 1 -->
+  <line x1="140" y1="200" x2="140" y2="340" stroke="#10b981" stroke-width="2"/>
+  <rect x="125" y="240" width="30" height="70" fill="#10b981" rx="4"/>
+
+  <!-- Candle 2 -->
+  <line x1="220" y1="180" x2="220" y2="300" stroke="#10b981" stroke-width="2"/>
+  <rect x="205" y="200" width="30" height="80" fill="#10b981" rx="4"/>
+
+  <!-- Candle 3 (Red) -->
+  <line x1="300" y1="160" x2="300" y2="280" stroke="#f43f5e" stroke-width="2"/>
+  <rect x="285" y="190" width="30" height="60" fill="#f43f5e" rx="4"/>
+
+  <!-- Candle 4 -->
+  <line x1="380" y1="130" x2="380" y2="240" stroke="#10b981" stroke-width="2"/>
+  <rect x="365" y="150" width="30" height="70" fill="#10b981" rx="4"/>
+
+  <!-- Candle 5 Breakout -->
+  <line x1="460" y1="90" x2="460" y2="210" stroke="#38bdf8" stroke-width="2"/>
+  <rect x="445" y="110" width="30" height="80" fill="#38bdf8" rx="4"/>
+
+  <!-- Glowing Trend Curve -->
+  <path d="M 140 270 Q 250 250 300 220 T 460 140 T 650 90" stroke="#38bdf8" stroke-width="3" fill="none"/>
+
+  <!-- Top Metric HUD -->
+  <rect x="520" y="70" width="220" height="90" rx="14" fill="#0f172a" stroke="#6366f1" stroke-width="1.5"/>
+  <text x="540" y="100" fill="#94a3b8" font-family="sans-serif" font-size="12">SOL/USDC Velocity</text>
+  <text x="540" y="130" fill="#38bdf8" font-family="monospace" font-size="20" font-weight="bold">$218.42</text>
+  <text x="680" y="130" fill="#10b981" font-family="sans-serif" font-size="13" font-weight="bold">+14.2%</text>
+</svg>

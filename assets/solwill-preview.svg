@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bgSW" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#180b29"/>
+      <stop offset="50%" stop-color="#0a0518"/>
+      <stop offset="100%" stop-color="#020108"/>
+    </linearGradient>
+    <linearGradient id="solanaGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#9945FF"/>
+      <stop offset="100%" stop-color="#14F195"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="500" fill="url(#bgSW)"/>
+  
+  <!-- Glowing Background Grid lines -->
+  <circle cx="400" cy="250" r="280" stroke="#9945FF" stroke-width="1" stroke-dasharray="6 6" fill="none" opacity="0.2"/>
+  <circle cx="400" cy="250" r="180" stroke="#14F195" stroke-width="1" stroke-dasharray="4 4" fill="none" opacity="0.3"/>
+
+  <!-- Protocol Card -->
+  <rect x="180" y="80" width="440" height="340" rx="24" fill="#120a24" stroke="url(#solanaGrad)" stroke-width="2"/>
+  
+  <!-- Shield Vault Icon -->
+  <circle cx="400" cy="150" r="36" fill="#1c0f38" stroke="#14F195" stroke-width="2"/>
+  <path d="M400 130 L418 140 V158 C418 170, 400 178, 400 178 C400 178, 382 170, 382 158 V140 Z" fill="url(#solanaGrad)"/>
+
+  <!-- Card Info -->
+  <text x="400" y="215" fill="#f8fafc" font-family="sans-serif" font-size="20" font-weight="bold" text-anchor="middle">SolWill Vault #7829</text>
+  <text x="400" y="238" fill="#a78bfa" font-family="sans-serif" font-size="12" text-anchor="middle">Anchor Smart Contract • Autonomous Proof-of-Life</text>
+
+  <!-- Split Allocation Pill -->
+  <rect x="220" y="260" width="360" height="50" rx="12" fill="#1e113a" stroke="#372463" stroke-width="1"/>
+  <text x="240" y="290" fill="#e2e8f0" font-family="sans-serif" font-size="13" font-weight="600">Heir Allocation</text>
+  <text x="560" y="290" fill="#14F195" font-family="monospace" font-size="13" font-weight="bold" text-anchor="end">4 Heirs (100.0%)</text>
+
+  <!-- Hold to Check In CTA Bar -->
+  <rect x="220" y="330" width="360" height="56" rx="16" fill="url(#solanaGrad)"/>
+  <text x="400" y="365" fill="#090514" font-family="sans-serif" font-size="15" font-weight="bold" text-anchor="middle">⏱ Hold to Check-in (Alive State)</text>
+</svg>

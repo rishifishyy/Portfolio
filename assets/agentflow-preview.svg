@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bgAF" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#022c22"/>
+      <stop offset="60%" stop-color="#061f18"/>
+      <stop offset="100%" stop-color="#020617"/>
+    </linearGradient>
+    <linearGradient id="aiGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#10b981"/>
+      <stop offset="100%" stop-color="#06b6d4"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="500" fill="url(#bgAF)"/>
+  <!-- DAG Nodes Graph -->
+  <line x1="200" y1="250" x2="380" y2="170" stroke="#10b981" stroke-width="2" stroke-dasharray="4 4"/>
+  <line x1="200" y1="250" x2="380" y2="330" stroke="#10b981" stroke-width="2" stroke-dasharray="4 4"/>
+  <line x1="380" y1="170" x2="580" y2="250" stroke="#06b6d4" stroke-width="2"/>
+  <line x1="380" y1="330" x2="580" y2="250" stroke="#06b6d4" stroke-width="2"/>
+
+  <!-- Node 1: Planner Agent -->
+  <rect x="110" y="210" width="180" height="80" rx="16" fill="#064e3b" stroke="#10b981" stroke-width="2"/>
+  <circle cx="140" cy="250" r="14" fill="#10b981"/>
+  <text x="170" y="245" fill="#f0fdf4" font-family="sans-serif" font-size="13" font-weight="bold">Planner Agent</text>
+  <text x="170" y="265" fill="#a7f3d0" font-family="monospace" font-size="11">DAG Tree Gen</text>
+
+  <!-- Node 2: Tool Runner -->
+  <rect x="300" y="130" width="180" height="80" rx="16" fill="#042f2e" stroke="#06b6d4" stroke-width="1.5"/>
+  <text x="390" y="165" fill="#f0fdf4" font-family="sans-serif" font-size="13" font-weight="bold" text-anchor="middle">Coder Subagent</text>
+  <text x="390" y="185" fill="#67e8f9" font-family="monospace" font-size="11" text-anchor="middle">AST Parsing</text>
+
+  <!-- Node 3: Test Agent -->
+  <rect x="300" y="290" width="180" height="80" rx="16" fill="#042f2e" stroke="#06b6d4" stroke-width="1.5"/>
+  <text x="390" y="325" fill="#f0fdf4" font-family="sans-serif" font-size="13" font-weight="bold" text-anchor="middle">Verifier Agent</text>
+  <text x="390" y="345" fill="#67e8f9" font-family="monospace" font-size="11" text-anchor="middle">Unit & E2E Pass</text>
+
+  <!-- Node 4: Output Deployment -->
+  <rect x="520" y="210" width="190" height="80" rx="16" fill="#064e3b" stroke="#10b981" stroke-width="2"/>
+  <text x="615" y="245" fill="#f0fdf4" font-family="sans-serif" font-size="13" font-weight="bold" text-anchor="middle">Deploy Runtime</text>
+  <text x="615" y="265" fill="#34d399" font-family="monospace" font-size="11" text-anchor="middle">✅ Live on Edge</text>
+</svg>

@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="100%" height="100%">
+  <defs>
+    <linearGradient id="avatarGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1e293b"/>
+      <stop offset="50%" stop-color="#0f172a"/>
+      <stop offset="100%" stop-color="#020617"/>
+    </linearGradient>
+    <linearGradient id="accentGlow" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38bdf8"/>
+      <stop offset="100%" stop-color="#818cf8"/>
+    </linearGradient>
+  </defs>
+  <rect width="400" height="400" fill="url(#avatarGrad)" rx="200"/>
+  <!-- Ambient subtle rings -->
+  <circle cx="200" cy="200" r="180" stroke="#334155" stroke-width="2" stroke-dasharray="8 8" fill="none" opacity="0.4"/>
+  <circle cx="200" cy="200" r="150" stroke="#475569" stroke-width="1" fill="none" opacity="0.3"/>
+  <!-- Stylized Developer Avatar Silhouette -->
+  <!-- Head & Hair -->
+  <circle cx="200" cy="140" r="60" fill="#cbd5e1"/>
+  <path d="M145 130 C145 80, 255 80, 255 130 C250 100, 230 90, 200 90 C170 90, 150 100, 145 130 Z" fill="#0f172a"/>
+  <!-- Glasses -->
+  <rect x="160" y="130" width="32" height="22" rx="6" fill="#0f172a" stroke="#38bdf8" stroke-width="3"/>
+  <rect x="208" y="130" width="32" height="22" rx="6" fill="#0f172a" stroke="#38bdf8" stroke-width="3"/>
+  <line x1="192" y1="141" x2="208" y2="141" stroke="#38bdf8" stroke-width="3"/>
+  <path d="M185 175 Q200 185 215 175" stroke="#475569" stroke-width="3" fill="none" stroke-linecap="round"/>
+  <!-- Shoulders & Hoodie -->
+  <path d="M110 320 C110 240, 150 215, 200 215 C250 215, 290 240, 290 320 Z" fill="#1e293b"/>
+  <path d="M170 215 L200 270 L230 215 Z" fill="#0f172a"/>
+  <path d="M185 270 L200 300 L215 270 Z" fill="url(#accentGlow)"/>
+  <!-- Code symbol badge -->
+  <rect x="150" y="325" width="100" height="34" rx="17" fill="#0f172a" stroke="#38bdf8" stroke-width="2"/>
+  <text x="200" y="347" font-family="monospace" font-size="14" font-weight="bold" fill="#38bdf8" text-anchor="middle">&lt;DEV /&gt;</text>
+</svg>
