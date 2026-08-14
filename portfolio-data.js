@@ -33,7 +33,7 @@ I love tackling complex algorithmic challenges, designing intuitive frontend int
   },
 
   music: {
-    trackTitle: "Chill Beat",
+    trackTitle: "Chill & Code",
     artist: "Lofi Vibes",
     audioSrc: "assets/chill-beat.mp3"
   },
