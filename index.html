@@ -5,13 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="Portfolio of Rishi Nehra - Full-Stack Developer & Software Engineer building high-performance modern web applications and scalable software systems.">
   
-  <!-- OpenGraph / Social Meta Tags -->
   <meta property="og:type" content="website">
   <meta property="og:title" content="Rishi Nehra | Developer Portfolio">
   <meta property="og:description" content="Full-Stack Developer & Software Engineer. Building high-performance, modern web experiences.">
   <meta property="og:image" content="assets/avatar.png">
 
-  <!-- Twitter / Card Meta Tags -->
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Rishi Nehra | Developer Portfolio">
   <meta name="twitter:description" content="Full-Stack Developer & Software Engineer. Building high-performance, modern web experiences.">
@@ -19,18 +17,15 @@
 
   <title>Rishi Nehra | Portfolio</title>
   
-  <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
   
-  <!-- Stylesheet -->
   <link rel="stylesheet" href="style.css">
   <link rel="icon" type="image/svg+xml" href="assets/avatar.png">
 </head>
 <body>
 
-  <!-- Ambient Chill Background Orbs -->
   <div class="ambient-bg" aria-hidden="true">
     <div class="ambient-orb orb-1"></div>
     <div class="ambient-orb orb-2"></div>
@@ -38,7 +33,6 @@
     <div class="ambient-orb orb-4"></div>
   </div>
 
-  <!-- Top Glassmorphism Navigation Bar -->
   <header class="site-header">
     <div class="container header-inner">
       <a href="#" class="brand-logo" id="brand-logo">
@@ -56,8 +50,7 @@
         </ul>
       </nav>
 
-      <!-- Background Music Player Toggle -->
-      <button class="music-toggle-btn" id="music-toggle-btn" aria-label="Toggle background music playback" title="Play / Pause Music">
+      <button class="music-toggle-btn" id="music-toggle-btn" aria-label="Toggle music playback" title="Play / Pause Music">
         <span class="music-equalizer" id="music-equalizer">
           <span class="eq-bar eq-bar-1"></span>
           <span class="eq-bar eq-bar-2"></span>
@@ -70,18 +63,15 @@
 
   <main class="container">
     
-    <!-- Hero Profile Section -->
     <section class="hero-section reveal-fade-up" id="hero">
       <div class="hero-profile-row">
-        <!-- Avatar with Pulsing Status Indicator -->
         <div class="avatar-wrapper">
           <div class="avatar-img-box">
-            <img src="assets/avatar.png" alt="Rishi Nehra Avatar" class="avatar-img" id="hero-avatar">
+            <img src="assets/avatar.png" alt="Rishi Nehra" class="avatar-img" id="hero-avatar">
           </div>
           <div class="avatar-status-dot" id="avatar-status-indicator" title="Available for opportunities"></div>
         </div>
 
-        <!-- Name, Status Pill & Tagline -->
         <div class="hero-details">
           <div class="status-pill" id="status-pill">
             <span class="status-pill-dot"></span>
@@ -96,7 +86,6 @@
         </div>
       </div>
 
-      <!-- Action Buttons: Glare CTA + Social Links (LinkedIn, GitHub, Codolio) -->
       <div class="hero-actions">
         <button type="button" class="cta-glare-btn" id="cta-contact-btn" onclick="document.getElementById('contact')?.scrollIntoView({behavior:'smooth'})">
           <span>Get in touch</span>
@@ -108,24 +97,20 @@
           </span>
         </button>
 
-        <!-- LinkedIn -->
         <a href="https://www.linkedin.com/in/rishi-nehra-78274a1a0/" target="_blank" rel="noopener noreferrer" class="social-icon-btn" id="social-linkedin" title="LinkedIn Profile" aria-label="LinkedIn Profile">
           <svg viewBox="0 0 24 24">
             <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
           </svg>
         </a>
 
-        <!-- GitHub -->
         <a href="https://github.com/rishifishyy" target="_blank" rel="noopener noreferrer" class="social-icon-btn" id="social-github" title="GitHub Profile" aria-label="GitHub Profile">
           <svg viewBox="0 0 24 24">
             <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.042-1.416-4.042-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
           </svg>
         </a>
 
-        <!-- Codolio (Coding Profile Tracker) -->
-        <a href="https://codolio.com/profile/rishifishyy" target="_blank" rel="noopener noreferrer" class="social-icon-btn" id="social-codolio" title="Codolio Profile - Coding Tracker" aria-label="Codolio Coding Profile Tracker">
+        <a href="https://codolio.com/profile/rishifishyy" target="_blank" rel="noopener noreferrer" class="social-icon-btn" id="social-codolio" title="Codolio Profile" aria-label="Codolio Profile">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <!-- Codolio Stylized Coding Matrix / Terminal Tracker Icon -->
             <polygon points="12 2 2 7 12 12 22 7 12 2" stroke="currentColor" fill="none"></polygon>
             <polyline points="2 17 12 22 22 17"></polyline>
             <polyline points="2 12 12 17 22 12"></polyline>
@@ -134,7 +119,6 @@
       </div>
     </section>
 
-    <!-- About & Core Skills Section -->
     <section class="about-section" id="about">
       <p class="about-summary" id="about-summary-text"></p>
       
@@ -144,7 +128,6 @@
       </div>
     </section>
 
-    <!-- Work Experience Section -->
     <section class="experience-section" id="experience" style="margin-top: 3.5rem;">
       <div class="section-header">
         <h2 class="section-title">Work experience</h2>
@@ -153,7 +136,6 @@
       <div class="experience-list" id="experience-list"></div>
     </section>
 
-    <!-- Projects Section (Bento Grid) -->
     <section class="projects-section" id="projects" style="margin-top: 4.5rem;">
       <div class="section-header">
         <h2 class="section-title">Projects</h2>
@@ -162,7 +144,6 @@
       <div class="projects-bento-grid" id="projects-grid"></div>
     </section>
 
-    <!-- Education Section -->
     <section class="education-section" id="education" style="margin-top: 4.5rem;">
       <div class="section-header">
         <h2 class="section-title">Education</h2>
@@ -171,7 +152,6 @@
       <div class="education-list" id="education-list"></div>
     </section>
 
-    <!-- Skills I am Learning Section -->
     <section class="learning-section" id="learning" style="margin-top: 4.5rem;">
       <div class="section-header">
         <h2 class="section-title">Skills I am learning</h2>
@@ -182,16 +162,14 @@
 
   </main>
 
-  <!-- Interactive Project Detail Modal -->
   <div class="modal-backdrop" id="project-modal" role="dialog" aria-modal="true" aria-hidden="true">
     <div class="modal-dialog">
-      <!-- Modal Header -->
       <div class="modal-header">
         <div class="modal-title-group">
           <span class="modal-type-tag" id="modal-project-type">Web App</span>
           <h2 class="modal-title" id="modal-project-title">Project Name</h2>
         </div>
-        <button class="modal-close-btn" id="modal-close-btn" aria-label="Close project modal">
+        <button class="modal-close-btn" id="modal-close-btn" aria-label="Close modal">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
             <line x1="18" y1="6" x2="6" y2="18"></line>
             <line x1="6" y1="6" x2="18" y2="18"></line>
@@ -199,16 +177,12 @@
         </button>
       </div>
 
-      <!-- Modal Body -->
       <div class="modal-body">
-        <!-- Hero Preview Media -->
         <div class="modal-hero-media">
           <img id="modal-project-img" src="" alt="Project Visual Preview">
         </div>
 
-        <!-- 2 Column Breakdown: Content & Meta Sidebar -->
         <div class="modal-grid">
-          <!-- Main Narrative Column -->
           <div class="modal-main-col">
             <section>
               <h3 class="modal-section-title">Overview</h3>
@@ -231,7 +205,6 @@
             </section>
           </div>
 
-          <!-- Sidebar Column: Tech, Role & Action Links -->
           <div class="modal-side-col">
             <section>
               <h3 class="modal-section-title">Tech Stack</h3>
@@ -265,7 +238,6 @@
     </div>
   </div>
 
-  <!-- Site Footer -->
   <footer class="site-footer">
     <div class="container footer-inner">
       <div>
@@ -281,7 +253,6 @@
     </div>
   </footer>
 
-  <!-- Floating Glassmorphic Music Player Widget -->
   <aside class="music-float-widget" id="music-float-widget" aria-label="Music Player">
     <div class="music-widget-inner">
       <div class="music-widget-disc" id="music-widget-disc">
@@ -292,7 +263,7 @@
         <div class="music-widget-status" id="music-widget-status">Now Playing</div>
       </div>
       <div class="music-widget-controls">
-        <button class="music-widget-playbtn" id="music-widget-playbtn" aria-label="Play/Pause music">
+        <button class="music-widget-playbtn" id="music-widget-playbtn" aria-label="Play or pause music">
           <svg id="music-play-icon" width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
             <polygon points="5 3 19 12 5 21 5 3"></polygon>
           </svg>
@@ -305,12 +276,6 @@
     </div>
   </aside>
 
-  <!-- Invisible YouTube IFrame Container -->
-  <div id="youtube-player-host" style="position: fixed; width: 1px; height: 1px; bottom: 0; left: 0; opacity: 0.001; pointer-events: none; overflow: hidden;">
-    <div id="yt-player-target"></div>
-  </div>
-
-  <!-- Scripts -->
   <script src="portfolio-data.js"></script>
   <script src="script.js"></script>
 </body>

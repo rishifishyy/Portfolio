@@ -1,12 +1,6 @@
-/**
- * Main Interactive Logic for Dark Theme Developer Portfolio
- * Handles dynamic content rendering, bento grid layout, and project detail modals.
- */
-
 document.addEventListener("DOMContentLoaded", () => {
-  // Ensure portfolioData is loaded
   if (typeof portfolioData === "undefined") {
-    console.error("portfolioData is missing! Check portfolio-data.js.");
+    console.error("portfolioData is missing!");
     return;
   }
 
@@ -22,13 +16,9 @@ document.addEventListener("DOMContentLoaded", () => {
   initAmbientParticles();
 });
 
-/**
- * 1. Render Profile Header & Hero Details
- */
 function renderProfile() {
   const { profile } = portfolioData;
 
-  // Header & Title
   const navBrand = document.getElementById("nav-brand-name");
   const heroName = document.getElementById("hero-name");
   const heroTagline = document.getElementById("hero-tagline");
@@ -55,12 +45,10 @@ function renderProfile() {
     statusBadge.textContent = profile.statusBadge;
   }
 
-  // Toggle status indicator active state
   if (statusIndicator && !profile.statusAvailable) {
     statusIndicator.style.display = "none";
   }
 
-  // Social & Contact Links
   const ctaBtn = document.getElementById("cta-contact-btn");
   const linkLinkedin = document.getElementById("social-linkedin");
   const linkGithub = document.getElementById("social-github");
@@ -84,9 +72,6 @@ function renderProfile() {
   if (footerCodolio && profile.contact.codolio) footerCodolio.href = profile.contact.codolio;
 }
 
-/**
- * 2. Render Core Skills List
- */
 function renderSkills() {
   const container = document.getElementById("skills-list");
   if (!container || !portfolioData.profile.skills) return;
@@ -96,9 +81,6 @@ function renderSkills() {
     .join("");
 }
 
-/**
- * 3. Render Work Experience Timeline
- */
 function renderExperience() {
   const container = document.getElementById("experience-list");
   if (!container || !portfolioData.experiences) return;
@@ -140,15 +122,11 @@ function renderExperience() {
   }).join("");
 }
 
-/**
- * 4. Render Work Projects in Staggered Bento Grid
- */
 function renderProjects() {
   const container = document.getElementById("projects-grid");
   if (!container || !portfolioData.projects) return;
 
   container.innerHTML = portfolioData.projects.map((project, index) => {
-    // Apply staggered margin classes for bento layout rhythm
     const staggerClass = (index % 4 === 1) ? 'bento-stagger-1' : (index % 4 === 3) ? 'bento-stagger-3' : '';
 
     const visibleTech = (project.techStack || []).slice(0, 4);
@@ -212,7 +190,6 @@ function renderProjects() {
     `;
   }).join("");
 
-  // Attach click & keyboard listeners to each project card
   document.querySelectorAll(".bento-project-card").forEach(card => {
     const projectId = card.getAttribute("data-project-id");
     card.addEventListener("click", () => openProjectModal(projectId));
@@ -225,9 +202,6 @@ function renderProjects() {
   });
 }
 
-/**
- * 5. Render Education
- */
 function renderEducation() {
   const container = document.getElementById("education-list");
   if (!container || !portfolioData.education) return;
@@ -261,9 +235,6 @@ function renderEducation() {
   }).join("");
 }
 
-/**
- * 6. Render Skills I Am Learning
- */
 function renderLearningSkills() {
   const container = document.getElementById("learning-list");
   if (!container || !portfolioData.learningSkills) return;
@@ -292,26 +263,20 @@ function renderLearningSkills() {
   }).join("");
 }
 
-/**
- * 6. Interactive Modal Management
- */
 function setupModalHandlers() {
   const modal = document.getElementById("project-modal");
   const closeBtn = document.getElementById("modal-close-btn");
 
   if (!modal || !closeBtn) return;
 
-  // Close when clicking the close button
   closeBtn.addEventListener("click", closeProjectModal);
 
-  // Close when clicking outside the dialog on the backdrop
   modal.addEventListener("click", (e) => {
     if (e.target === modal) {
       closeProjectModal();
     }
   });
 
-  // Close on Escape key press
   document.addEventListener("keydown", (e) => {
     if (e.key === "Escape" && modal.classList.contains("open")) {
       closeProjectModal();
@@ -336,7 +301,6 @@ function openProjectModal(projectId) {
   const liveLink = document.getElementById("modal-live-link");
   const githubLink = document.getElementById("modal-github-link");
 
-  // Populate data
   if (titleEl) titleEl.textContent = project.title;
   if (typeEl) typeEl.textContent = project.type;
   if (imgEl) {
@@ -348,21 +312,18 @@ function openProjectModal(projectId) {
   if (solutionEl) solutionEl.textContent = project.solution;
   if (roleEl) roleEl.textContent = project.role;
 
-  // Outcomes list
   if (outcomesEl) {
     outcomesEl.innerHTML = (project.outcomes || [])
       .map(outcome => `<li>${escapeHtml(outcome)}</li>`)
       .join("");
   }
 
-  // Tech stack pills
   if (techStackEl) {
     techStackEl.innerHTML = (project.techStack || [])
       .map(tech => `<span class="skill-tag">${escapeHtml(tech)}</span>`)
       .join("");
   }
 
-  // Action links
   if (liveLink) {
     if (project.links && project.links.live) {
       liveLink.href = project.links.live;
@@ -381,7 +342,6 @@ function openProjectModal(projectId) {
     }
   }
 
-  // Open modal & lock background scroll
   modal.classList.add("open");
   modal.setAttribute("aria-hidden", "false");
   document.body.style.overflow = "hidden";
@@ -396,9 +356,6 @@ function closeProjectModal() {
   document.body.style.overflow = "";
 }
 
-/**
- * 7. Smooth Scroll for Navigation Anchors
- */
 function setupSmoothScroll() {
   document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     anchor.addEventListener("click", function(e) {
@@ -421,9 +378,6 @@ function setupSmoothScroll() {
   });
 }
 
-/**
- * 8. HTML5 Background Music Player Controller
- */
 let bgAudio = null;
 let isMusicPlaying = false;
 
@@ -445,7 +399,6 @@ function setupMusicPlayer() {
 
   if (widgetTitle) widgetTitle.textContent = musicConfig.trackTitle;
 
-  // Initialize native HTML5 Audio element
   try {
     bgAudio = new Audio(musicConfig.audioSrc);
     bgAudio.loop = true;
@@ -521,9 +474,6 @@ function setupMusicPlayer() {
   if (playBtn) playBtn.addEventListener("click", toggleMusic);
 }
 
-/**
- * Helper utility to prevent XSS injection
- */
 function escapeHtml(str) {
   if (!str) return "";
   return String(str)
@@ -534,17 +484,12 @@ function escapeHtml(str) {
     .replace(/'/g, "&#039;");
 }
 
-/**
- * Ambient Floating Particles — lightweight canvas effect
- * Creates tiny glowing dots that drift slowly for a chill lofi vibe
- */
 function initAmbientParticles() {
   const canvas = document.createElement("canvas");
   canvas.id = "ambient-particles";
   canvas.style.cssText =
     "position:fixed;inset:0;pointer-events:none;z-index:0;opacity:0.7;";
   
-  // Insert right after the ambient-bg div
   const ambientBg = document.querySelector(".ambient-bg");
   if (ambientBg) {
     ambientBg.after(canvas);
@@ -562,16 +507,14 @@ function initAmbientParticles() {
   resize();
   window.addEventListener("resize", resize);
 
-  // Particle colors — matching the orb palette
   const colors = [
-    "rgba(56, 189, 248, ",   // cyan
-    "rgba(129, 140, 248, ",  // indigo
-    "rgba(168, 85, 247, ",   // violet
-    "rgba(45, 212, 191, ",   // teal
-    "rgba(255, 255, 255, ",  // white sparkle
+    "rgba(56, 189, 248, ",
+    "rgba(129, 140, 248, ",
+    "rgba(168, 85, 247, ",
+    "rgba(45, 212, 191, ",
+    "rgba(255, 255, 255, ",
   ];
 
-  // Create particles
   const PARTICLE_COUNT = 45;
   const particles = [];
 
@@ -592,21 +535,17 @@ function initAmbientParticles() {
     ctx.clearRect(0, 0, w, h);
 
     for (const p of particles) {
-      // Move
       p.x += p.vx;
       p.y += p.vy;
 
-      // Wrap around edges
       if (p.x < -10) p.x = w + 10;
       if (p.x > w + 10) p.x = -10;
       if (p.y < -10) p.y = h + 10;
       if (p.y > h + 10) p.y = -10;
 
-      // Twinkle
       p.alpha += p.alphaDir;
       if (p.alpha > 0.8 || p.alpha < 0.1) p.alphaDir *= -1;
 
-      // Draw
       ctx.beginPath();
       ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
       ctx.fillStyle = p.color + p.alpha.toFixed(2) + ")";

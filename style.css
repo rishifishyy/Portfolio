@@ -1,45 +1,34 @@
-/* ==========================================================================
-   Modern Dark Theme Portfolio Design System
-   Inspired by piyushsaini.me with obsidian aesthetics & micro-interactions
-   ========================================================================== */
-
 :root {
-  /* Dark Color Palette */
+  
   --bg-main: #09090b;
   --bg-surface: #111114;
   --bg-card: #18181b;
   --bg-card-hover: #202024;
   --bg-muted: #27272a;
-  
-  /* Borders */
+
   --border-subtle: rgba(255, 255, 255, 0.08);
   --border-card: rgba(255, 255, 255, 0.12);
   --border-glow: rgba(56, 189, 248, 0.4);
 
-  /* Typography Colors */
   --text-primary: #f4f4f5;
   --text-secondary: #a1a1aa;
   --text-muted: #71717a;
   --text-inverse: #09090b;
 
-  /* Accents & Status */
   --accent-cyan: #38bdf8;
   --accent-indigo: #818cf8;
   --accent-violet: #a855f7;
   --status-green: #22c55e;
   --status-green-bg: rgba(34, 197, 94, 0.12);
   --status-green-border: rgba(34, 197, 94, 0.25);
-  
-  /* Typography Tokens */
+
   --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
-  
-  /* Layout */
+
   --max-width: 1140px;
   --transition-smooth: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* Reset & Base Setup */
 *, *::before, *::after {
   box-sizing: border-box;
   margin: 0;
@@ -62,7 +51,6 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 
-  /* Signature 56px Blueprint Grid from reference */
   background-image:
     linear-gradient(to right, rgba(255, 255, 255, 0.025) 1px, transparent 1px),
     linear-gradient(to bottom, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
@@ -70,10 +58,6 @@ body {
   background-attachment: fixed;
 }
 
-/* ==========================================================================
-   Ambient Chill Dynamic Background
-   Slow-drifting soft gradient orbs for a lofi / chill coding vibe
-   ========================================================================== */
 .ambient-bg {
   position: fixed;
   inset: 0;
@@ -89,7 +73,6 @@ body {
   will-change: transform, opacity;
 }
 
-/* Orb 1 — Cyan top-left, slow drift right */
 .orb-1 {
   width: 600px;
   height: 600px;
@@ -99,7 +82,6 @@ body {
   animation: orbDrift1 25s infinite alternate ease-in-out;
 }
 
-/* Orb 2 — Indigo/violet bottom-right, slow drift up-left */
 .orb-2 {
   width: 550px;
   height: 550px;
@@ -109,7 +91,6 @@ body {
   animation: orbDrift2 30s infinite alternate ease-in-out;
 }
 
-/* Orb 3 — Warm purple center, breathes slowly */
 .orb-3 {
   width: 700px;
   height: 700px;
@@ -120,7 +101,6 @@ body {
   animation: orbBreathe 20s infinite alternate ease-in-out;
 }
 
-/* Orb 4 — Teal accent, floats near bottom-left */
 .orb-4 {
   width: 450px;
   height: 450px;
@@ -181,7 +161,6 @@ body {
   }
 }
 
-/* Subtle top ambient glow (enhanced) */
 body::before {
   content: "";
   position: fixed;
@@ -201,7 +180,6 @@ body::before {
   100% { opacity: 0.9; transform: translateX(-50%) scale(1.08); }
 }
 
-/* Container */
 .container {
   width: 100%;
   max-width: var(--max-width);
@@ -213,9 +191,6 @@ body::before {
   z-index: 1;
 }
 
-/* ==========================================================================
-   Header & Navigation
-   ========================================================================== */
 .site-header {
   position: fixed;
   top: 0;
@@ -276,9 +251,6 @@ body::before {
   color: var(--text-primary);
 }
 
-/* ==========================================================================
-   YouTube Music Player Header Button & Floating Widget
-   ========================================================================== */
 .music-toggle-btn {
   display: inline-flex;
   align-items: center;
@@ -308,7 +280,6 @@ body::before {
   box-shadow: 0 0 20px rgba(56, 189, 248, 0.25);
 }
 
-/* Sound Equalizer Animated Bars */
 .music-equalizer {
   display: inline-flex;
   align-items: flex-end;
@@ -355,7 +326,6 @@ body::before {
   color: #f87171;
 }
 
-/* Floating Glassmorphic Mini Music Player Card */
 .music-float-widget {
   position: fixed;
   bottom: 1.5rem;
@@ -482,9 +452,6 @@ body::before {
   transform: scale(1.08);
 }
 
-/* ==========================================================================
-   Hero Profile Section
-   ========================================================================== */
 .hero-section {
   padding-top: 7.5rem;
   padding-bottom: 2.5rem;
@@ -527,7 +494,6 @@ body::before {
   display: block;
 }
 
-/* Pulsing Status Dot */
 .avatar-status-dot {
   position: absolute;
   bottom: 0.25rem;
@@ -601,7 +567,6 @@ body::before {
   max-width: 42rem;
 }
 
-/* Action Buttons (Glare CTA + Socials) */
 .hero-actions {
   display: flex;
   align-items: center;
@@ -610,7 +575,6 @@ body::before {
   margin-top: 0.5rem;
 }
 
-/* Signature Glare Hover Effect */
 @keyframes glareAnim {
   0% { left: -100%; }
   100% { left: 160%; }
@@ -671,7 +635,6 @@ body::before {
   transform: translateX(4px);
 }
 
-/* Social Circular Buttons */
 .social-icon-btn {
   width: 3.35rem;
   height: 3.35rem;
@@ -700,9 +663,6 @@ body::before {
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
 }
 
-/* ==========================================================================
-   About & Core Skills Section
-   ========================================================================== */
 .about-section {
   padding-top: 1.5rem;
   padding-bottom: 2.5rem;
@@ -751,9 +711,6 @@ body::before {
   transform: translateY(-1px);
 }
 
-/* ==========================================================================
-   Section Headers & Dividers
-   ========================================================================== */
 .section-header {
   margin-bottom: 1.75rem;
 }
@@ -772,9 +729,6 @@ body::before {
   width: 100%;
 }
 
-/* ==========================================================================
-   Work Experience Section
-   ========================================================================== */
 .experience-list {
   display: flex;
   flex-direction: column;
@@ -900,9 +854,6 @@ body::before {
   border-radius: 9999px;
 }
 
-/* ==========================================================================
-   Work Projects Section (Bento Grid)
-   ========================================================================== */
 .projects-bento-grid {
   display: grid;
   grid-template-columns: 1fr;
@@ -914,8 +865,7 @@ body::before {
     grid-template-columns: repeat(2, 1fr);
     gap: 2rem;
   }
-  
-  /* Stagger effect as seen in reference site */
+
   .bento-stagger-1 { margin-top: 2.25rem; }
   .bento-stagger-2 { margin-top: 0.5rem; }
   .bento-stagger-3 { margin-top: 1.5rem; }
@@ -958,7 +908,6 @@ body::before {
   transform: scale(1.04);
 }
 
-/* Coming Soon Blurry & Animated Overlay */
 .coming-soon-card:hover .project-preview-img {
   filter: blur(5px) brightness(0.6);
   transform: scale(1.06);
@@ -1139,9 +1088,6 @@ body::before {
   transform: translate(2px, -2px);
 }
 
-/* ==========================================================================
-   Education Section
-   ========================================================================== */
 .education-list {
   display: flex;
   flex-direction: column;
@@ -1256,9 +1202,6 @@ body::before {
   line-height: 1.6;
 }
 
-/* ==========================================================================
-   Skills I Am Learning Section
-   ========================================================================== */
 .learning-grid {
   display: grid;
   grid-template-columns: 1fr;
@@ -1371,9 +1314,6 @@ body::before {
   line-height: 1.6;
 }
 
-/* ==========================================================================
-   Interactive Project Detail Modal
-   ========================================================================== */
 .modal-backdrop {
   position: fixed;
   inset: 0;
@@ -1607,9 +1547,6 @@ body::before {
   border-color: rgba(255, 255, 255, 0.2);
 }
 
-/* ==========================================================================
-   Footer
-   ========================================================================== */
 .site-footer {
   margin-top: 6rem;
   padding-top: 3.5rem;
@@ -1664,9 +1601,6 @@ body::before {
   color: var(--text-primary);
 }
 
-/* ==========================================================================
-   Animations & Responsive Breakpoints
-   ========================================================================== */
 @keyframes fadeInUp {
   from {
     opacity: 0;
@@ -1695,6 +1629,6 @@ body::before {
   }
 
   .nav-links {
-    display: none; /* Keep clean on small mobile */
+    display: none; 
   }
 }

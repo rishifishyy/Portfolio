@@ -1,7 +1,3 @@
-/**
- * Portfolio Data Configuration for Rishi Nehra
- * Edit this file to customize your portfolio details, experiences, projects, and links.
- */
 const portfolioData = {
   profile: {
     name: "Rishi Nehra",
