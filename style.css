@@ -883,6 +883,14 @@ body::before {
   }
 }
 
+@media (min-width: 1024px) {
+  .projects-bento-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.75rem;
+    align-items: stretch;
+  }
+}
+
 .bento-project-card {
   background-color: var(--bg-surface);
   border: 1px solid var(--border-subtle);

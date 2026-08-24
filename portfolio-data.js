@@ -90,6 +90,28 @@ I love to tackle algorithmic challenges and design interactive frontend interfac
 
   projects: [
     {
+      id: "team-up",
+      title: "TeamUP",
+      type: "Full Stack Web App / MERN",
+      badge: "Live App",
+      shortDescription: "A real-time matchmaking & squad finder platform that connects players across 8 global server regions with live invites and in-app chat.",
+      fullDescription: "TeamUP is a full-stack player matchmaking web application engineered to eliminate the frustration of random queues. It connects competitive and casual gamers across 8 official server regions, matching them by Game Mode, Build Setting, Platform, Mic preference, and Languages with live matchmaking pools and integrated real-time match chat.",
+      image: "assets/teamup-preview.svg",
+      problemStatement: "Gamers struggle with toxic random queues, mismatched skill levels, communication hurdles, and lack of verified party finders when searching for reliable squadmates.",
+      solution: "Engineered a responsive MERN application featuring granular multi-attribute matchmaking filters, real-time match requests, instant notification modals, and direct in-app match chat rooms.",
+      techStack: ["React.js", "Node.js", "Express.js", "MongoDB", "Framer Motion", "Tailwind CSS", "REST APIs", "Render"],
+      role: "Lead Full Stack Developer & UI Designer",
+      outcomes: [
+        "Live player matchmaking pool supporting 8 server regions and custom mode filters",
+        "Interactive request workflow with match notifications, toast alerts, and live in-browser chat",
+        "Fully deployed and accessible with live demo on Render and open source on GitHub"
+      ],
+      links: {
+        live: "https://teamup-x5fq.onrender.com/",
+        github: "https://github.com/rishifishyy/teamUP"
+      }
+    },
+    {
       id: "ai-exam-notes",
       title: "AI Exam Notes",
       type: "AI & Full Stack Web App",
