@@ -9,7 +9,8 @@ const portfolioData = {
 
 I love to tackle algorithmic challenges and design interactive frontend interfaces. Always curious and actively learning new technologies.`,
     contact: {
-      email: "mailto:rishinehra@example.com",
+      email: "rishinehra1@gmail.com",
+      mailUrl: "https://mail.google.com/mail/?view=cm&fs=1&to=rishinehra1@gmail.com",
       github: "https://github.com/rishifishyy",
       linkedin: "https://www.linkedin.com/in/rishi-nehra-78274a1a0/",
       codolio: "https://codolio.com/profile/rishifishyy"
@@ -96,7 +97,7 @@ I love to tackle algorithmic challenges and design interactive frontend interfac
       badge: "Live App",
       shortDescription: "A real-time matchmaking & squad finder platform that connects players across 8 global server regions with live invites and in-app chat.",
       fullDescription: "TeamUP is a full-stack player matchmaking web application engineered to eliminate the frustration of random queues. It connects competitive and casual gamers across 8 official server regions, matching them by Game Mode, Build Setting, Platform, Mic preference, and Languages with live matchmaking pools and integrated real-time match chat.",
-      image: "assets/teamup-preview.svg",
+      image: "assets/teamup-preview.png",
       problemStatement: "Gamers struggle with toxic random queues, mismatched skill levels, communication hurdles, and lack of verified party finders when searching for reliable squadmates.",
       solution: "Engineered a responsive MERN application featuring granular multi-attribute matchmaking filters, real-time match requests, instant notification modals, and direct in-app match chat rooms.",
       techStack: ["React.js", "Node.js", "Express.js", "MongoDB", "Framer Motion", "Tailwind CSS", "REST APIs", "Render"],

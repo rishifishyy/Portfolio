@@ -51,17 +51,39 @@ function renderProfile() {
   }
 
   const ctaBtn = document.getElementById("cta-contact-btn");
+  const linkEmail = document.getElementById("social-email");
   const linkLinkedin = document.getElementById("social-linkedin");
   const linkGithub = document.getElementById("social-github");
   const linkCodolio = document.getElementById("social-codolio");
+  const footerEmail = document.getElementById("footer-email");
   const footerLinkedin = document.getElementById("footer-linkedin");
   const footerGithub = document.getElementById("footer-github");
   const footerCodolio = document.getElementById("footer-codolio");
 
-  if (ctaBtn && profile.contact.email) {
-    ctaBtn.href = profile.contact.email.startsWith("mailto:") 
-      ? profile.contact.email 
-      : `mailto:${profile.contact.email}`;
+  const emailRaw = profile.contact && profile.contact.email ? profile.contact.email.replace(/^mailto:/, "") : "rishinehra1@gmail.com";
+  const mailUrl = (profile.contact && profile.contact.mailUrl) 
+    ? profile.contact.mailUrl 
+    : `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(emailRaw)}`;
+
+  if (ctaBtn) {
+    ctaBtn.href = mailUrl;
+    ctaBtn.target = "_blank";
+    ctaBtn.rel = "noopener noreferrer";
+    ctaBtn.onclick = () => copyEmailToClipboard(emailRaw);
+  }
+
+  if (linkEmail) {
+    linkEmail.href = mailUrl;
+    linkEmail.target = "_blank";
+    linkEmail.rel = "noopener noreferrer";
+    linkEmail.onclick = () => copyEmailToClipboard(emailRaw);
+  }
+
+  if (footerEmail) {
+    footerEmail.href = mailUrl;
+    footerEmail.target = "_blank";
+    footerEmail.rel = "noopener noreferrer";
+    footerEmail.onclick = () => copyEmailToClipboard(emailRaw);
   }
 
   if (linkLinkedin && profile.contact.linkedin) linkLinkedin.href = profile.contact.linkedin;
@@ -610,4 +632,40 @@ function initAmbientParticles() {
   }
 
   animate();
+}
+
+function copyEmailToClipboard(email) {
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(email)
+      .then(() => showToast(`Copied ${email} to clipboard!`))
+      .catch(() => showToast(`Opening compose for ${email}...`));
+  } else {
+    showToast(`Opening compose for ${email}...`);
+  }
+}
+
+function showToast(message) {
+  let toast = document.getElementById("portfolio-toast");
+  if (!toast) {
+    toast = document.createElement("div");
+    toast.id = "portfolio-toast";
+    toast.className = "portfolio-toast";
+    document.body.appendChild(toast);
+  }
+  toast.innerHTML = `
+    <div class="toast-content">
+      <svg class="toast-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="20 6 9 17 4 12"></polyline>
+      </svg>
+      <span>${escapeHtml(message)}</span>
+    </div>
+  `;
+  toast.classList.remove("show");
+  void toast.offsetWidth;
+  toast.classList.add("show");
+
+  clearTimeout(toast._timeout);
+  toast._timeout = setTimeout(() => {
+    toast.classList.remove("show");
+  }, 3000);
 }

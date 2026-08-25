@@ -1786,3 +1786,48 @@ body::before {
   justify-content: center;
   opacity: 0.8;
 }
+
+/* ==========================================================================
+   Toast Notification
+   ========================================================================== */
+
+.portfolio-toast {
+  position: fixed;
+  bottom: 2.25rem;
+  left: 50%;
+  transform: translateX(-50%) translateY(30px);
+  opacity: 0;
+  pointer-events: none;
+  z-index: 9999;
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.35s ease;
+}
+
+.portfolio-toast.show {
+  transform: translateX(-50%) translateY(0);
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.toast-content {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  background: rgba(15, 23, 42, 0.94);
+  color: #f8fafc;
+  padding: 0.85rem 1.45rem;
+  border-radius: 9999px;
+  border: 1px solid rgba(56, 189, 248, 0.35);
+  box-shadow: 0 14px 35px rgba(0, 0, 0, 0.6), 0 0 25px rgba(56, 189, 248, 0.2);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  font-size: 0.925rem;
+  font-weight: 600;
+  font-family: inherit;
+  letter-spacing: -0.01em;
+}
+
+.toast-icon {
+  color: #38bdf8;
+  flex-shrink: 0;
+}
+
