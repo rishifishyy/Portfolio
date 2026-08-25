@@ -13,7 +13,8 @@ I love to tackle algorithmic challenges and design interactive frontend interfac
       mailUrl: "https://mail.google.com/mail/?view=cm&fs=1&to=rishinehra1@gmail.com",
       github: "https://github.com/rishifishyy",
       linkedin: "https://www.linkedin.com/in/rishi-nehra-78274a1a0/",
-      codolio: "https://codolio.com/profile/rishifishyy"
+      codolio: "https://codolio.com/profile/rishifishyy",
+      resume: "https://drive.google.com/file/d/1s4sOdI8n5YetsISfasY2F7jDUqTyKcF2/view?usp=sharing"
     },
     skills: [
       "React.js",
