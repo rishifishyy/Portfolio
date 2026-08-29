@@ -21,7 +21,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
   
-  <link rel="stylesheet" href="style.css?v=2.2">
+  <link rel="stylesheet" href="style.css?v=2.3">
   <link rel="icon" type="image/svg+xml" href="assets/avatar.png">
 </head>
 <body>
@@ -51,28 +51,114 @@
         </ul>
       </nav>
 
-      <button class="music-toggle-btn" id="music-toggle-btn" aria-label="Toggle music playback" title="Play / Pause Music">
-        <span class="nav-music-disc" id="nav-music-disc">
-          <span class="disc-vinyl-mini"></span>
-        </span>
-        <span class="music-equalizer" id="music-equalizer">
-          <span class="eq-bar eq-bar-1"></span>
-          <span class="eq-bar eq-bar-2"></span>
-          <span class="eq-bar eq-bar-3"></span>
-        </span>
-        <span class="music-btn-text" id="music-btn-text">Play Music</span>
-        <span class="music-state-icon">
-          <svg id="nav-play-icon" width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
-            <polygon points="5 3 19 12 5 21 5 3"></polygon>
-          </svg>
-          <svg id="nav-pause-icon" width="12" height="12" viewBox="0 0 24 24" fill="currentColor" style="display: none;">
-            <rect x="6" y="4" width="4" height="16"></rect>
-            <rect x="14" y="4" width="4" height="16"></rect>
-          </svg>
-        </span>
-      </button>
+      <div class="header-actions">
+        <button class="music-toggle-btn" id="music-toggle-btn" aria-label="Toggle music playback" title="Play / Pause Music">
+          <span class="nav-music-disc" id="nav-music-disc">
+            <span class="disc-vinyl-mini"></span>
+          </span>
+          <span class="music-equalizer" id="music-equalizer">
+            <span class="eq-bar eq-bar-1"></span>
+            <span class="eq-bar eq-bar-2"></span>
+            <span class="eq-bar eq-bar-3"></span>
+          </span>
+          <span class="music-btn-text" id="music-btn-text">Play Music</span>
+          <span class="music-state-icon">
+            <svg id="nav-play-icon" width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+              <polygon points="5 3 19 12 5 21 5 3"></polygon>
+            </svg>
+            <svg id="nav-pause-icon" width="12" height="12" viewBox="0 0 24 24" fill="currentColor" style="display: none;">
+              <rect x="6" y="4" width="4" height="16"></rect>
+              <rect x="14" y="4" width="4" height="16"></rect>
+            </svg>
+          </span>
+        </button>
+
+        <button class="mobile-menu-btn" id="mobile-menu-btn" aria-label="Open mobile menu" aria-expanded="false" aria-controls="mobile-nav-drawer">
+          <span class="hamburger-box">
+            <span class="hamburger-line line-1"></span>
+            <span class="hamburger-line line-2"></span>
+            <span class="hamburger-line line-3"></span>
+          </span>
+        </button>
+      </div>
     </div>
   </header>
+
+  <!-- Mobile Navigation Drawer -->
+  <div class="mobile-nav-drawer" id="mobile-nav-drawer" aria-hidden="true" role="dialog" aria-modal="true" aria-label="Mobile Navigation Menu">
+    <div class="mobile-nav-backdrop" id="mobile-nav-backdrop"></div>
+    <div class="mobile-nav-panel">
+      <div class="mobile-nav-header">
+        <div class="brand-logo">
+          <span class="brand-dot"></span>
+          <span id="mobile-brand-name">Rishi Nehra</span>
+        </div>
+        <button class="mobile-nav-close" id="mobile-nav-close" aria-label="Close mobile menu">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+
+      <nav class="mobile-nav-links" aria-label="Mobile Navigation Links">
+        <a href="#about" class="mobile-nav-link" data-section="about">
+          <span class="mobile-nav-num">01</span>
+          <span class="mobile-nav-title">About</span>
+          <svg class="mobile-nav-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+        </a>
+        <a href="#experience" class="mobile-nav-link" data-section="experience">
+          <span class="mobile-nav-num">02</span>
+          <span class="mobile-nav-title">Experience</span>
+          <svg class="mobile-nav-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+        </a>
+        <a href="#projects" class="mobile-nav-link" data-section="projects">
+          <span class="mobile-nav-num">03</span>
+          <span class="mobile-nav-title">Projects</span>
+          <svg class="mobile-nav-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+        </a>
+        <a href="#education" class="mobile-nav-link" data-section="education">
+          <span class="mobile-nav-num">04</span>
+          <span class="mobile-nav-title">Education</span>
+          <svg class="mobile-nav-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+        </a>
+        <a href="#learning" class="mobile-nav-link" data-section="learning">
+          <span class="mobile-nav-num">05</span>
+          <span class="mobile-nav-title">Learning</span>
+          <svg class="mobile-nav-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+        </a>
+        <a href="https://drive.google.com/file/d/1s4sOdI8n5YetsISfasY2F7jDUqTyKcF2/view?usp=sharing" target="_blank" rel="noopener noreferrer" class="mobile-nav-link mobile-nav-resume">
+          <span class="mobile-nav-num">06</span>
+          <span class="mobile-nav-title">Resume</span>
+          <svg class="mobile-nav-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+        </a>
+      </nav>
+
+      <div class="mobile-nav-footer">
+        <a href="https://mail.google.com/mail/?view=cm&fs=1&to=rishinehra1@gmail.com" target="_blank" rel="noopener noreferrer" class="mobile-nav-cta" id="mobile-nav-email-btn">
+          <span>Get in touch</span>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+            <polyline points="12 5 19 12 12 19"></polyline>
+          </svg>
+        </a>
+        <div class="mobile-nav-socials">
+          <a href="https://github.com/rishifishyy" target="_blank" rel="noopener noreferrer" class="mobile-social-icon" id="mobile-drawer-github" title="GitHub Profile" aria-label="GitHub">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.042-1.416-4.042-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+          </a>
+          <a href="https://www.linkedin.com/in/rishi-nehra-78274a1a0/" target="_blank" rel="noopener noreferrer" class="mobile-social-icon" id="mobile-drawer-linkedin" title="LinkedIn Profile" aria-label="LinkedIn">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
+          </a>
+          <a href="https://codolio.com/profile/rishifishyy" target="_blank" rel="noopener noreferrer" class="mobile-social-icon" id="mobile-drawer-codolio" title="Codolio Profile" aria-label="Codolio">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2" stroke="currentColor" fill="none"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
+          </a>
+          <a href="https://mail.google.com/mail/?view=cm&fs=1&to=rishinehra1@gmail.com" target="_blank" rel="noopener noreferrer" class="mobile-social-icon" id="mobile-drawer-email" title="Email" aria-label="Email">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <main class="container">
     
@@ -110,31 +196,33 @@
           </span>
         </a>
 
-        <a href="https://mail.google.com/mail/?view=cm&fs=1&to=rishinehra1@gmail.com" target="_blank" rel="noopener noreferrer" class="social-icon-btn" id="social-email" title="Email: rishinehra1@gmail.com" aria-label="Email Rishi Nehra">
-          <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
-            <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
-          </svg>
-        </a>
+        <div class="social-row">
+          <a href="https://mail.google.com/mail/?view=cm&fs=1&to=rishinehra1@gmail.com" target="_blank" rel="noopener noreferrer" class="social-icon-btn" id="social-email" title="Email: rishinehra1@gmail.com" aria-label="Email Rishi Nehra">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+              <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
+            </svg>
+          </a>
 
-        <a href="https://www.linkedin.com/in/rishi-nehra-78274a1a0/" target="_blank" rel="noopener noreferrer" class="social-icon-btn" id="social-linkedin" title="LinkedIn Profile" aria-label="LinkedIn Profile">
-          <svg viewBox="0 0 24 24">
-            <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
-          </svg>
-        </a>
+          <a href="https://www.linkedin.com/in/rishi-nehra-78274a1a0/" target="_blank" rel="noopener noreferrer" class="social-icon-btn" id="social-linkedin" title="LinkedIn Profile" aria-label="LinkedIn Profile">
+            <svg viewBox="0 0 24 24">
+              <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
+            </svg>
+          </a>
 
-        <a href="https://github.com/rishifishyy" target="_blank" rel="noopener noreferrer" class="social-icon-btn" id="social-github" title="GitHub Profile" aria-label="GitHub Profile">
-          <svg viewBox="0 0 24 24">
-            <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.042-1.416-4.042-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
-          </svg>
-        </a>
+          <a href="https://github.com/rishifishyy" target="_blank" rel="noopener noreferrer" class="social-icon-btn" id="social-github" title="GitHub Profile" aria-label="GitHub Profile">
+            <svg viewBox="0 0 24 24">
+              <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.042-1.416-4.042-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+            </svg>
+          </a>
 
-        <a href="https://codolio.com/profile/rishifishyy" target="_blank" rel="noopener noreferrer" class="social-icon-btn" id="social-codolio" title="Codolio Profile" aria-label="Codolio Profile">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <polygon points="12 2 2 7 12 12 22 7 12 2" stroke="currentColor" fill="none"></polygon>
-            <polyline points="2 17 12 22 22 17"></polyline>
-            <polyline points="2 12 12 17 22 12"></polyline>
-          </svg>
-        </a>
+          <a href="https://codolio.com/profile/rishifishyy" target="_blank" rel="noopener noreferrer" class="social-icon-btn" id="social-codolio" title="Codolio Profile" aria-label="Codolio Profile">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polygon points="12 2 2 7 12 12 22 7 12 2" stroke="currentColor" fill="none"></polygon>
+              <polyline points="2 17 12 22 22 17"></polyline>
+              <polyline points="2 12 12 17 22 12"></polyline>
+            </svg>
+          </a>
+        </div>
       </div>
     </section>
 
@@ -273,7 +361,7 @@
     </div>
   </footer>
 
-  <script src="portfolio-data.js?v=2.2"></script>
-  <script src="script.js?v=2.2"></script>
+  <script src="portfolio-data.js?v=2.3"></script>
+  <script src="script.js?v=2.3"></script>
 </body>
 </html>

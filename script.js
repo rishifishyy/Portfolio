@@ -10,6 +10,8 @@ document.addEventListener("DOMContentLoaded", () => {
   renderProjects();
   renderEducation();
   renderLearningSkills();
+  setupMobileNavigation();
+  setupActiveNavObserver();
   setupModalHandlers();
   setupSmoothScroll();
   setupMusicPlayer();
@@ -21,6 +23,7 @@ function renderProfile() {
   const { profile } = portfolioData;
 
   const navBrand = document.getElementById("nav-brand-name");
+  const mobileBrand = document.getElementById("mobile-brand-name");
   const heroName = document.getElementById("hero-name");
   const heroTagline = document.getElementById("hero-tagline");
   const footerName = document.getElementById("footer-name");
@@ -31,6 +34,7 @@ function renderProfile() {
   const currentYear = document.getElementById("current-year");
 
   if (navBrand) navBrand.textContent = profile.name;
+  if (mobileBrand) mobileBrand.textContent = profile.name;
   if (heroName) heroName.textContent = profile.name;
   if (footerName) footerName.textContent = profile.name;
   if (heroTagline) heroTagline.textContent = profile.tagline;
@@ -60,6 +64,12 @@ function renderProfile() {
   const footerGithub = document.getElementById("footer-github");
   const footerCodolio = document.getElementById("footer-codolio");
 
+  const mobileNavEmail = document.getElementById("mobile-nav-email-btn");
+  const mobileDrawerEmail = document.getElementById("mobile-drawer-email");
+  const mobileDrawerGithub = document.getElementById("mobile-drawer-github");
+  const mobileDrawerLinkedin = document.getElementById("mobile-drawer-linkedin");
+  const mobileDrawerCodolio = document.getElementById("mobile-drawer-codolio");
+
   const emailRaw = profile.contact && profile.contact.email ? profile.contact.email.replace(/^mailto:/, "") : "rishinehra1@gmail.com";
   const mailUrl = (profile.contact && profile.contact.mailUrl) 
     ? profile.contact.mailUrl 
@@ -86,6 +96,16 @@ function renderProfile() {
     footerEmail.onclick = () => copyEmailToClipboard(emailRaw);
   }
 
+  if (mobileNavEmail) {
+    mobileNavEmail.href = mailUrl;
+    mobileNavEmail.onclick = () => copyEmailToClipboard(emailRaw);
+  }
+
+  if (mobileDrawerEmail) {
+    mobileDrawerEmail.href = mailUrl;
+    mobileDrawerEmail.onclick = () => copyEmailToClipboard(emailRaw);
+  }
+
   if (linkLinkedin && profile.contact.linkedin) linkLinkedin.href = profile.contact.linkedin;
   if (linkGithub && profile.contact.github) linkGithub.href = profile.contact.github;
   if (linkCodolio && profile.contact.codolio) linkCodolio.href = profile.contact.codolio;
@@ -93,6 +113,10 @@ function renderProfile() {
   if (footerLinkedin && profile.contact.linkedin) footerLinkedin.href = profile.contact.linkedin;
   if (footerGithub && profile.contact.github) footerGithub.href = profile.contact.github;
   if (footerCodolio && profile.contact.codolio) footerCodolio.href = profile.contact.codolio;
+
+  if (mobileDrawerLinkedin && profile.contact.linkedin) mobileDrawerLinkedin.href = profile.contact.linkedin;
+  if (mobileDrawerGithub && profile.contact.github) mobileDrawerGithub.href = profile.contact.github;
+  if (mobileDrawerCodolio && profile.contact.codolio) mobileDrawerCodolio.href = profile.contact.codolio;
 }
 
 function renderSkills() {
@@ -278,6 +302,95 @@ function renderLearningSkills() {
       </div>
     `;
   }).join("");
+}
+
+function setupMobileNavigation() {
+  const menuBtn = document.getElementById("mobile-menu-btn");
+  const drawer = document.getElementById("mobile-nav-drawer");
+  const backdrop = document.getElementById("mobile-nav-backdrop");
+  const closeBtn = document.getElementById("mobile-nav-close");
+  const navLinks = document.querySelectorAll(".mobile-nav-link");
+
+  if (!menuBtn || !drawer) return;
+
+  function openDrawer() {
+    drawer.classList.add("open");
+    drawer.setAttribute("aria-hidden", "false");
+    menuBtn.classList.add("active");
+    menuBtn.setAttribute("aria-expanded", "true");
+    document.body.style.overflow = "hidden";
+  }
+
+  function closeDrawer() {
+    drawer.classList.remove("open");
+    drawer.setAttribute("aria-hidden", "true");
+    menuBtn.classList.remove("active");
+    menuBtn.setAttribute("aria-expanded", "false");
+    document.body.style.overflow = "";
+  }
+
+  menuBtn.addEventListener("click", () => {
+    if (drawer.classList.contains("open")) {
+      closeDrawer();
+    } else {
+      openDrawer();
+    }
+  });
+
+  if (closeBtn) closeBtn.addEventListener("click", closeDrawer);
+  if (backdrop) backdrop.addEventListener("click", closeDrawer);
+
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && drawer.classList.contains("open")) {
+      closeDrawer();
+    }
+  });
+
+  navLinks.forEach(link => {
+    link.addEventListener("click", () => {
+      closeDrawer();
+    });
+  });
+}
+
+function setupActiveNavObserver() {
+  const sections = document.querySelectorAll("section[id]");
+  const mobileLinks = document.querySelectorAll(".mobile-nav-link[data-section]");
+  const desktopLinks = document.querySelectorAll(".nav-link[href^='#']");
+
+  if (!sections.length || !("IntersectionObserver" in window)) return;
+
+  const observerOptions = {
+    root: null,
+    rootMargin: "-20% 0px -60% 0px",
+    threshold: 0
+  };
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const id = entry.target.getAttribute("id");
+
+        mobileLinks.forEach(link => {
+          if (link.getAttribute("data-section") === id) {
+            link.classList.add("active");
+          } else {
+            link.classList.remove("active");
+          }
+        });
+
+        desktopLinks.forEach(link => {
+          if (link.getAttribute("href") === `#${id}`) {
+            link.style.color = "var(--text-primary)";
+          } else {
+            link.style.color = "";
+          }
+        });
+      }
+    });
+  }, observerOptions);
+
+  sections.forEach(section => observer.observe(section));
 }
 
 function setupModalHandlers() {
@@ -540,6 +653,7 @@ function setupNameHoverAnimation() {
   const scrambler = new TextScramble(heroName);
   const originalName = "Rishi Nehra";
   const aliasName = "Rishifishyy";
+  let isToggled = false;
 
   heroName.addEventListener("mouseenter", () => {
     scrambler.setText(aliasName);
@@ -547,6 +661,12 @@ function setupNameHoverAnimation() {
 
   heroName.addEventListener("mouseleave", () => {
     scrambler.setText(originalName);
+  });
+
+  // Tap-to-scramble support for mobile touch users
+  heroName.addEventListener("click", () => {
+    isToggled = !isToggled;
+    scrambler.setText(isToggled ? aliasName : originalName);
   });
 }
 
@@ -576,6 +696,10 @@ function initAmbientParticles() {
   const ctx = canvas.getContext("2d");
   let w, h;
 
+  const isMobile = window.innerWidth < 768;
+  const PARTICLE_COUNT = isMobile ? 18 : 45;
+  const particles = [];
+
   function resize() {
     w = canvas.width = window.innerWidth;
     h = canvas.height = window.innerHeight;
@@ -590,9 +714,6 @@ function initAmbientParticles() {
     "rgba(45, 212, 191, ",
     "rgba(255, 255, 255, ",
   ];
-
-  const PARTICLE_COUNT = 45;
-  const particles = [];
 
   for (let i = 0; i < PARTICLE_COUNT; i++) {
     particles.push({
