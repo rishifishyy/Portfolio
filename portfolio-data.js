@@ -14,7 +14,7 @@ I love to tackle algorithmic challenges and design interactive frontend interfac
       github: "https://github.com/rishifishyy",
       linkedin: "https://www.linkedin.com/in/rishi-nehra-78274a1a0/",
       codolio: "https://codolio.com/profile/rishifishyy",
-      resume: "https://drive.google.com/file/d/1OdPJUIQgkrPvOHAHKf0sOQZFpXj3WLyC/view?usp=sharing"
+      resume: "https://drive.google.com/file/d/13uvqbCScoFd13uWVoayfTZnQ4QRvWp9O/view?usp=sharing"
     },
     skills: [
       "React.js",
