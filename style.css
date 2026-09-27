@@ -531,6 +531,51 @@ body::before {
   background: var(--bg-muted);
 }
 
+.game-toggle-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(24, 24, 27, 0.85);
+  border: 1px solid rgba(163, 230, 53, 0.35);
+  border-radius: 9999px;
+  color: #d7f886;
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  padding: 0.43rem 0.85rem;
+  transition: var(--transition-smooth);
+}
+
+.game-toggle-btn:not(.activated) { animation: gameTease 1.8s infinite ease-in-out; border-color: rgba(190, 242, 100, .85); box-shadow: 0 0 0 0 rgba(190, 242, 100, .45); }
+.game-toggle-btn:hover { background: rgba(132, 204, 22, 0.13); border-color: #bef264; box-shadow: 0 0 18px rgba(163, 230, 53, 0.18); transform: translateY(-1px); }
+.game-toggle-btn.activated { animation: none; }
+.gamepad-icon { filter: drop-shadow(0 0 5px rgba(215, 248, 134, .55)); }
+@keyframes gameTease { 0%, 100% { transform: translateY(0) scale(1); box-shadow: 0 0 0 0 rgba(190, 242, 100, .35); } 50% { transform: translateY(-2px) scale(1.04); box-shadow: 0 0 0 7px rgba(190, 242, 100, 0); } }
+.snake-open { overflow: hidden; }
+.snake-open .ambient-bg, .snake-open #ambient-particles { visibility: hidden; }
+.snake-modal { position: fixed; inset: 0; z-index: 1000; display: grid; place-items: center; padding: 1rem; opacity: 0; pointer-events: none; transition: opacity .2s ease; }
+.snake-modal.open { opacity: 1; pointer-events: auto; }
+.snake-modal-backdrop { position: absolute; inset: 0; background: rgba(0, 0, 0, .78); backdrop-filter: blur(8px); }
+.snake-panel { position: relative; width: min(100%, 32rem); border: 1px solid rgba(190, 242, 100, .35); border-radius: 1.25rem; background: #10150e; box-shadow: 0 24px 70px rgba(0, 0, 0, .7), 0 0 35px rgba(163, 230, 53, .12); overflow: hidden; padding: clamp(1rem, 3vw, 1.4rem); }
+.snake-panel-header, .snake-scoreboard { display: flex; justify-content: space-between; align-items: center; gap: 1rem; }
+.snake-kicker { color: #9bbd61; font: 700 .65rem/1 var(--font-mono, monospace); letter-spacing: .18em; text-transform: uppercase; margin: 0 0 .35rem; }
+.snake-panel h2 { margin: 0; color: #eefbd3; font-size: 1.65rem; }
+.snake-close-btn { width: 2.35rem; height: 2.35rem; border: 1px solid rgba(190, 242, 100, .25); border-radius: 50%; background: transparent; color: #eefbd3; cursor: pointer; font-size: 1.65rem; line-height: 1; }
+.snake-scoreboard { margin: 1rem 0 .7rem; color: #aab59a; font: 700 .78rem/1 var(--font-mono, monospace); letter-spacing: .1em; text-transform: uppercase; }
+.snake-scoreboard strong { color: #d7f886; font-size: 1rem; }
+.snake-board-wrap { position: relative; aspect-ratio: 1; border: 10px solid #26351b; background: #07110a; box-shadow: inset 0 0 0 1px rgba(215, 248, 134, .12); touch-action: none; }
+#snake-canvas { display: block; width: 100%; height: 100%; image-rendering: pixelated; }
+.snake-screen { position: absolute; inset: 0; display: grid; place-content: center; justify-items: center; gap: 1rem; padding: 2rem; text-align: center; background: rgba(6, 14, 7, .76); color: #e8f9bf; font-weight: 700; }
+.snake-screen[hidden] { display: none; }
+.snake-screen p { margin: 0; max-width: 20rem; line-height: 1.5; }
+.snake-start-btn { border: 0; border-radius: .55rem; padding: .72rem 1.1rem; background: #c6f46c; color: #112006; cursor: pointer; font: inherit; font-weight: 800; }
+.snake-help { margin: .85rem 0; color: #8d987d; font-size: .72rem; line-height: 1.45; text-align: center; }
+.snake-controls { display: grid; grid-template-columns: repeat(3, 3.2rem); justify-content: center; gap: .35rem; touch-action: none; }
+.snake-controls button { min-width: 3.2rem; min-height: 3.2rem; border: 1px solid rgba(190, 242, 100, .25); border-radius: .5rem; background: #1b2814; color: #d7f886; cursor: pointer; font-size: 1rem; touch-action: none; -webkit-tap-highlight-color: transparent; }
+.snake-controls button:hover, .snake-controls button:active { background: #30461f; }
+.snake-controls button:nth-child(1) { grid-column: 2; }.snake-controls button:nth-child(2) { grid-column: 1; grid-row: 2; }.snake-controls button:nth-child(3) { grid-column: 2; grid-row: 2; }.snake-controls button:nth-child(4) { grid-column: 3; grid-row: 2; }
+
 .music-toggle-btn {
   display: inline-flex;
   align-items: center;
@@ -1963,6 +2008,39 @@ body::before {
 
 /* Modern Phones (<= 640px) */
 @media (max-width: 640px) {
+  body { background-attachment: scroll; }
+
+  .ambient-orb {
+    animation: none;
+    filter: none;
+    opacity: 0.12;
+  }
+
+  .game-toggle-btn, .mobile-menu-btn {
+    width: 2.75rem;
+    height: 2.75rem;
+    justify-content: center;
+    padding: 0;
+    border-radius: 0.8rem;
+  }
+
+  .game-btn-text { display: none; }
+  .game-toggle-btn svg { width: 1.2rem; height: 1.2rem; }
+
+  .social-icon-btn, .mobile-social-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 2.9rem;
+    min-height: 2.9rem;
+    border-radius: 0.85rem;
+  }
+
+  .social-icon-btn svg, .mobile-social-icon svg {
+    width: 1.2rem;
+    height: 1.2rem;
+  }
+
   .container {
     padding-left: 1.15rem;
     padding-right: 1.15rem;

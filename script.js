@@ -14,7 +14,7 @@ document.addEventListener("DOMContentLoaded", () => {
   setupActiveNavObserver();
   setupModalHandlers();
   setupSmoothScroll();
-  setupMusicPlayer();
+  setupSnakeGame();
   setupNameHoverAnimation();
   initAmbientParticles();
 });
@@ -508,89 +508,221 @@ function setupSmoothScroll() {
   });
 }
 
-let bgAudio = null;
-let isMusicPlaying = false;
+function setupSnakeGame() {
+  const modal = document.getElementById("snake-modal");
+  const openButton = document.getElementById("game-toggle-btn");
+  const closeButton = document.getElementById("snake-close-btn");
+  const backdrop = document.getElementById("snake-modal-backdrop");
+  const canvas = document.getElementById("snake-canvas");
+  const screen = document.getElementById("snake-screen");
+  const message = document.getElementById("snake-message");
+  const startButton = document.getElementById("snake-start-btn");
+  const scoreElement = document.getElementById("snake-score");
+  const bestElement = document.getElementById("snake-best-score");
+  if (!modal || !canvas) return;
 
-function setupMusicPlayer() {
-  const musicConfig = portfolioData.music || {
-    idleText: "Play Music",
-    trackTitle: "Just Chill and Code",
-    artist: "Lofi Vibes",
-    audioSrc: "assets/chill-beat.mp3"
-  };
+  const context = canvas.getContext("2d", { alpha: false, desynchronized: true });
+  const gridSize = 20;
+  const boardLayer = document.createElement("canvas");
+  boardLayer.width = canvas.width;
+  boardLayer.height = canvas.height;
+  const boardContext = boardLayer.getContext("2d");
+  let snake, food, direction, score, bestScore = 0, running, frameId, lastFrame, touchStart, lastPointerInput = 0;
+  bestElement.textContent = bestScore;
 
-  const idleText = musicConfig.idleText || "Play Music";
-  const playingText = musicConfig.trackTitle || "Just Chill and Code";
+  async function loadBestScore() {
+    try {
+      const response = await fetch("/api/snake-best", { cache: "no-store" });
+      if (!response.ok) return;
+      const data = await response.json();
+      bestScore = Number(data.bestScore) || 0;
+      bestElement.textContent = bestScore;
+    } catch {
+      // The game remains playable if the shared-score service is temporarily unavailable.
+    }
+  }
 
-  const toggleBtn = document.getElementById("music-toggle-btn");
-  const btnText = document.getElementById("music-btn-text");
-  const playIcon = document.getElementById("nav-play-icon");
-  const pauseIcon = document.getElementById("nav-pause-icon");
+  async function submitBestScore(value) {
+    try {
+      const response = await fetch("/api/snake-best", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ score: value })
+      });
+      if (!response.ok) return;
+      const data = await response.json();
+      bestScore = Number(data.bestScore) || bestScore;
+      bestElement.textContent = bestScore;
+    } catch {
+      // A failed score submission never interrupts an active game.
+    }
+  }
 
-  if (btnText) btnText.textContent = idleText;
+  loadBestScore();
 
-  try {
-    bgAudio = new Audio(musicConfig.audioSrc);
-    bgAudio.loop = true;
-    bgAudio.volume = 0.75;
+  function paintBoard() {
+    const size = canvas.width / gridSize;
+    boardContext.fillStyle = "#07110a";
+    boardContext.fillRect(0, 0, canvas.width, canvas.height);
+    boardContext.strokeStyle = "rgba(135, 181, 89, 0.11)";
+    boardContext.lineWidth = 1;
+    for (let index = 0; index <= gridSize; index += 1) {
+      const point = index * size;
+      boardContext.beginPath(); boardContext.moveTo(point, 0); boardContext.lineTo(point, canvas.height); boardContext.stroke();
+      boardContext.beginPath(); boardContext.moveTo(0, point); boardContext.lineTo(canvas.width, point); boardContext.stroke();
+    }
+  }
+  paintBoard();
 
-    bgAudio.addEventListener("play", () => setPlayingUI(true));
-    bgAudio.addEventListener("pause", () => setPlayingUI(false));
-    bgAudio.addEventListener("ended", () => setPlayingUI(false));
-    bgAudio.addEventListener("error", (err) => {
-      console.warn("Audio loading notice:", err);
+  function resetGame() {
+    snake = [{ x: 10.5, y: 10.5 }, { x: 9.6, y: 10.5 }, { x: 8.7, y: 10.5 }];
+    direction = { x: 1, y: 0 };
+    score = 0;
+    scoreElement.textContent = score;
+    placeFood();
+    draw();
+  }
+
+  function placeFood() {
+    do {
+      food = { x: Math.floor(Math.random() * gridSize) + 0.5, y: Math.floor(Math.random() * gridSize) + 0.5 };
+    } while (snake.some(segment => Math.hypot(segment.x - food.x, segment.y - food.y) < 1));
+  }
+
+  function draw() {
+    const size = canvas.width / gridSize;
+    context.drawImage(boardLayer, 0, 0);
+    context.fillStyle = "#e24335";
+    context.fillRect((food.x - .32) * size, (food.y - .32) * size, size * .64, size * .64);
+    snake.forEach((segment, index) => {
+      context.fillStyle = index === 0 ? "#d7f886" : "#8fbe4d";
+      context.fillRect((segment.x - .42) * size, (segment.y - .42) * size, size * .84, size * .84);
     });
-  } catch (e) {
-    console.error("Audio init error:", e);
   }
 
-  function toggleMusic() {
-    if (!bgAudio) {
-      bgAudio = new Audio(musicConfig.audioSrc);
-      bgAudio.loop = true;
-      bgAudio.volume = 0.75;
-    }
-
-    if (isMusicPlaying) {
-      bgAudio.pause();
-      setPlayingUI(false);
-    } else {
-      const playPromise = bgAudio.play();
-      if (playPromise !== undefined) {
-        playPromise
-          .then(() => {
-            setPlayingUI(true);
-          })
-          .catch((error) => {
-            console.warn("Audio playback prevented:", error);
-            setPlayingUI(false);
-          });
+  function updateGame(delta) {
+    const speed = Math.min(8.5, 4.1 + score * .28);
+    const head = snake[0];
+    head.x += direction.x * speed * delta;
+    head.y += direction.y * speed * delta;
+    const hitWall = head.x < .42 || head.x > gridSize - .42 || head.y < .42 || head.y > gridSize - .42;
+    for (let index = 1; index < snake.length; index += 1) {
+      const leader = snake[index - 1];
+      const segment = snake[index];
+      const distance = Math.hypot(leader.x - segment.x, leader.y - segment.y);
+      if (distance > .88) {
+        const follow = (distance - .88) / distance;
+        segment.x += (leader.x - segment.x) * follow;
+        segment.y += (leader.y - segment.y) * follow;
       }
     }
-  }
-
-  function setPlayingUI(playing) {
-    isMusicPlaying = playing;
-
-    if (toggleBtn) {
-      if (playing) {
-        toggleBtn.classList.add("playing");
-      } else {
-        toggleBtn.classList.remove("playing");
+    const hitSelf = snake.slice(5).some(segment => Math.hypot(head.x - segment.x, head.y - segment.y) < .56);
+    if (hitWall || hitSelf) return gameOver();
+    if (Math.hypot(head.x - food.x, head.y - food.y) < .48) {
+      score += 1;
+      scoreElement.textContent = score;
+      if (score > bestScore) {
+        bestScore = score; bestElement.textContent = bestScore;
+        submitBestScore(score);
       }
-    }
-
-    if (btnText) {
-      btnText.textContent = playing ? playingText : idleText;
-    }
-
-    if (playIcon && pauseIcon) {
-      playIcon.style.display = playing ? "none" : "block";
-      pauseIcon.style.display = playing ? "block" : "none";
+      const tail = snake[snake.length - 1];
+      snake.push({ x: tail.x, y: tail.y });
+      placeFood();
     }
   }
 
-  if (toggleBtn) toggleBtn.addEventListener("click", toggleMusic);
+  function animate(now) {
+    if (!running) return;
+    if (!lastFrame) lastFrame = now;
+    const delta = Math.min((now - lastFrame) / 1000, .035);
+    lastFrame = now;
+    updateGame(delta);
+    if (running) {
+      draw();
+      frameId = requestAnimationFrame(animate);
+    }
+  }
+
+  function startGame() {
+    cancelAnimationFrame(frameId);
+    resetGame(); running = true;
+    screen.hidden = true;
+    lastFrame = 0;
+    frameId = requestAnimationFrame(animate);
+  }
+
+  function gameOver() {
+    cancelAnimationFrame(frameId); running = false;
+    draw();
+    message.textContent = `Game over — score ${score}`;
+    startButton.textContent = "Play again";
+    screen.hidden = false;
+  }
+
+  function pauseGame() {
+    if (!running) return;
+    cancelAnimationFrame(frameId); running = false;
+    message.textContent = "Game paused — press Start to play again";
+    startButton.textContent = "Start game";
+    screen.hidden = false;
+  }
+
+  function setDirection(name) {
+    const choices = { up: { x: 0, y: -1 }, down: { x: 0, y: 1 }, left: { x: -1, y: 0 }, right: { x: 1, y: 0 } };
+    const selected = choices[name];
+    if (selected && selected.x !== -direction.x && selected.y !== -direction.y) direction = selected;
+  }
+
+  function openGame() {
+    openButton.classList.add("activated");
+    modal.classList.add("open"); modal.setAttribute("aria-hidden", "false");
+    document.body.classList.add("snake-open");
+    if (!snake) resetGame();
+    closeButton.focus();
+  }
+  function closeGame() {
+    pauseGame(); modal.classList.remove("open"); modal.setAttribute("aria-hidden", "true");
+    document.body.classList.remove("snake-open"); openButton.focus();
+  }
+
+  openButton.addEventListener("click", openGame);
+  closeButton.addEventListener("click", closeGame);
+  backdrop.addEventListener("click", closeGame);
+  startButton.addEventListener("click", () => running ? null : startGame());
+  document.querySelectorAll("[data-direction]").forEach(button => {
+    const handleControlInput = event => {
+      event.preventDefault();
+      const now = performance.now();
+      if (now - lastPointerInput < 45) return;
+      lastPointerInput = now;
+      setDirection(button.dataset.direction);
+    };
+    button.addEventListener("touchstart", handleControlInput, { passive: false });
+    button.addEventListener("pointerdown", handleControlInput, { passive: false });
+    button.addEventListener("click", event => {
+      if (performance.now() - lastPointerInput < 700) return;
+      handleControlInput(event);
+    }, { passive: false });
+  });
+  document.addEventListener("keydown", event => {
+    if (!modal.classList.contains("open")) return;
+    const keys = { ArrowUp: "up", w: "up", W: "up", ArrowDown: "down", s: "down", S: "down", ArrowLeft: "left", a: "left", A: "left", ArrowRight: "right", d: "right", D: "right" };
+    if (keys[event.key]) { event.preventDefault(); setDirection(keys[event.key]); }
+    if (event.key === "Escape") closeGame();
+    if (event.key === " ") { event.preventDefault(); if (!running) startGame(); }
+  });
+  canvas.addEventListener("pointerdown", event => {
+    touchStart = { x: event.clientX, y: event.clientY };
+    canvas.setPointerCapture?.(event.pointerId);
+  });
+  canvas.addEventListener("pointerup", event => {
+    if (!touchStart) return;
+    const deltaX = event.clientX - touchStart.x, deltaY = event.clientY - touchStart.y;
+    if (Math.max(Math.abs(deltaX), Math.abs(deltaY)) > 18) setDirection(Math.abs(deltaX) > Math.abs(deltaY) ? (deltaX > 0 ? "right" : "left") : (deltaY > 0 ? "down" : "up"));
+    touchStart = null;
+  });
+  canvas.addEventListener("pointercancel", () => { touchStart = null; });
+  document.addEventListener("visibilitychange", () => { if (document.hidden) pauseGame(); });
 }
 
 class TextScramble {
@@ -729,6 +861,10 @@ function initAmbientParticles() {
   }
 
   function animate() {
+    if (document.body.classList.contains("snake-open")) {
+      requestAnimationFrame(animate);
+      return;
+    }
     ctx.clearRect(0, 0, w, h);
 
     for (const p of particles) {
