@@ -21,7 +21,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
   
-  <link rel="stylesheet" href="style.css?v=2.3">
+  <link rel="stylesheet" href="style.css?v=3.6">
   <link rel="icon" type="image/svg+xml" href="assets/avatar.png">
 </head>
 <body>
@@ -47,6 +47,7 @@
           <li><a href="#projects" class="nav-link">Projects</a></li>
           <li><a href="#education" class="nav-link">Education</a></li>
           <li><a href="#learning" class="nav-link">Learning</a></li>
+          <li><a href="#coding-activity" class="nav-link">DSA Graph</a></li>
           <li><a href="https://drive.google.com/file/d/13uvqbCScoFd13uWVoayfTZnQ4QRvWp9O/view?usp=sharing" target="_blank" rel="noopener noreferrer" class="nav-link">Resume</a></li>
         </ul>
       </nav>
@@ -85,7 +86,7 @@
       </div>
       <div class="snake-scoreboard" aria-live="polite">
         <span>Score <strong id="snake-score">0</strong></span>
-        <span>Best <strong id="snake-best-score">0</strong></span>
+        <span>All-Time Best <strong id="snake-best-score">0</strong></span>
       </div>
       <div class="snake-board-wrap">
         <canvas id="snake-canvas" width="480" height="480" aria-label="Snake game board"></canvas>
@@ -147,8 +148,13 @@
           <span class="mobile-nav-title">Learning</span>
           <svg class="mobile-nav-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
         </a>
-        <a href="https://drive.google.com/file/d/13uvqbCScoFd13uWVoayfTZnQ4QRvWp9O/view?usp=sharing" target="_blank" rel="noopener noreferrer" class="mobile-nav-link mobile-nav-resume">
+        <a href="#coding-activity" class="mobile-nav-link" data-section="coding-activity">
           <span class="mobile-nav-num">06</span>
+          <span class="mobile-nav-title">DSA Graph</span>
+          <svg class="mobile-nav-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+        </a>
+        <a href="https://drive.google.com/file/d/13uvqbCScoFd13uWVoayfTZnQ4QRvWp9O/view?usp=sharing" target="_blank" rel="noopener noreferrer" class="mobile-nav-link mobile-nav-resume">
+          <span class="mobile-nav-num">07</span>
           <span class="mobile-nav-title">Resume</span>
           <svg class="mobile-nav-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
         </a>
@@ -287,6 +293,36 @@
       <div class="learning-grid" id="learning-list"></div>
     </section>
 
+    <!-- DSA Contribution Graph (LeetCode Style) -->
+    <section class="activity-section" id="coding-activity" style="margin-top: 4.5rem;">
+      <div class="section-header">
+        <h2 class="section-title">DSA Contribution Graph</h2>
+        <div class="section-divider"></div>
+      </div>
+
+      <div class="leetcode-card">
+        <div class="activity-scroll-area" id="activity-scroll-area">
+          <div class="activity-calendar" id="activity-calendar" aria-label="DSA Contribution Calendar">
+            <div class="activity-calendar-loading">
+              <div class="activity-loading-spinner"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="leetcode-footer">
+          <div class="leetcode-legend">
+            <span class="legend-text">Less</span>
+            <span class="legend-cell lvl-0"></span>
+            <span class="legend-cell lvl-1"></span>
+            <span class="legend-cell lvl-2"></span>
+            <span class="legend-cell lvl-3"></span>
+            <span class="legend-cell lvl-4"></span>
+            <span class="legend-text">More</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
   </main>
 
   <div class="modal-backdrop" id="project-modal" role="dialog" aria-modal="true" aria-hidden="true">
@@ -381,7 +417,7 @@
     </div>
   </footer>
 
-  <script src="portfolio-data.js?v=2.5"></script>
-  <script src="script.js?v=2.4"></script>
+  <script src="portfolio-data.js?v=3.6"></script>
+  <script src="script.js?v=3.6"></script>
 </body>
 </html>

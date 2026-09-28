@@ -1,0 +1,151 @@
+\documentclass[letterpaper,10pt]{article}
+
+\usepackage{latexsym}
+\usepackage[empty]{fullpage}
+\usepackage{titlesec}
+\usepackage{marvosym}
+\usepackage[usenames,dvipsnames]{color}
+\usepackage{verbatim}
+\usepackage{enumitem}
+\usepackage[hidelinks]{hyperref}
+\usepackage{fancyhdr}
+\usepackage[english]{babel}
+\usepackage{tabularx}
+\usepackage{fontawesome5}
+\usepackage[top=0.55in, bottom=0.55in, left=0.6in, right=0.6in]{geometry}
+
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\footrulewidth}{0pt}
+
+\urlstyle{same}
+\setlength{\tabcolsep}{0in}
+
+% Dynamic section spacing: stretches cleanly to occupy exactly one full page
+\titleformat{\section}{
+  \scshape\raggedright\large\bfseries
+}{}{0em}{}[\color{black}\titlerule \vspace{3pt}]
+
+\titlespacing*{\section}{0pt}{8pt plus 1fill minus 2pt}{3.5pt}
+
+% Custom commands
+\newcommand{\resumeItem}[1]{
+  \item\small{{#1 \vspace{1.5pt}}}
+}
+
+\newcommand{\resumeSubheading}[4]{
+  \item
+    \begin{tabular*}{1.0\textwidth}[t]{l@{\extracolsep{\fill}}r}
+      \textbf{#1} & \textbf{\small #2} \\
+      \textit{\small#3} & \textit{\small #4} \\
+    \end{tabular*}\vspace{-3pt}
+}
+
+\newcommand{\resumeProjectHeading}[2]{
+  \item
+    \begin{tabular*}{1.0\textwidth}{l@{\extracolsep{\fill}}r}
+      \small#1 & \textbf{\small #2} \\
+    \end{tabular*}\vspace{-3pt}
+}
+
+\renewcommand\labelitemi{$\vcenter{\hbox{\tiny$\bullet$}}$}
+
+\newcommand{\resumeSubHeadingListStart}{\begin{itemize}[leftmargin=0.0in, label={}, itemsep=3pt]}
+\newcommand{\resumeSubHeadingListEnd}{\end{itemize}}
+\newcommand{\resumeItemListStart}{\begin{itemize}[leftmargin=0.18in, itemsep=2.5pt, topsep=2pt]}
+\newcommand{\resumeItemListEnd}{\end{itemize}\vspace{-2pt}}
+
+%-------------------------------------------
+%%%%%%  RESUME STARTS HERE  %%%%%%%%%%%%%%%%%
+%-------------------------------------------
+\begin{document}
+
+%----------HEADING----------
+\begin{center}
+    {\Huge \textbf{Rishi Nehra}} \\ \vspace{5pt}
+    \small
+    Ghaziabad, India \quad$|$\quad
+    \href{mailto:rishinehra1@gmail.com}{\underline{rishinehra1@gmail.com}} \quad$|$\quad
+    \href{https://yourportfolio.com}{\underline{Portfolio}} \quad$|$\quad
+    \href{https://linkedin.com/in/rishinehra}{\underline{linkedin.com/in/rishinehra}} \quad$|$\quad
+    \href{https://github.com/rishifishyy}{\underline{github.com/rishifishyy}}
+\end{center}
+
+%-----------SUMMARY-----------
+\section{Summary}
+\small{MCA candidate with strong practical foundation in building full-stack web applications using the MERN stack (MongoDB, Express.js, React.js, Node.js). Proficient in Object-Oriented Programming, Data Structures \& Algorithms, RESTful API architecture, and real-time state management.}
+
+%-----------EDUCATION-----------
+\section{Education}
+  \resumeSubHeadingListStart
+    \resumeSubheading
+      {KIET Group of Institutions, Ghaziabad}{2024 -- 2026}
+      {Master of Computer Applications (M.C.A.)}{CGPA: 7.43 / 10.0}
+    \resumeSubheading
+      {ITS College, Ghaziabad}{2021 -- 2024}
+      {Bachelor of Computer Applications (B.C.A.)}{First Division}
+  \resumeSubHeadingListEnd
+
+%-----------TECHNICAL SKILLS-----------
+\section{Technical Skills}
+ \begin{itemize}[leftmargin=0.0in, label={}, itemsep=2.5pt]
+    \small{\item{
+     \textbf{Languages:} C, C++, JavaScript (ES6+), SQL, Python \\
+     \textbf{Frontend:} React.js, Redux Toolkit, HTML5, CSS3, Tailwind CSS, Bootstrap \\
+     \textbf{Backend \& DB:} Node.js, Express.js, RESTful APIs, WebSockets (Socket.io), MongoDB, MySQL \\
+     \textbf{Tools \& Platforms:} Git, GitHub, VS Code, Postman, Vercel, Render \\
+     \textbf{Core CS:} Data Structures \& Algorithms, OOPs, DBMS, Operating Systems, Computer Networks, SDLC
+    }}
+ \end{itemize}
+
+%-----------EXPERIENCE-----------
+\section{Experience}
+  \resumeSubHeadingListStart
+    \resumeSubheading
+      {Frontend Developer Intern, Oasis Infobyte -- Remote}{June 2025 -- July 2025}
+      {}{}\vspace{-10pt}
+      \resumeItemListStart
+        \resumeItem{Built responsive, modular user interfaces utilizing \textbf{React.js}, \textbf{JavaScript (ES6+)}, and \textbf{CSS3}, ensuring consistent rendering across diverse device viewports.}
+        \resumeItem{Integrated \textbf{8+ backend RESTful APIs}, implemented modular UI components, and streamlined client-side state handling to reduce redundant re-renders.}
+        \resumeItem{Deployed client-side routed single-page applications (SPA), collaborating via \textbf{Git/GitHub} within an Agile sprint workflow.}
+      \resumeItemListEnd
+  \resumeSubHeadingListEnd
+
+%-----------PROJECTS-----------
+\section{Projects}
+  \resumeSubHeadingListStart
+    \resumeProjectHeading
+      {\textbf{TeamUP -- Full Stack Matchmaking Platform} $|$ \emph{React.js, Node.js, Express.js, MongoDB, Socket.io}}{
+        \href{https://yourliveprojectlink.com}{\underline{[Live Demo]}} \ \href{https://github.com/rishifishyy}{\underline{[GitHub]}}
+      }
+      \resumeItemListStart
+        \resumeItem{Architected a full-stack player matchmaking web application using \textbf{MongoDB, Express.js, React.js, and Node.js}.}
+        \resumeItem{Engineered multi-attribute filtering algorithms to dynamically match players across \textbf{8 server regions} by game mode, build, and voice chat preferences.}
+        \resumeItem{Built real-time match requests, live availability pools, and instant in-browser chat rooms using \textbf{Socket.io}; deployed on \textbf{Render}.}
+      \resumeItemListEnd
+
+    \resumeProjectHeading
+      {\textbf{AI Exam Notes -- Smart Study \& Revision Platform} $|$ \emph{React.js, Tailwind CSS, Node.js, Gemini API}}{
+        \href{https://github.com/rishifishyy}{\underline{[GitHub]}}
+      }
+      \resumeItemListStart
+        \resumeItem{Developed an AI-powered study platform using \textbf{React.js}, \textbf{Tailwind CSS}, and \textbf{Express.js} to automate lecture note synthesis.}
+        \resumeItem{Integrated \textbf{Google Gemini API} with structured prompt engineering to generate concise concept summaries, formula cheat sheets, and predicted exam questions.}
+        \resumeItem{Engineered interactive revision flashcards, high-throughput REST API text processing, and one-click clipboard/export capabilities.}
+      \resumeItemListEnd
+  \resumeSubHeadingListEnd
+
+%-----------CERTIFICATIONS-----------
+\section{Certifications}
+  \begin{itemize}[leftmargin=0.18in, itemsep=3.5pt, topsep=2pt]
+    \small{
+      \item Cohort 3.0 -- Full Stack Web Development \& DevOps: Harkirat Singh \hfill \textbf{Pursuing}
+      \item Zero to Advanced in Data Structures: Udemy \hfill \textbf{Jan 2026}
+      \item Introduction to Cybersecurity: Cisco (via KIET) \hfill \textbf{May 2025}
+      \item Python Essentials 1 \& 2: Cisco Networking Academy (via KIET) \hfill \textbf{Apr 2025}
+      \item MySQL Database Mastery: Udemy \hfill \textbf{May 2024}
+    }
+  \end{itemize}
+
+\end{document}

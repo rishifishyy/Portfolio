@@ -17,6 +17,7 @@ document.addEventListener("DOMContentLoaded", () => {
   setupSnakeGame();
   setupNameHoverAnimation();
   initAmbientParticles();
+  initCodingActivity();
 });
 
 function renderProfile() {
@@ -521,13 +522,34 @@ function setupSnakeGame() {
   const bestElement = document.getElementById("snake-best-score");
   if (!modal || !canvas) return;
 
-  const context = canvas.getContext("2d", { alpha: false, desynchronized: true });
+  const context = canvas.getContext("2d", { alpha: false });
   const gridSize = 20;
-  const boardLayer = document.createElement("canvas");
-  boardLayer.width = canvas.width;
-  boardLayer.height = canvas.height;
-  const boardContext = boardLayer.getContext("2d");
-  let snake, food, direction, score, bestScore = 0, running, frameId, lastFrame, touchStart, lastPointerInput = 0;
+
+  // Game state & loop
+  let running = false;
+  let frameId = null;
+  let lastTime = 0;
+  let score = 0;
+  let bestScore = 0;
+
+  // Continuous physics & path trail
+  const headRadius = 10;
+  const bodyRadius = 9;
+  const spacing = 11; // Arc-length distance between consecutive body segments
+  const minTurnDist = 18; // Minimum travel distance between turns to prevent accidental self-overlap
+
+  let head = { x: 192, y: 240 };
+  let direction = { x: 1, y: 0 };
+  let inputQueue = [];
+  let distanceSinceTurn = 100;
+  let trail = []; // Records continuous head position history
+  let numSegments = 10; // Active length of snake
+  let food = { x: 336, y: 240 };
+  let particles = [];
+
+  const LOCAL_STORAGE_KEY = "portfolio_snake_global_best";
+  const storedLocal = Number(localStorage.getItem(LOCAL_STORAGE_KEY)) || 0;
+  bestScore = Math.max(bestScore, storedLocal);
   bestElement.textContent = bestScore;
 
   async function loadBestScore() {
@@ -535,14 +557,23 @@ function setupSnakeGame() {
       const response = await fetch("/api/snake-best", { cache: "no-store" });
       if (!response.ok) return;
       const data = await response.json();
-      bestScore = Number(data.bestScore) || 0;
-      bestElement.textContent = bestScore;
+      const serverBest = Number(data.bestScore) || 0;
+      if (serverBest > bestScore) {
+        bestScore = serverBest;
+        localStorage.setItem(LOCAL_STORAGE_KEY, String(bestScore));
+        bestElement.textContent = bestScore;
+      }
     } catch {
-      // The game remains playable if the shared-score service is temporarily unavailable.
+      // Local fallback maintains score even offline
     }
   }
 
   async function submitBestScore(value) {
+    if (value > bestScore) {
+      bestScore = value;
+      bestElement.textContent = bestScore;
+      localStorage.setItem(LOCAL_STORAGE_KEY, String(bestScore));
+    }
     try {
       const response = await fetch("/api/snake-best", {
         method: "POST",
@@ -551,8 +582,10 @@ function setupSnakeGame() {
       });
       if (!response.ok) return;
       const data = await response.json();
-      bestScore = Number(data.bestScore) || bestScore;
+      const serverBest = Number(data.bestScore) || bestScore;
+      bestScore = Math.max(bestScore, serverBest);
       bestElement.textContent = bestScore;
+      localStorage.setItem(LOCAL_STORAGE_KEY, String(bestScore));
     } catch {
       // A failed score submission never interrupts an active game.
     }
@@ -560,169 +593,551 @@ function setupSnakeGame() {
 
   loadBestScore();
 
-  function paintBoard() {
-    const size = canvas.width / gridSize;
-    boardContext.fillStyle = "#07110a";
-    boardContext.fillRect(0, 0, canvas.width, canvas.height);
-    boardContext.strokeStyle = "rgba(135, 181, 89, 0.11)";
-    boardContext.lineWidth = 1;
-    for (let index = 0; index <= gridSize; index += 1) {
-      const point = index * size;
-      boardContext.beginPath(); boardContext.moveTo(point, 0); boardContext.lineTo(point, canvas.height); boardContext.stroke();
-      boardContext.beginPath(); boardContext.moveTo(0, point); boardContext.lineTo(canvas.width, point); boardContext.stroke();
-    }
+  // Distance from point (px, py) to line segment (x1, y1)-(x2, y2)
+  function distToSegment(px, py, x1, y1, x2, y2) {
+    const dx = x2 - x1;
+    const dy = y2 - y1;
+    const l2 = dx * dx + dy * dy;
+    if (l2 === 0) return Math.hypot(px - x1, py - y1);
+    let t = ((px - x1) * dx + (py - y1) * dy) / l2;
+    t = Math.max(0, Math.min(1, t));
+    return Math.hypot(px - (x1 + t * dx), py - (y1 + t * dy));
   }
-  paintBoard();
+
+  // Sample segment coordinates along the head's exact path trail
+  function getSegmentPositions() {
+    const points = [{ x: head.x, y: head.y }];
+    if (numSegments <= 1 || trail.length < 2) return points;
+
+    let currentDist = 0;
+    let trailIdx = 0;
+
+    for (let s = 1; s < numSegments; s++) {
+      const targetDist = s * spacing;
+
+      while (trailIdx < trail.length - 1) {
+        const p1 = trail[trailIdx];
+        const p2 = trail[trailIdx + 1];
+        const segDist = Math.hypot(p2.x - p1.x, p2.y - p1.y);
+
+        if (segDist === 0) {
+          trailIdx++;
+          continue;
+        }
+
+        if (currentDist + segDist >= targetDist) {
+          const factor = (targetDist - currentDist) / segDist;
+          points.push({
+            x: p1.x + (p2.x - p1.x) * factor,
+            y: p1.y + (p2.y - p1.y) * factor
+          });
+          break;
+        } else {
+          currentDist += segDist;
+          trailIdx++;
+        }
+      }
+      if (points.length <= s) {
+        points.push({ ...trail[trail.length - 1] });
+      }
+    }
+    return points;
+  }
 
   function resetGame() {
-    snake = [{ x: 10.5, y: 10.5 }, { x: 9.6, y: 10.5 }, { x: 8.7, y: 10.5 }];
+    head = { x: 192, y: 240 };
     direction = { x: 1, y: 0 };
+    inputQueue = [];
+    distanceSinceTurn = 100;
+    numSegments = 10;
     score = 0;
-    scoreElement.textContent = score;
+    scoreElement.textContent = "0";
+    lastTime = 0;
+    particles = [];
+
+    // Pre-populate initial straight trail behind head
+    trail = [];
+    const initialTrailLength = (numSegments + 3) * spacing;
+    for (let d = 0; d <= initialTrailLength; d += 2) {
+      trail.push({ x: head.x - d, y: head.y });
+    }
+
     placeFood();
-    draw();
+    const segments = getSegmentPositions();
+    draw(segments);
   }
 
   function placeFood() {
-    do {
-      food = { x: Math.floor(Math.random() * gridSize) + 0.5, y: Math.floor(Math.random() * gridSize) + 0.5 };
-    } while (snake.some(segment => Math.hypot(segment.x - food.x, segment.y - food.y) < 1));
+    const cellSize = canvas.width / gridSize;
+    let attempts = 0;
+    let valid = false;
+    let candidate = { x: 336, y: 240 };
+    const currentSegments = getSegmentPositions();
+
+    while (!valid && attempts < 500) {
+      const col = Math.floor(Math.random() * 18) + 1;
+      const row = Math.floor(Math.random() * 18) + 1;
+      candidate = {
+        x: (col + 0.5) * cellSize,
+        y: (row + 0.5) * cellSize
+      };
+      const tooClose = currentSegments.some(seg => Math.hypot(candidate.x - seg.x, candidate.y - seg.y) < 24);
+      if (!tooClose) {
+        valid = true;
+      }
+      attempts++;
+    }
+    food = candidate;
   }
 
-  function draw() {
-    const size = canvas.width / gridSize;
-    context.drawImage(boardLayer, 0, 0);
-    context.fillStyle = "#e24335";
-    context.fillRect((food.x - .32) * size, (food.y - .32) * size, size * .64, size * .64);
-    snake.forEach((segment, index) => {
-      context.fillStyle = index === 0 ? "#d7f886" : "#8fbe4d";
-      context.fillRect((segment.x - .42) * size, (segment.y - .42) * size, size * .84, size * .84);
-    });
+  function queueDirection(name) {
+    const choices = {
+      up: { x: 0, y: -1 },
+      down: { x: 0, y: 1 },
+      left: { x: -1, y: 0 },
+      right: { x: 1, y: 0 }
+    };
+    const newDir = choices[name];
+    if (!newDir) return;
+
+    // Disallow 180° turnaround into own body
+    const refDir = inputQueue.length > 0 ? inputQueue[inputQueue.length - 1] : direction;
+    if (newDir.x === -refDir.x && newDir.y === -refDir.y) return;
+    if (newDir.x === refDir.x && newDir.y === refDir.y) return;
+
+    // Hyper-responsive: if travel threshold since last turn is met, turn INSTANTLY!
+    if (distanceSinceTurn >= minTurnDist && inputQueue.length === 0) {
+      direction = newDir;
+      distanceSinceTurn = 0;
+      trail.unshift({ x: head.x, y: head.y });
+    } else if (inputQueue.length < 2) {
+      // Buffer fast consecutive turns (e.g. quick cornering)
+      inputQueue.push(newDir);
+    }
   }
 
-  function updateGame(delta) {
-    const speed = Math.min(8.5, 4.1 + score * .28);
-    const head = snake[0];
-    head.x += direction.x * speed * delta;
-    head.y += direction.y * speed * delta;
-    const hitWall = head.x < .42 || head.x > gridSize - .42 || head.y < .42 || head.y > gridSize - .42;
-    for (let index = 1; index < snake.length; index += 1) {
-      const leader = snake[index - 1];
-      const segment = snake[index];
-      const distance = Math.hypot(leader.x - segment.x, leader.y - segment.y);
-      if (distance > .88) {
-        const follow = (distance - .88) / distance;
-        segment.x += (leader.x - segment.x) * follow;
-        segment.y += (leader.y - segment.y) * follow;
+  function updateGame(dt) {
+    // Process buffered turn if travel threshold reached
+    if (inputQueue.length > 0 && distanceSinceTurn >= minTurnDist) {
+      const nextDir = inputQueue.shift();
+      if (!(nextDir.x === -direction.x && nextDir.y === -direction.y)) {
+        direction = nextDir;
+        distanceSinceTurn = 0;
+        trail.unshift({ x: head.x, y: head.y });
       }
     }
-    const hitSelf = snake.slice(5).some(segment => Math.hypot(head.x - segment.x, head.y - segment.y) < .56);
-    if (hitWall || hitSelf) return gameOver();
-    if (Math.hypot(head.x - food.x, head.y - food.y) < .48) {
+
+    // Smooth speed scaling: starts fluid (170px/s), ramps gently up to 270px/s with score
+    const speed = Math.min(270, 170 + score * 3.4);
+    const moveDist = speed * dt;
+    distanceSinceTurn += moveDist;
+
+    // Advance head continuously
+    head.x += direction.x * moveDist;
+    head.y += direction.y * moveDist;
+    trail.unshift({ x: head.x, y: head.y });
+
+    // Trim trail to keep memory lightweight
+    const maxTrailDist = numSegments * spacing + 40;
+    let accDist = 0;
+    let keepCount = trail.length;
+    for (let i = 0; i < trail.length - 1; i++) {
+      const d = Math.hypot(trail[i + 1].x - trail[i].x, trail[i + 1].y - trail[i].y);
+      accDist += d;
+      if (accDist > maxTrailDist) {
+        keepCount = i + 2;
+        break;
+      }
+    }
+    if (trail.length > keepCount) {
+      trail.length = keepCount;
+    }
+
+    // Calculate segment positions along trail
+    const segments = getSegmentPositions();
+
+    // 1. Strict Wall Collision Check
+    if (head.x < headRadius || head.x > canvas.width - headRadius ||
+        head.y < headRadius || head.y > canvas.height - headRadius) {
+      return gameOver(segments);
+    }
+
+    // 2. Strict Self Collision Check:
+    // Segments 0..3 are the neck directly behind head (< 44px path distance).
+    // Any segment from index 4 onwards constitutes body that CANNOT be entered.
+    let hitSelf = false;
+    for (let k = 4; k < segments.length - 1; k++) {
+      const d = distToSegment(head.x, head.y, segments[k].x, segments[k].y, segments[k + 1].x, segments[k + 1].y);
+      if (d < 15.2) {
+        hitSelf = true;
+        break;
+      }
+    }
+    if (!hitSelf && segments.length >= 5) {
+      const tailSeg = segments[segments.length - 1];
+      if (Math.hypot(head.x - tailSeg.x, head.y - tailSeg.y) < 15.2) {
+        hitSelf = true;
+      }
+    }
+
+    if (hitSelf) {
+      return gameOver(segments);
+    }
+
+    // 3. Eating Food
+    const foodRadius = 9;
+    if (Math.hypot(head.x - food.x, head.y - food.y) < headRadius + foodRadius + 1) {
       score += 1;
       scoreElement.textContent = score;
       if (score > bestScore) {
-        bestScore = score; bestElement.textContent = bestScore;
+        bestScore = score;
+        bestElement.textContent = bestScore;
+        localStorage.setItem(LOCAL_STORAGE_KEY, String(bestScore));
         submitBestScore(score);
       }
-      const tail = snake[snake.length - 1];
-      snake.push({ x: tail.x, y: tail.y });
+      numSegments += 3;
+
+      // Sparkle burst
+      for (let i = 0; i < 8; i++) {
+        const angle = (Math.PI * 2 * i) / 8 + (Math.random() * 0.4 - 0.2);
+        const spd = 45 + Math.random() * 65;
+        particles.push({
+          x: food.x,
+          y: food.y,
+          vx: Math.cos(angle) * spd,
+          vy: Math.sin(angle) * spd,
+          life: 0.35,
+          maxLife: 0.35,
+          color: i % 2 === 0 ? "#ef4444" : "#d7f886"
+        });
+      }
+
       placeFood();
+    }
+
+    // Update Particles
+    for (let i = particles.length - 1; i >= 0; i--) {
+      const p = particles[i];
+      p.x += p.vx * dt;
+      p.y += p.vy * dt;
+      p.life -= dt;
+      if (p.life <= 0) {
+        particles.splice(i, 1);
+      }
+    }
+
+    return segments;
+  }
+
+  function draw(segments) {
+    if (!segments) segments = getSegmentPositions();
+    const cellSize = canvas.width / gridSize;
+
+    // Clear board background
+    context.fillStyle = "#07110a";
+    context.fillRect(0, 0, canvas.width, canvas.height);
+
+    // Subtle grid lines
+    context.strokeStyle = "rgba(135, 181, 89, 0.08)";
+    context.lineWidth = 1;
+    for (let index = 0; index <= gridSize; index++) {
+      const p = index * cellSize;
+      context.beginPath(); context.moveTo(p, 0); context.lineTo(p, canvas.height); context.stroke();
+      context.beginPath(); context.moveTo(0, p); context.lineTo(canvas.width, p); context.stroke();
+    }
+
+    // Draw Particles
+    particles.forEach(p => {
+      const alpha = Math.max(0, p.life / p.maxLife);
+      context.save();
+      context.globalAlpha = alpha;
+      context.fillStyle = p.color;
+      context.shadowColor = p.color;
+      context.shadowBlur = 6;
+      context.beginPath();
+      context.arc(p.x, p.y, 3 * alpha, 0, Math.PI * 2);
+      context.fill();
+      context.restore();
+    });
+
+    // Draw Food (Glowing pulsing apple)
+    const time = performance.now();
+    const pulse = Math.sin(time * 0.007) * 1.5;
+    const fx = food.x;
+    const fy = food.y;
+    const foodRadius = Math.max(2, 9 + pulse);
+
+    context.save();
+    context.shadowColor = "rgba(239, 68, 68, 0.7)";
+    context.shadowBlur = 12;
+    context.fillStyle = "#ef4444";
+    context.beginPath();
+    context.arc(fx, fy, foodRadius, 0, Math.PI * 2);
+    context.fill();
+
+    context.shadowBlur = 0;
+    context.fillStyle = "#fca5a5";
+    context.beginPath();
+    context.arc(fx - foodRadius * 0.3, fy - foodRadius * 0.3, foodRadius * 0.28, 0, Math.PI * 2);
+    context.fill();
+
+    // Leaf stem
+    context.fillStyle = "#84cc16";
+    context.beginPath();
+    context.ellipse(fx + 2, fy - foodRadius - 1, 3.5, 2, Math.PI / 4, 0, Math.PI * 2);
+    context.fill();
+    context.restore();
+
+    // Draw Connected Snake Body
+    if (segments.length > 1) {
+      context.save();
+      context.shadowColor = "rgba(143, 190, 77, 0.25)";
+      context.shadowBlur = 8;
+      context.lineCap = "round";
+      context.lineJoin = "round";
+
+      // Render connected smooth segments from tail to head
+      for (let i = segments.length - 1; i > 0; i--) {
+        const p1 = segments[i];
+        const p2 = segments[i - 1];
+        const ratio = 1 - (i / Math.max(segments.length, 1)) * 0.42;
+
+        context.beginPath();
+        context.strokeStyle = `rgba(130, 185, 60, ${Math.max(0.68, ratio)})`;
+        context.lineWidth = bodyRadius * 2;
+        context.moveTo(p1.x, p1.y);
+        context.lineTo(p2.x, p2.y);
+        context.stroke();
+      }
+      context.restore();
+
+      // Inner spine highlight for sleek 3D depth
+      context.save();
+      context.lineCap = "round";
+      context.lineJoin = "round";
+      context.lineWidth = 4;
+      context.strokeStyle = "rgba(215, 248, 134, 0.45)";
+      context.beginPath();
+      context.moveTo(segments[0].x, segments[0].y);
+      for (let i = 1; i < segments.length; i++) {
+        context.lineTo(segments[i].x, segments[i].y);
+      }
+      context.stroke();
+      context.restore();
+    }
+
+    // Draw Snake Head
+    if (segments.length > 0) {
+      const h = segments[0];
+      context.save();
+      context.fillStyle = "#d7f886";
+      context.shadowColor = "rgba(215, 248, 134, 0.65)";
+      context.shadowBlur = 12;
+      context.beginPath();
+      context.arc(h.x, h.y, headRadius, 0, Math.PI * 2);
+      context.fill();
+      context.shadowBlur = 0;
+
+      // Eyes pointing in current heading
+      const eyeDist = 4.8;
+      const eyeForward = 3.6;
+      const eyeRadius = 2.4;
+      const pupilRadius = 1.2;
+      let e1 = { x: 0, y: 0 }, e2 = { x: 0, y: 0 };
+
+      if (direction.x === 1) { // Right
+        e1 = { x: h.x + eyeForward, y: h.y - eyeDist };
+        e2 = { x: h.x + eyeForward, y: h.y + eyeDist };
+      } else if (direction.x === -1) { // Left
+        e1 = { x: h.x - eyeForward, y: h.y - eyeDist };
+        e2 = { x: h.x - eyeForward, y: h.y + eyeDist };
+      } else if (direction.y === 1) { // Down
+        e1 = { x: h.x - eyeDist, y: h.y + eyeForward };
+        e2 = { x: h.x + eyeDist, y: h.y + eyeForward };
+      } else { // Up
+        e1 = { x: h.x - eyeDist, y: h.y - eyeForward };
+        e2 = { x: h.x + eyeDist, y: h.y - eyeForward };
+      }
+
+      // Eye whites
+      context.fillStyle = "#112006";
+      context.beginPath();
+      context.arc(e1.x, e1.y, eyeRadius, 0, Math.PI * 2);
+      context.arc(e2.x, e2.y, eyeRadius, 0, Math.PI * 2);
+      context.fill();
+
+      // Eye pupils
+      context.fillStyle = "#ffffff";
+      context.beginPath();
+      context.arc(e1.x + direction.x * 0.8, e1.y + direction.y * 0.8, pupilRadius, 0, Math.PI * 2);
+      context.arc(e2.x + direction.x * 0.8, e2.y + direction.y * 0.8, pupilRadius, 0, Math.PI * 2);
+      context.fill();
+
+      context.restore();
     }
   }
 
   function animate(now) {
     if (!running) return;
-    if (!lastFrame) lastFrame = now;
-    const delta = Math.min((now - lastFrame) / 1000, .035);
-    lastFrame = now;
-    updateGame(delta);
+    if (!lastTime) lastTime = now;
+    const dt = Math.min((now - lastTime) / 1000, 0.033);
+    lastTime = now;
+
+    const segments = updateGame(dt);
     if (running) {
-      draw();
+      draw(segments);
       frameId = requestAnimationFrame(animate);
     }
   }
 
   function startGame() {
     cancelAnimationFrame(frameId);
-    resetGame(); running = true;
+    resetGame();
+    running = true;
     screen.hidden = true;
-    lastFrame = 0;
+    lastTime = 0;
     frameId = requestAnimationFrame(animate);
   }
 
-  function gameOver() {
-    cancelAnimationFrame(frameId); running = false;
-    draw();
-    message.textContent = `Game over — score ${score}`;
+  function gameOver(segments) {
+    cancelAnimationFrame(frameId);
+    running = false;
+    draw(segments);
+    if (score > bestScore) {
+      bestScore = score;
+      bestElement.textContent = bestScore;
+      localStorage.setItem(LOCAL_STORAGE_KEY, String(bestScore));
+      submitBestScore(score);
+      message.innerHTML = `🏆 <strong style="color: #4ade80;">NEW ALL-TIME RECORD: ${score}!</strong><br><span style="font-size: 0.8rem; color: var(--text-muted);">Recorded globally forever!</span>`;
+    } else {
+      message.textContent = `Game over — score ${score}`;
+    }
     startButton.textContent = "Play again";
     screen.hidden = false;
   }
 
   function pauseGame() {
     if (!running) return;
-    cancelAnimationFrame(frameId); running = false;
+    cancelAnimationFrame(frameId);
+    running = false;
     message.textContent = "Game paused — press Start to play again";
     startButton.textContent = "Start game";
     screen.hidden = false;
   }
 
-  function setDirection(name) {
-    const choices = { up: { x: 0, y: -1 }, down: { x: 0, y: 1 }, left: { x: -1, y: 0 }, right: { x: 1, y: 0 } };
-    const selected = choices[name];
-    if (selected && selected.x !== -direction.x && selected.y !== -direction.y) direction = selected;
-  }
-
   function openGame() {
     openButton.classList.add("activated");
-    modal.classList.add("open"); modal.setAttribute("aria-hidden", "false");
+    modal.classList.add("open");
+    modal.setAttribute("aria-hidden", "false");
     document.body.classList.add("snake-open");
-    if (!snake) resetGame();
+    loadBestScore();
+    if (!running) resetGame();
     closeButton.focus();
   }
+
   function closeGame() {
-    pauseGame(); modal.classList.remove("open"); modal.setAttribute("aria-hidden", "true");
-    document.body.classList.remove("snake-open"); openButton.focus();
+    pauseGame();
+    modal.classList.remove("open");
+    modal.setAttribute("aria-hidden", "true");
+    document.body.classList.remove("snake-open");
+    openButton.focus();
   }
 
   openButton.addEventListener("click", openGame);
   closeButton.addEventListener("click", closeGame);
   backdrop.addEventListener("click", closeGame);
   startButton.addEventListener("click", () => running ? null : startGame());
+
+  // On-screen direction controls (Mobile & Tablet)
+  let lastTouchInputTime = 0;
   document.querySelectorAll("[data-direction]").forEach(button => {
-    const handleControlInput = event => {
+    const handleControlInput = (event) => {
       event.preventDefault();
-      const now = performance.now();
-      if (now - lastPointerInput < 45) return;
-      lastPointerInput = now;
-      setDirection(button.dataset.direction);
+      event.stopPropagation();
+      const now = Date.now();
+      if (now - lastTouchInputTime < 30) return;
+      lastTouchInputTime = now;
+
+      if (!running && screen.hidden === false) {
+        startGame();
+      }
+      queueDirection(button.dataset.direction);
     };
     button.addEventListener("touchstart", handleControlInput, { passive: false });
     button.addEventListener("pointerdown", handleControlInput, { passive: false });
-    button.addEventListener("click", event => {
-      if (performance.now() - lastPointerInput < 700) return;
-      handleControlInput(event);
-    }, { passive: false });
   });
-  document.addEventListener("keydown", event => {
+
+  // Keyboard controls (Desktop)
+  document.addEventListener("keydown", (event) => {
     if (!modal.classList.contains("open")) return;
-    const keys = { ArrowUp: "up", w: "up", W: "up", ArrowDown: "down", s: "down", S: "down", ArrowLeft: "left", a: "left", A: "left", ArrowRight: "right", d: "right", D: "right" };
-    if (keys[event.key]) { event.preventDefault(); setDirection(keys[event.key]); }
+    const keys = {
+      ArrowUp: "up", w: "up", W: "up",
+      ArrowDown: "down", s: "down", S: "down",
+      ArrowLeft: "left", a: "left", A: "left",
+      ArrowRight: "right", d: "right", D: "right"
+    };
+    if (keys[event.key]) {
+      event.preventDefault();
+      if (!running && screen.hidden === false) {
+        startGame();
+      }
+      queueDirection(keys[event.key]);
+    }
     if (event.key === "Escape") closeGame();
-    if (event.key === " ") { event.preventDefault(); if (!running) startGame(); }
+    if (event.key === " ") {
+      event.preventDefault();
+      if (!running) startGame();
+    }
   });
-  canvas.addEventListener("pointerdown", event => {
-    touchStart = { x: event.clientX, y: event.clientY };
-    canvas.setPointerCapture?.(event.pointerId);
+
+  // Mobile Touch Swipe & Continuous Drag Steering
+  let touchStartX = 0;
+  let touchStartY = 0;
+  let isSwiping = false;
+
+  canvas.addEventListener("touchstart", (e) => {
+    if (e.touches.length === 1) {
+      touchStartX = e.touches[0].clientX;
+      touchStartY = e.touches[0].clientY;
+      isSwiping = true;
+    }
+  }, { passive: true });
+
+  canvas.addEventListener("touchmove", (e) => {
+    if (!modal.classList.contains("open")) return;
+    e.preventDefault(); // Prevents page scroll while playing
+
+    if (isSwiping && e.touches.length === 1) {
+      const currentX = e.touches[0].clientX;
+      const currentY = e.touches[0].clientY;
+      const dx = currentX - touchStartX;
+      const dy = currentY - touchStartY;
+      const dist = Math.hypot(dx, dy);
+
+      // Fast, responsive 12px threshold for turn activation
+      if (dist >= 12) {
+        if (!running && screen.hidden === false) {
+          startGame();
+        }
+        if (Math.abs(dx) > Math.abs(dy)) {
+          queueDirection(dx > 0 ? "right" : "left");
+        } else {
+          queueDirection(dy > 0 ? "down" : "up");
+        }
+        // Continuous steering: update anchor so user doesn't need to lift finger
+        touchStartX = currentX;
+        touchStartY = currentY;
+      }
+    }
+  }, { passive: false });
+
+  canvas.addEventListener("touchend", () => {
+    isSwiping = false;
+  }, { passive: true });
+
+  document.addEventListener("visibilitychange", () => {
+    if (document.hidden) pauseGame();
   });
-  canvas.addEventListener("pointerup", event => {
-    if (!touchStart) return;
-    const deltaX = event.clientX - touchStart.x, deltaY = event.clientY - touchStart.y;
-    if (Math.max(Math.abs(deltaX), Math.abs(deltaY)) > 18) setDirection(Math.abs(deltaX) > Math.abs(deltaY) ? (deltaX > 0 ? "right" : "left") : (deltaY > 0 ? "down" : "up"));
-    touchStart = null;
-  });
-  canvas.addEventListener("pointercancel", () => { touchStart = null; });
-  document.addEventListener("visibilitychange", () => { if (document.hidden) pauseGame(); });
 }
 
 class TextScramble {
@@ -926,3 +1341,263 @@ function showToast(message) {
     toast.classList.remove("show");
   }, 3000);
 }
+
+/* ==========================================================================
+   DSA Contribution Graph (LeetCode Style)
+   ========================================================================== */
+
+function initCodingActivity() {
+  const container = document.getElementById("activity-calendar");
+  const scrollArea = document.getElementById("activity-scroll-area");
+
+  if (!container) return;
+
+  // Create floating tooltip
+  let tooltip = document.getElementById("activity-tooltip");
+  if (!tooltip) {
+    tooltip = document.createElement("div");
+    tooltip.id = "activity-tooltip";
+    tooltip.className = "activity-tooltip";
+    document.body.appendChild(tooltip);
+  }
+
+  // Fetch combined activity data
+  async function loadData() {
+    try {
+      const res = await fetch("/api/coding-activity");
+      if (res.ok) return await res.json();
+    } catch (e) {
+      console.warn("API route /api/coding-activity unavailable, trying local fallback:", e.message);
+    }
+
+    try {
+      const fallbackRes = await fetch("data/coding-activity.json?t=" + Date.now());
+      if (fallbackRes.ok) return await fallbackRes.json();
+    } catch (err) {
+      console.error("Failed to load activity fallback data:", err);
+    }
+    return null;
+  }
+
+  loadData().then(data => {
+    if (!data) {
+      container.innerHTML = `<div class="activity-calendar-loading"><span>Unable to load contribution graph.</span></div>`;
+      return;
+    }
+    renderCalendar(data);
+    setupSectionObserver();
+  });
+
+  function renderCalendar(data) {
+    const daysData = data.days || {};
+    const now = new Date();
+
+    const formatDate = (d) => {
+      const y = d.getFullYear();
+      const m = String(d.getMonth() + 1).padStart(2, "0");
+      const day = String(d.getDate()).padStart(2, "0");
+      return `${y}-${m}-${day}`;
+    };
+
+    const localToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const localTodayStr = formatDate(localToday);
+
+    const utcToday = new Date(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate());
+    const utcTodayStr = formatDate(utcToday);
+
+    // Platform daily cycles (LeetCode / GFG) reset at 00:00:00 UTC (05:30 AM IST).
+    // If the visitor's local date has crossed midnight ahead of UTC (e.g. 00:00 to 05:30 IST in India),
+    // and local day hasn't recorded submissions yet while current UTC day has active session submissions,
+    // align "today" to the active daily cycle so today's submissions are immediately visible!
+    let activeToday = localToday;
+    let activeTodayStr = localTodayStr;
+
+    if ((!daysData[localTodayStr] || !daysData[localTodayStr].count) && (daysData[utcTodayStr] && daysData[utcTodayStr].count > 0)) {
+      activeToday = utcToday;
+      activeTodayStr = utcTodayStr;
+    }
+
+    const currentDayOfWeek = activeToday.getDay(); // 0 is Sun, 6 is Sat
+    const totalWeeks = 53;
+    const startDate = new Date(activeToday);
+    startDate.setDate(activeToday.getDate() - (52 * 7 + currentDayOfWeek));
+
+    const weeks = [];
+    let curr = new Date(startDate);
+
+    for (let w = 0; w < totalWeeks; w++) {
+      const weekDays = [];
+      for (let d = 0; d < 7; d++) {
+        const dateObj = new Date(curr);
+        const dateStr = formatDate(dateObj);
+        const isFuture = dateObj > activeToday;
+        const isToday = dateStr === activeTodayStr;
+
+        const dayInfo = daysData[dateStr] || null;
+        const count = (!isFuture && dayInfo) ? (dayInfo.count || 0) : 0;
+
+        let level = 0;
+        if (count >= 9) level = 4;
+        else if (count >= 6) level = 3;
+        else if (count >= 3) level = 2;
+        else if (count >= 1) level = 1;
+
+        weekDays.push({
+          dateStr,
+          dateObj,
+          isFuture,
+          isToday,
+          count,
+          level,
+          month: dateObj.getMonth(),
+          year: dateObj.getFullYear()
+        });
+
+        curr.setDate(curr.getDate() + 1);
+      }
+      weeks.push(weekDays);
+    }
+
+    // Build Months Row
+    const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    let monthsRowHtml = '<div class="activity-months-row">';
+    let lastLabeledCol = -10;
+
+    weeks.forEach((week, wIdx) => {
+      const firstDay = week[0];
+      const prevWeekFirstDay = wIdx > 0 ? weeks[wIdx - 1][0] : null;
+
+      const isNewMonth = !prevWeekFirstDay || (firstDay.month !== prevWeekFirstDay.month);
+      if (isNewMonth && (wIdx - lastLabeledCol >= 3) && (wIdx < totalWeeks - 1)) {
+        const leftPx = wIdx * 15;
+        monthsRowHtml += `<span class="activity-month-label" style="left: ${leftPx}px">${monthNames[firstDay.month]}</span>`;
+        lastLabeledCol = wIdx;
+      }
+    });
+    monthsRowHtml += '</div>';
+
+    // Build Grid Body
+    let gridBodyHtml = '<div class="activity-grid-body">';
+
+    // Left Day Labels (Mon, Wed, Fri)
+    gridBodyHtml += '<div class="activity-days-col">';
+    for (let r = 0; r < 7; r++) {
+      let label = "";
+      if (r === 1) label = "Mon";
+      else if (r === 3) label = "Wed";
+      else if (r === 5) label = "Fri";
+      gridBodyHtml += `<div class="activity-day-label">${label}</div>`;
+    }
+    gridBodyHtml += '</div>';
+
+    // Weeks Grid
+    gridBodyHtml += '<div class="activity-weeks-grid">';
+    weeks.forEach((week, wIdx) => {
+      gridBodyHtml += `<div class="activity-week-col" data-col="${wIdx}">`;
+      week.forEach((day, dIdx) => {
+        let classes = `activity-cell lvl-${day.level}`;
+        if (day.isFuture) classes = "activity-cell lvl-future";
+        if (day.isToday) classes += " cell-today";
+
+        const animDelay = Math.min((wIdx * 12 + dIdx * 8), 650);
+
+        gridBodyHtml += `
+          <div class="${classes}"
+               data-date="${day.dateStr}"
+               data-count="${day.count}"
+               data-future="${day.isFuture}"
+               style="animation-delay: ${animDelay}ms"
+               tabindex="${day.isFuture ? '-1' : '0'}"
+               role="gridcell"
+               aria-label="${day.dateStr}">
+          </div>
+        `;
+      });
+      gridBodyHtml += '</div>';
+    });
+    gridBodyHtml += '</div>';
+    gridBodyHtml += '</div>';
+
+    container.innerHTML = monthsRowHtml + gridBodyHtml;
+
+    attachCellEvents();
+
+    if (scrollArea) {
+      requestAnimationFrame(() => {
+        scrollArea.scrollLeft = scrollArea.scrollWidth;
+      });
+    }
+  }
+
+  function attachCellEvents() {
+    const cells = container.querySelectorAll(".activity-cell:not(.lvl-future)");
+
+    cells.forEach(cell => {
+      cell.addEventListener("mouseenter", showTooltip);
+      cell.addEventListener("mouseleave", hideTooltip);
+      cell.addEventListener("focus", showTooltip);
+      cell.addEventListener("blur", hideTooltip);
+      cell.addEventListener("touchstart", (e) => {
+        showTooltip(e);
+      }, { passive: true });
+    });
+
+    document.addEventListener("touchstart", (e) => {
+      if (!e.target.closest(".activity-cell")) {
+        hideTooltip();
+      }
+    }, { passive: true });
+  }
+
+  function showTooltip(e) {
+    const cell = e.currentTarget || e.target;
+    if (!cell || cell.classList.contains("lvl-future")) return;
+
+    const dateStr = cell.getAttribute("data-date");
+    const count = Number(cell.getAttribute("data-count")) || 0;
+    if (!dateStr) return;
+
+    const [y, m, d] = dateStr.split("-").map(Number);
+    const dateObj = new Date(y, m - 1, d);
+    const options = { month: "short", day: "numeric", year: "numeric" };
+    const dateFormatted = dateObj.toLocaleDateString("en-US", options);
+
+    const message = count > 0 
+      ? `${count} submission${count === 1 ? '' : 's'} on ${dateFormatted}`
+      : `No submissions on ${dateFormatted}`;
+
+    tooltip.textContent = message;
+
+    const rect = cell.getBoundingClientRect();
+    const tooltipX = rect.left + rect.width / 2;
+    const tooltipY = rect.top;
+
+    tooltip.style.left = `${tooltipX}px`;
+    tooltip.style.top = `${tooltipY}px`;
+    tooltip.classList.add("show");
+  }
+
+  function hideTooltip() {
+    tooltip.classList.remove("show");
+  }
+
+  function setupSectionObserver() {
+    const section = document.getElementById("coding-activity");
+    if (!section || !("IntersectionObserver" in window)) {
+      container.classList.add("animated");
+      return;
+    }
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          container.classList.add("animated");
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.1 });
+
+    observer.observe(section);
+  }
+}
+

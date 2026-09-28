@@ -557,7 +557,7 @@ body::before {
 .snake-modal { position: fixed; inset: 0; z-index: 1000; display: grid; place-items: center; padding: 1rem; opacity: 0; pointer-events: none; transition: opacity .2s ease; }
 .snake-modal.open { opacity: 1; pointer-events: auto; }
 .snake-modal-backdrop { position: absolute; inset: 0; background: rgba(0, 0, 0, .78); backdrop-filter: blur(8px); }
-.snake-panel { position: relative; width: min(100%, 32rem); border: 1px solid rgba(190, 242, 100, .35); border-radius: 1.25rem; background: #10150e; box-shadow: 0 24px 70px rgba(0, 0, 0, .7), 0 0 35px rgba(163, 230, 53, .12); overflow: hidden; padding: clamp(1rem, 3vw, 1.4rem); }
+.snake-panel { position: relative; width: min(100%, 32rem); max-height: 94vh; overflow-y: auto; border: 1px solid rgba(190, 242, 100, .35); border-radius: 1.25rem; background: #10150e; box-shadow: 0 24px 70px rgba(0, 0, 0, .7), 0 0 35px rgba(163, 230, 53, .12); padding: clamp(1rem, 3vw, 1.4rem); scrollbar-width: thin; scrollbar-color: rgba(190, 242, 100, .2) transparent; }
 .snake-panel-header, .snake-scoreboard { display: flex; justify-content: space-between; align-items: center; gap: 1rem; }
 .snake-kicker { color: #9bbd61; font: 700 .65rem/1 var(--font-mono, monospace); letter-spacing: .18em; text-transform: uppercase; margin: 0 0 .35rem; }
 .snake-panel h2 { margin: 0; color: #eefbd3; font-size: 1.65rem; }
@@ -565,7 +565,7 @@ body::before {
 .snake-scoreboard { margin: 1rem 0 .7rem; color: #aab59a; font: 700 .78rem/1 var(--font-mono, monospace); letter-spacing: .1em; text-transform: uppercase; }
 .snake-scoreboard strong { color: #d7f886; font-size: 1rem; }
 .snake-board-wrap { position: relative; aspect-ratio: 1; border: 10px solid #26351b; background: #07110a; box-shadow: inset 0 0 0 1px rgba(215, 248, 134, .12); touch-action: none; }
-#snake-canvas { display: block; width: 100%; height: 100%; image-rendering: pixelated; }
+#snake-canvas { display: block; width: 100%; height: 100%; image-rendering: auto; touch-action: none; }
 .snake-screen { position: absolute; inset: 0; display: grid; place-content: center; justify-items: center; gap: 1rem; padding: 2rem; text-align: center; background: rgba(6, 14, 7, .76); color: #e8f9bf; font-weight: 700; }
 .snake-screen[hidden] { display: none; }
 .snake-screen p { margin: 0; max-width: 20rem; line-height: 1.5; }
@@ -575,6 +575,29 @@ body::before {
 .snake-controls button { min-width: 3.2rem; min-height: 3.2rem; border: 1px solid rgba(190, 242, 100, .25); border-radius: .5rem; background: #1b2814; color: #d7f886; cursor: pointer; font-size: 1rem; touch-action: none; -webkit-tap-highlight-color: transparent; }
 .snake-controls button:hover, .snake-controls button:active { background: #30461f; }
 .snake-controls button:nth-child(1) { grid-column: 2; }.snake-controls button:nth-child(2) { grid-column: 1; grid-row: 2; }.snake-controls button:nth-child(3) { grid-column: 2; grid-row: 2; }.snake-controls button:nth-child(4) { grid-column: 3; grid-row: 2; }
+
+@media (max-width: 640px) {
+  .snake-modal {
+    padding: 0.5rem;
+  }
+  .snake-panel {
+    max-height: 96vh;
+    padding: 0.85rem;
+    border-radius: 1rem;
+  }
+  .snake-board-wrap {
+    border-width: 6px;
+  }
+  .snake-controls {
+    grid-template-columns: repeat(3, 2.85rem);
+    gap: 0.3rem;
+  }
+  .snake-controls button {
+    min-width: 2.85rem;
+    min-height: 2.85rem;
+    font-size: 0.95rem;
+  }
+}
 
 .music-toggle-btn {
   display: inline-flex;
@@ -2367,6 +2390,307 @@ body::before {
 .toast-icon {
   color: #38bdf8;
   flex-shrink: 0;
+}
+
+/* ==========================================================================
+   DSA Contribution Graph (Minimalist LeetCode Style)
+   ========================================================================== */
+
+.activity-section {
+  position: relative;
+  width: 100%;
+}
+
+.leetcode-card {
+  background: rgba(18, 18, 22, 0.7);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid var(--border-card);
+  border-radius: 14px;
+  padding: 1.25rem 1.4rem;
+  box-shadow: 0 16px 36px -12px rgba(0, 0, 0, 0.5);
+  transition: border-color 0.25s ease;
+}
+
+.leetcode-card:hover {
+  border-color: rgba(255, 255, 255, 0.16);
+}
+
+.activity-scroll-area {
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding-bottom: 0.35rem;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.1) transparent;
+}
+
+.activity-scroll-area::-webkit-scrollbar {
+  height: 4px;
+}
+
+.activity-scroll-area::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.activity-scroll-area::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 4px;
+}
+
+.activity-calendar {
+  display: inline-flex;
+  flex-direction: column;
+  min-width: max-content;
+  user-select: none;
+}
+
+.activity-calendar-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2.5rem 1rem;
+}
+
+.activity-loading-spinner {
+  width: 18px;
+  height: 18px;
+  border: 2px solid rgba(44, 187, 93, 0.2);
+  border-top-color: #2cbb5d;
+  border-radius: 50%;
+  animation: spinnerRotate 0.8s linear infinite;
+}
+
+@keyframes spinnerRotate {
+  to { transform: rotate(360deg); }
+}
+
+/* Month labels row */
+.activity-months-row {
+  display: flex;
+  margin-left: 28px;
+  height: 16px;
+  position: relative;
+  margin-bottom: 6px;
+}
+
+.activity-month-label {
+  position: absolute;
+  font-family: var(--font-sans);
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  letter-spacing: 0.01em;
+}
+
+/* Grid Body */
+.activity-grid-body {
+  display: flex;
+  gap: 4px;
+}
+
+.activity-days-col {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  width: 24px;
+  margin-right: 4px;
+}
+
+.activity-day-label {
+  height: 12px;
+  font-family: var(--font-sans);
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  line-height: 12px;
+  text-align: right;
+  padding-right: 3px;
+}
+
+.activity-weeks-grid {
+  display: flex;
+  gap: 3px;
+}
+
+.activity-week-col {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+/* Calendar Cells (LeetCode style) */
+.activity-cell {
+  width: 12px;
+  height: 12px;
+  border-radius: 2px;
+  box-sizing: border-box;
+  cursor: pointer;
+  outline: none;
+  transition: transform 0.15s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.15s ease;
+}
+
+/* Staggered Ripple Wave */
+.activity-calendar.animated .activity-cell {
+  animation: leetcodeWaveIn 0.38s cubic-bezier(0.16, 1, 0.3, 1) backwards;
+}
+
+@keyframes leetcodeWaveIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.25);
+  }
+  60% {
+    transform: scale(1.15);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* LeetCode Green Levels */
+.activity-cell.lvl-0,
+.legend-cell.lvl-0 {
+  background-color: rgba(255, 255, 255, 0.055);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.activity-cell.lvl-1,
+.legend-cell.lvl-1 {
+  background-color: #14532d;
+  border: 1px solid #166534;
+}
+
+.activity-cell.lvl-2,
+.legend-cell.lvl-2 {
+  background-color: #15803d;
+  border: 1px solid #16a34a;
+}
+
+.activity-cell.lvl-3,
+.legend-cell.lvl-3 {
+  background-color: #22c55e;
+  border: 1px solid #4ade80;
+  box-shadow: 0 0 4px rgba(34, 197, 94, 0.3);
+}
+
+.activity-cell.lvl-4,
+.legend-cell.lvl-4 {
+  background-color: #4ade80;
+  border: 1px solid #86efac;
+  box-shadow: 0 0 7px rgba(74, 222, 128, 0.5);
+}
+
+.activity-cell:not(.lvl-future):hover {
+  transform: scale(1.4);
+  z-index: 10;
+}
+
+.activity-cell.lvl-0:hover {
+  background-color: rgba(255, 255, 255, 0.14);
+}
+
+.activity-cell.lvl-1:hover,
+.activity-cell.lvl-2:hover,
+.activity-cell.lvl-3:hover,
+.activity-cell.lvl-4:hover {
+  box-shadow: 0 0 12px rgba(74, 222, 128, 0.85);
+}
+
+.activity-cell.lvl-future {
+  background: transparent;
+  border: 1px dashed rgba(255, 255, 255, 0.03);
+  pointer-events: none;
+  opacity: 0.15;
+}
+
+/* Today indicator */
+.activity-cell.cell-today {
+  position: relative;
+}
+
+.activity-cell.cell-today::after {
+  content: "";
+  position: absolute;
+  inset: -2px;
+  border-radius: 3px;
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  pointer-events: none;
+  animation: todayRingPulse 2.5s infinite ease-in-out;
+}
+
+@keyframes todayRingPulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.9;
+  }
+  50% {
+    transform: scale(1.35);
+    opacity: 0.2;
+  }
+}
+
+/* LeetCode Legend (Less .... More) */
+.leetcode-footer {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  margin-top: 0.75rem;
+  padding: 0 0.25rem;
+}
+
+.leetcode-legend {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.leetcode-legend .legend-text {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  font-family: var(--font-sans);
+  margin: 0 4px;
+}
+
+.leetcode-legend .legend-cell {
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+}
+
+/* LeetCode Tooltip */
+.activity-tooltip {
+  position: fixed;
+  z-index: 99999;
+  pointer-events: none;
+  opacity: 0;
+  transform: translate(-50%, -100%) translateY(-6px) scale(0.96);
+  transition: opacity 0.12s ease, transform 0.12s cubic-bezier(0.16, 1, 0.3, 1);
+  background: rgba(24, 24, 28, 0.96);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 6px;
+  padding: 0.35rem 0.65rem;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+  font-size: 0.74rem;
+  color: var(--text-primary);
+  white-space: nowrap;
+  font-family: var(--font-sans);
+}
+
+.activity-tooltip.show {
+  opacity: 1;
+  transform: translate(-50%, -100%) translateY(-6px) scale(1);
+}
+
+@media (max-width: 768px) {
+  .leetcode-card {
+    padding: 1rem 0.75rem;
+  }
+
+  .leetcode-footer {
+    justify-content: flex-start;
+  }
 }
 
 
