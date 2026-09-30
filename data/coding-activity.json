@@ -1,5 +1,6 @@
 {
-  "updatedAt": "2026-09-28T19:14:02.192Z",
+  "updatedAt": "2026-09-30T08:04:20.152Z",
+  "checkedAt": "2026-09-30T08:04:20.152Z",
   "profiles": {
     "leetcode": {
       "username": "rishifishyy",
@@ -10,25 +11,18 @@
       "url": "https://www.geeksforgeeks.org/profile/rishifishyy?tab=activity"
     }
   },
-  "stats": {
-    "totalActiveDaysPastYear": 198,
-    "leetcodeActiveDaysPastYear": 198,
-    "gfgActiveDaysPastYear": 76,
-    "bothActiveDaysPastYear": 76,
-    "currentStreak": 27,
-    "maxStreak": 84
+  "sources": {
+    "leetcode": {
+      "status": "live",
+      "updatedAt": "2026-09-30T08:04:20.152Z"
+    },
+    "gfg": {
+      "status": "live",
+      "updatedAt": "2026-09-30T08:04:20.152Z"
+    }
   },
+  "stale": false,
   "days": {
-    "2025-09-29": {
-      "count": 3,
-      "leetcode": 1,
-      "gfg": 2
-    },
-    "2025-09-30": {
-      "count": 1,
-      "leetcode": 1,
-      "gfg": 0
-    },
     "2025-10-01": {
       "count": 7,
       "leetcode": 6,
@@ -45,9 +39,9 @@
       "gfg": 1
     },
     "2025-10-04": {
-      "count": 6,
+      "count": 5,
       "leetcode": 4,
-      "gfg": 2
+      "gfg": 1
     },
     "2025-10-05": {
       "count": 4,
@@ -360,9 +354,9 @@
       "gfg": 3
     },
     "2025-12-06": {
-      "count": 13,
+      "count": 12,
       "leetcode": 3,
-      "gfg": 10
+      "gfg": 9
     },
     "2025-12-07": {
       "count": 5,
@@ -375,9 +369,9 @@
       "gfg": 1
     },
     "2025-12-09": {
-      "count": 2,
+      "count": 1,
       "leetcode": 1,
-      "gfg": 1
+      "gfg": 0
     },
     "2025-12-10": {
       "count": 3,
@@ -515,9 +509,9 @@
       "gfg": 3
     },
     "2026-01-26": {
-      "count": 7,
+      "count": 4,
       "leetcode": 4,
-      "gfg": 3
+      "gfg": 0
     },
     "2026-01-27": {
       "count": 4,
@@ -530,9 +524,9 @@
       "gfg": 6
     },
     "2026-01-29": {
-      "count": 5,
+      "count": 1,
       "leetcode": 1,
-      "gfg": 4
+      "gfg": 0
     },
     "2026-01-30": {
       "count": 1,
@@ -670,9 +664,9 @@
       "gfg": 1
     },
     "2026-02-26": {
-      "count": 7,
+      "count": 6,
       "leetcode": 5,
-      "gfg": 2
+      "gfg": 1
     },
     "2026-02-27": {
       "count": 3,
@@ -680,9 +674,9 @@
       "gfg": 1
     },
     "2026-02-28": {
-      "count": 3,
+      "count": 2,
       "leetcode": 1,
-      "gfg": 2
+      "gfg": 1
     },
     "2026-03-01": {
       "count": 6,
@@ -705,9 +699,9 @@
       "gfg": 2
     },
     "2026-03-05": {
-      "count": 5,
+      "count": 4,
       "leetcode": 3,
-      "gfg": 2
+      "gfg": 1
     },
     "2026-03-06": {
       "count": 4,
@@ -725,9 +719,9 @@
       "gfg": 1
     },
     "2026-03-09": {
-      "count": 4,
+      "count": 3,
       "leetcode": 3,
-      "gfg": 1
+      "gfg": 0
     },
     "2026-03-10": {
       "count": 1,
@@ -745,9 +739,9 @@
       "gfg": 1
     },
     "2026-03-13": {
-      "count": 4,
+      "count": 3,
       "leetcode": 2,
-      "gfg": 2
+      "gfg": 1
     },
     "2026-03-14": {
       "count": 1,
@@ -940,9 +934,9 @@
       "gfg": 2
     },
     "2026-09-15": {
-      "count": 5,
+      "count": 4,
       "leetcode": 3,
-      "gfg": 2
+      "gfg": 1
     },
     "2026-09-16": {
       "count": 2,
@@ -965,9 +959,9 @@
       "gfg": 1
     },
     "2026-09-20": {
-      "count": 2,
+      "count": 1,
       "leetcode": 1,
-      "gfg": 1
+      "gfg": 0
     },
     "2026-09-21": {
       "count": 1,
@@ -1005,344 +999,27 @@
       "gfg": 2
     },
     "2026-09-28": {
-      "count": 3,
+      "count": 2,
       "leetcode": 1,
-      "gfg": 2
-    },
-    "2025-09-27": {
-      "count": 2,
-      "leetcode": 0,
-      "gfg": 2
-    },
-    "2025-09-26": {
-      "count": 4,
-      "leetcode": 0,
-      "gfg": 4
-    },
-    "2025-09-22": {
-      "count": 1,
-      "leetcode": 0,
       "gfg": 1
     },
-    "2025-09-17": {
-      "count": 2,
-      "leetcode": 0,
-      "gfg": 2
-    },
-    "2025-09-15": {
-      "count": 2,
-      "leetcode": 0,
-      "gfg": 2
-    },
-    "2025-09-13": {
-      "count": 3,
-      "leetcode": 0,
-      "gfg": 3
-    },
-    "2025-09-11": {
+    "2026-09-29": {
       "count": 1,
-      "leetcode": 0,
-      "gfg": 1
-    },
-    "2025-09-07": {
-      "count": 1,
-      "leetcode": 0,
-      "gfg": 1
-    },
-    "2025-09-02": {
-      "count": 2,
-      "leetcode": 0,
-      "gfg": 2
-    },
-    "2025-08-30": {
-      "count": 1,
-      "leetcode": 0,
-      "gfg": 1
-    },
-    "2025-08-22": {
-      "count": 1,
-      "leetcode": 0,
-      "gfg": 1
-    },
-    "2025-08-21": {
-      "count": 2,
-      "leetcode": 0,
-      "gfg": 2
-    },
-    "2025-08-20": {
-      "count": 1,
-      "leetcode": 0,
-      "gfg": 1
-    },
-    "2025-08-19": {
-      "count": 1,
-      "leetcode": 0,
-      "gfg": 1
-    },
-    "2025-08-18": {
-      "count": 2,
-      "leetcode": 0,
-      "gfg": 2
-    },
-    "2025-08-17": {
-      "count": 1,
-      "leetcode": 0,
-      "gfg": 1
-    },
-    "2025-08-14": {
-      "count": 1,
-      "leetcode": 0,
-      "gfg": 1
-    },
-    "2025-08-13": {
-      "count": 4,
-      "leetcode": 0,
-      "gfg": 4
-    },
-    "2025-08-12": {
-      "count": 2,
-      "leetcode": 0,
-      "gfg": 2
-    },
-    "2025-08-07": {
-      "count": 1,
-      "leetcode": 0,
-      "gfg": 1
-    },
-    "2025-08-06": {
-      "count": 2,
-      "leetcode": 0,
-      "gfg": 2
-    },
-    "2025-08-05": {
-      "count": 2,
-      "leetcode": 0,
-      "gfg": 2
-    },
-    "2025-08-04": {
-      "count": 1,
-      "leetcode": 0,
-      "gfg": 1
-    },
-    "2025-08-02": {
-      "count": 3,
-      "leetcode": 0,
-      "gfg": 3
-    },
-    "2025-08-01": {
-      "count": 3,
-      "leetcode": 0,
-      "gfg": 3
-    },
-    "2025-07-31": {
-      "count": 1,
-      "leetcode": 0,
-      "gfg": 1
-    },
-    "2025-07-30": {
-      "count": 1,
-      "leetcode": 0,
-      "gfg": 1
-    },
-    "2025-07-25": {
-      "count": 1,
-      "leetcode": 0,
-      "gfg": 1
-    },
-    "2025-07-24": {
-      "count": 1,
-      "leetcode": 0,
-      "gfg": 1
-    },
-    "2025-07-20": {
-      "count": 1,
-      "leetcode": 0,
-      "gfg": 1
-    },
-    "2025-07-19": {
-      "count": 2,
-      "leetcode": 0,
-      "gfg": 2
-    },
-    "2025-07-18": {
-      "count": 4,
-      "leetcode": 0,
-      "gfg": 4
-    },
-    "2025-07-16": {
-      "count": 2,
-      "leetcode": 0,
-      "gfg": 2
-    },
-    "2025-07-15": {
-      "count": 2,
-      "leetcode": 0,
-      "gfg": 2
-    },
-    "2025-07-10": {
-      "count": 1,
-      "leetcode": 0,
-      "gfg": 1
-    },
-    "2025-07-09": {
-      "count": 3,
-      "leetcode": 0,
-      "gfg": 3
-    },
-    "2025-07-07": {
-      "count": 5,
-      "leetcode": 0,
-      "gfg": 5
-    },
-    "2025-07-06": {
-      "count": 2,
-      "leetcode": 0,
-      "gfg": 2
-    },
-    "2025-07-05": {
-      "count": 1,
-      "leetcode": 0,
-      "gfg": 1
-    },
-    "2025-07-02": {
-      "count": 6,
-      "leetcode": 0,
-      "gfg": 6
-    },
-    "2025-07-01": {
-      "count": 5,
-      "leetcode": 0,
-      "gfg": 5
-    },
-    "2025-06-29": {
-      "count": 2,
-      "leetcode": 0,
-      "gfg": 2
-    },
-    "2025-06-28": {
-      "count": 4,
-      "leetcode": 0,
-      "gfg": 4
-    },
-    "2025-06-27": {
-      "count": 4,
-      "leetcode": 0,
-      "gfg": 4
-    },
-    "2025-09-16": {
-      "count": 2,
-      "leetcode": 0,
-      "gfg": 2
-    },
-    "2023-03-30": {
-      "count": 2,
-      "leetcode": 0,
-      "gfg": 2
-    },
-    "2024-05-02": {
-      "count": 3,
-      "leetcode": 0,
-      "gfg": 3
-    },
-    "2024-06-17": {
-      "count": 1,
-      "leetcode": 0,
-      "gfg": 1
-    },
-    "2024-06-03": {
-      "count": 2,
-      "leetcode": 0,
-      "gfg": 2
-    },
-    "2024-05-03": {
-      "count": 1,
-      "leetcode": 0,
-      "gfg": 1
-    },
-    "2024-06-16": {
-      "count": 1,
-      "leetcode": 0,
-      "gfg": 1
-    },
-    "2024-04-30": {
-      "count": 1,
-      "leetcode": 0,
-      "gfg": 1
-    },
-    "2024-05-30": {
-      "count": 1,
-      "leetcode": 0,
-      "gfg": 1
-    },
-    "2025-06-30": {
-      "count": 2,
-      "leetcode": 0,
-      "gfg": 2
-    },
-    "2024-05-31": {
-      "count": 2,
-      "leetcode": 0,
-      "gfg": 2
-    },
-    "2024-06-02": {
-      "count": 2,
-      "leetcode": 0,
-      "gfg": 2
-    },
-    "2024-06-01": {
-      "count": 3,
-      "leetcode": 0,
-      "gfg": 3
-    },
-    "2024-06-06": {
-      "count": 1,
-      "leetcode": 0,
-      "gfg": 1
-    },
-    "2024-06-08": {
-      "count": 1,
-      "leetcode": 0,
-      "gfg": 1
-    },
-    "2024-05-22": {
-      "count": 2,
-      "leetcode": 0,
-      "gfg": 2
-    },
-    "2024-06-20": {
-      "count": 1,
-      "leetcode": 0,
-      "gfg": 1
-    },
-    "2025-08-03": {
-      "count": 2,
-      "leetcode": 0,
-      "gfg": 2
-    },
-    "2024-05-25": {
-      "count": 1,
-      "leetcode": 0,
-      "gfg": 1
-    },
-    "2024-05-29": {
-      "count": 1,
-      "leetcode": 0,
-      "gfg": 1
-    },
-    "2024-05-01": {
-      "count": 1,
-      "leetcode": 0,
-      "gfg": 1
-    },
-    "2024-06-07": {
-      "count": 1,
-      "leetcode": 0,
-      "gfg": 1
-    },
-    "2024-06-10": {
-      "count": 1,
-      "leetcode": 0,
-      "gfg": 1
+      "leetcode": 1,
+      "gfg": 0
     }
+  },
+  "stats": {
+    "totalActiveDaysPastYear": 197,
+    "leetcodeActiveDaysPastYear": 197,
+    "gfgActiveDaysPastYear": 70,
+    "bothActiveDaysPastYear": 70,
+    "currentStreak": 28,
+    "maxStreak": 82
+  },
+  "range": {
+    "startDate": "2025-10-01",
+    "endDate": "2026-09-30",
+    "dayCount": 365
   }
 }

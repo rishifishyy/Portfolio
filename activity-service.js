@@ -1,339 +1,175 @@
 const https = require("https");
 const fs = require("fs");
 const path = require("path");
-
+const { dateKey, range, summarize } = require("./activity-calendar");
 const cachePath = path.join(__dirname, "data", "coding-activity.json");
+const username = "rishifishyy";
+const profiles = {
+  leetcode: { username, url: `https://leetcode.com/u/${username}/` },
+  gfg: { username, url: `https://www.geeksforgeeks.org/profile/${username}?tab=activity` }
+};
+let memoryCache = null, lastFetchTime = 0, pendingFetch = null;
+const CACHE_TTL_MS = 5 * 60 * 1000;
 
-let memoryCache = null;
-let lastFetchTime = 0;
-const CACHE_TTL_MS = 30 * 60 * 1000; // 30 minutes cache
-
-function formatDateStr(date) {
-  const y = date.getUTCFullYear();
-  const m = String(date.getUTCMonth() + 1).padStart(2, "0");
-  const d = String(date.getUTCDate()).padStart(2, "0");
-  return `${y}-${m}-${d}`;
-}
-
-function fetchLeetCode(username = "rishifishyy") {
-  return new Promise((resolve) => {
-    const postData = JSON.stringify({
-      query: `query getUserProfile($username: String!) {
-        matchedUser(username: $username) {
-          submissionCalendar
-        }
-      }`,
-      variables: { username }
-    });
-
-    const req = https.request("https://leetcode.com/graphql", {
-      method: "POST",
-      family: 4,
-      headers: {
-        "Content-Type": "application/json",
-        "Content-Length": Buffer.byteLength(postData),
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36",
-        "Referer": `https://leetcode.com/u/${username}/`
-      },
-      timeout: 7000
-    }, (res) => {
+function postJson(url, payload, referer) {
+  return new Promise((resolve, reject) => {
+    const body = JSON.stringify(payload);
+    const req = https.request(url, {
+      method: "POST", family: 4,
+      headers: { "Content-Type": "application/json", "Content-Length": Buffer.byteLength(body),
+        "User-Agent": "Mozilla/5.0", Referer: referer, Origin: new URL(referer).origin }
+    }, res => {
       let data = "";
-      res.on("data", chunk => data += chunk);
+      res.on("data", chunk => { data += chunk; });
+      res.on("error", reject);
       res.on("end", () => {
+        clearTimeout(deadline);
         try {
+          if (res.statusCode !== 200) throw new Error(`HTTP ${res.statusCode}`);
           const json = JSON.parse(data);
-          const rawCal = json.data?.matchedUser?.submissionCalendar;
-          const parsedCal = rawCal ? JSON.parse(rawCal) : {};
-          resolve({ ok: true, calendar: parsedCal });
-        } catch (e) {
-          resolve({ ok: false, error: e.message, calendar: {} });
-        }
+          if (json.errors?.length) throw new Error(json.errors.map(e => e.message).join("; "));
+          resolve(json);
+        } catch (error) { reject(error); }
       });
     });
-
-    req.on("error", (err) => resolve({ ok: false, error: err.message, calendar: {} }));
-    req.on("timeout", () => { req.destroy(); resolve({ ok: false, error: "timeout", calendar: {} }); });
-    req.write(postData);
-    req.end();
+    const deadline = setTimeout(() => req.destroy(new Error("Activity request timed out")), 12000);
+    req.on("error", error => { clearTimeout(deadline); reject(error); });
+    req.end(body);
   });
 }
 
-function fetchGfgYear(handle, year) {
-  return new Promise((resolve) => {
-    const payload = JSON.stringify({
-      handle,
-      requestType: "getYearwiseUserSubmissions",
-      year: String(year),
-      month: ""
-    });
-
-    const req = https.request("https://practiceapi.geeksforgeeks.org/api/v1/user/problems/submissions/", {
-      method: "POST",
-      family: 4,
-      headers: {
-        "Content-Type": "application/json",
-        "Content-Length": Buffer.byteLength(payload),
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36",
-        "Referer": "https://www.geeksforgeeks.org/",
-        "Origin": "https://www.geeksforgeeks.org"
-      },
-      timeout: 7000
-    }, (res) => {
-      let data = "";
-      res.on("data", chunk => data += chunk);
-      res.on("end", () => {
-        try {
-          const json = JSON.parse(data);
-          resolve(json.result || {});
-        } catch (e) {
-          resolve({});
-        }
-      });
-    });
-
-    req.on("error", () => resolve({}));
-    req.on("timeout", () => { req.destroy(); resolve({}); });
-    req.write(payload);
-    req.end();
-  });
+async function fetchLeetCode(now) {
+  const window = range(now);
+  const years = [...new Set([window.start.getUTCFullYear(), window.end.getUTCFullYear()])];
+  const calendars = await Promise.all(years.map(async year => {
+    const json = await postJson("https://leetcode.com/graphql", {
+      query: `query($username: String!, $year: Int!) {
+        matchedUser(username: $username) { userCalendar(year: $year) { submissionCalendar } }
+      }`, variables: { username, year }
+    }, profiles.leetcode.url);
+    const raw = json.data?.matchedUser?.userCalendar?.submissionCalendar;
+    if (typeof raw !== "string") throw new Error("Missing LeetCode calendar");
+    return JSON.parse(raw);
+  }));
+  const days = {};
+  for (const calendar of calendars) {
+    for (const [timestamp, count] of Object.entries(calendar)) {
+      const date = new Date(Number(timestamp) * 1000);
+      if (!Number.isNaN(date.getTime()) && Number(count) > 0) days[dateKey(date)] = Number(count);
+    }
+  }
+  // Recent submissions may appear before the daily calendar catches up.
+  // Calendar buckets are UTC; keep recent timestamps in UTC too. Max prevents double counting.
+  try {
+    const json = await postJson("https://leetcode.com/graphql", {
+      query: `query($username: String!) {
+        recentSubmissionList(username: $username, limit: 20) { id timestamp }
+      }`, variables: { username }
+    }, profiles.leetcode.url);
+    const recent = {}, seen = new Set();
+    for (const sub of json.data?.recentSubmissionList || []) {
+      if (seen.has(sub.id)) continue;
+      seen.add(sub.id);
+      const date = new Date(Number(sub.timestamp) * 1000);
+      if (Number.isNaN(date.getTime())) continue;
+      const key = dateKey(date);
+      recent[key] = (recent[key] || 0) + 1;
+    }
+    for (const [key, count] of Object.entries(recent)) days[key] = Math.max(days[key] || 0, count);
+  } catch (error) { console.warn("LeetCode recent submissions:", error.message); }
+  return days;
 }
 
-function fetchGfgRecentSubmissions(handle = "rishifishyy") {
-  return new Promise((resolve) => {
-    const payload = JSON.stringify({
-      handle,
-      requestType: "getUserSubmissions",
-      page: 1
-    });
-
-    const req = https.request("https://practiceapi.geeksforgeeks.org/api/v1/user/problems/submissions/", {
-      method: "POST",
-      family: 4,
-      headers: {
-        "Content-Type": "application/json",
-        "Content-Length": Buffer.byteLength(payload),
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36",
-        "Referer": "https://www.geeksforgeeks.org/",
-        "Origin": "https://www.geeksforgeeks.org"
-      },
-      timeout: 7000
-    }, (res) => {
-      let data = "";
-      res.on("data", chunk => data += chunk);
-      res.on("end", () => {
-        try {
-          const json = JSON.parse(data);
-          const dateCounts = {};
-          for (const diff of Object.keys(json.result || {})) {
-            for (const pId of Object.keys(json.result[diff] || {})) {
-              const sub = json.result[diff][pId];
-              if (!sub?.user_subtime) continue;
-              const utcDate = new Date(sub.user_subtime.replace(" ", "T") + "Z");
-              if (isNaN(utcDate)) continue;
-              // Map to IST date (UTC+5:30) for Indian competitive programming session alignment
-              const istDate = new Date(utcDate.getTime() + 5.5 * 60 * 60 * 1000);
-              const y = istDate.getUTCFullYear();
-              const m = String(istDate.getUTCMonth() + 1).padStart(2, "0");
-              const d = String(istDate.getUTCDate()).padStart(2, "0");
-              const istDateStr = `${y}-${m}-${d}`;
-              dateCounts[istDateStr] = (dateCounts[istDateStr] || 0) + 1;
-            }
-          }
-          resolve(dateCounts);
-        } catch (e) {
-          resolve({});
-        }
-      });
-    });
-
-    req.on("error", () => resolve({}));
-    req.on("timeout", () => { req.destroy(); resolve({}); });
-    req.write(payload);
-    req.end();
-  });
-}
-
-async function fetchGfg(handle = "rishifishyy") {
-  const now = new Date();
-  const currentYear = now.getFullYear();
-  const pastYear = currentYear - 1;
-
-  const [resCurrent, resPast] = await Promise.all([
-    fetchGfgYear(handle, currentYear),
-    fetchGfgYear(handle, pastYear)
-  ]);
-
-  return { ...resPast, ...resCurrent };
+async function fetchGfg(now) {
+  const window = range(now);
+  const years = [...new Set([window.start.getUTCFullYear(), window.end.getUTCFullYear()])];
+  const calendars = await Promise.all(years.map(async year => {
+    const json = await postJson("https://practiceapi.geeksforgeeks.org/api/v1/user/problems/submissions/", {
+      handle: username, requestType: "getYearwiseUserSubmissions", year: String(year), month: ""
+    }, "https://www.geeksforgeeks.org/");
+    if (!json.result || typeof json.result !== "object" || Array.isArray(json.result)) {
+      throw new Error("Missing GFG calendar");
+    }
+    return json.result;
+  }));
+  const days = Object.assign({}, ...calendars);
+  try {
+    const json = await postJson("https://practiceapi.geeksforgeeks.org/api/v1/user/problems/submissions/", {
+      handle: username, requestType: "getUserSubmissions", page: 1
+    }, "https://www.geeksforgeeks.org/");
+    const recent = {};
+    for (const group of Object.values(json.result || {})) {
+      for (const sub of Object.values(group || {})) {
+        if (!sub?.user_subtime) continue;
+        const raw = sub.user_subtime.replace(" ", "T");
+        const date = new Date(/[zZ]$|[+-]\d{2}:?\d{2}$/.test(raw) ? raw : raw + "Z");
+        if (Number.isNaN(date.getTime())) continue;
+        const key = dateKey(date);
+        recent[key] = (recent[key] || 0) + 1;
+      }
+    }
+    for (const [key, count] of Object.entries(recent)) days[key] = Math.max(Number(days[key]) || 0, count);
+  } catch (error) { console.warn("GFG recent submissions:", error.message); }
+  return days;
 }
 
 function readDiskCache() {
-  try {
-    if (fs.existsSync(cachePath)) {
-      return JSON.parse(fs.readFileSync(cachePath, "utf8"));
-    }
-  } catch (e) {
-    console.error("Error reading activity disk cache:", e.message);
-  }
-  return null;
+  try { return JSON.parse(fs.readFileSync(cachePath, "utf8")); }
+  catch { return null; }
 }
 
-async function fetchAndCalculate() {
-  const [lcRes, gfgCal, gfgRecent] = await Promise.all([
-    fetchLeetCode("rishifishyy"),
-    fetchGfg("rishifishyy"),
-    fetchGfgRecentSubmissions("rishifishyy")
-  ]);
-
-  const lcCount = Object.keys(lcRes.calendar || {}).length;
-  const gfgCount = Object.keys(gfgCal || {}).length;
-
-  if (lcCount === 0 && gfgCount === 0) {
-    const diskFallback = readDiskCache();
-    if (diskFallback) return diskFallback;
-  }
-
-  const lcDays = {};
-  for (const [timestampStr, count] of Object.entries(lcRes.calendar || {})) {
-    const ts = parseInt(timestampStr, 10);
-    if (!ts || count <= 0) continue;
-    const d = new Date(ts * 1000);
-    const dStr = formatDateStr(d);
-    lcDays[dStr] = (lcDays[dStr] || 0) + Number(count);
-  }
-
-  const gfgDays = {};
-  for (const [dateStr, count] of Object.entries(gfgCal || {})) {
-    if (count > 0) gfgDays[dateStr] = (gfgDays[dateStr] || 0) + Number(count);
-  }
-  for (const [dateStr, count] of Object.entries(gfgRecent || {})) {
-    gfgDays[dateStr] = Math.max(gfgDays[dateStr] || 0, Number(count));
-  }
-
-  const allDates = new Set([...Object.keys(lcDays), ...Object.keys(gfgDays)]);
-  const days = {};
-  for (const date of allDates) {
-    const lc = lcDays[date] || 0;
-    const gfg = gfgDays[date] || 0;
-    days[date] = {
-      count: lc + gfg,
-      leetcode: lc,
-      gfg: gfg
+async function fetchAndCalculate(now = new Date()) {
+  const previous = memoryCache || readDiskCache();
+  const results = await Promise.allSettled([fetchLeetCode(now), fetchGfg(now)]);
+  const days = {}, sources = {};
+  ["leetcode", "gfg"].forEach((platform, index) => {
+    const result = results[index], ok = result.status === "fulfilled";
+    const counts = ok ? result.value : Object.fromEntries(
+      Object.entries(previous?.days || {}).map(([key, day]) => [key, day[platform] || 0])
+    );
+    sources[platform] = {
+      status: ok ? "live" : "stale",
+      updatedAt: ok ? now.toISOString() : (previous?.sources?.[platform]?.updatedAt || previous?.updatedAt || null),
+      ...(ok ? {} : { error: result.reason.message })
     };
-  }
-
-  const now = new Date();
-  const oneYearAgo = new Date(now);
-  oneYearAgo.setUTCDate(oneYearAgo.getUTCDate() - 365);
-
-  let totalActivePastYear = 0;
-  let leetcodeActivePastYear = 0;
-  let gfgActivePastYear = 0;
-  let bothActivePastYear = 0;
-
-  for (let d = new Date(oneYearAgo); d <= now; d.setUTCDate(d.getUTCDate() + 1)) {
-    const dStr = formatDateStr(d);
-    const info = days[dStr];
-    if (info) {
-      totalActivePastYear++;
-      if (info.leetcode && info.gfg) bothActivePastYear++;
-      if (info.leetcode) leetcodeActivePastYear++;
-      if (info.gfg) gfgActivePastYear++;
+    for (const [key, count] of Object.entries(counts)) {
+      if (!days[key]) days[key] = { leetcode: 0, gfg: 0 };
+      days[key][platform] = count;
     }
-  }
-
-  let currentStreak = 0;
-  let maxStreak = 0;
-  let tempStreak = 0;
-
-  const todayStr = formatDateStr(now);
-  const yesterday = new Date(now);
-  yesterday.setUTCDate(yesterday.getUTCDate() - 1);
-  const yesterdayStr = formatDateStr(yesterday);
-
-  let checkDate = new Date(days[todayStr] ? now : (days[yesterdayStr] ? yesterday : null));
-  if (checkDate && !isNaN(checkDate)) {
-    while (true) {
-      const s = formatDateStr(checkDate);
-      if (days[s]) {
-        currentStreak++;
-        checkDate.setUTCDate(checkDate.getUTCDate() - 1);
-      } else {
-        break;
-      }
-    }
-  }
-
-  for (let d = new Date(oneYearAgo); d <= now; d.setUTCDate(d.getUTCDate() + 1)) {
-    const dStr = formatDateStr(d);
-    if (days[dStr]) {
-      tempStreak++;
-      if (tempStreak > maxStreak) maxStreak = tempStreak;
-    } else {
-      tempStreak = 0;
-    }
-  }
-
+  });
+  const stale = Object.values(sources).some(source => source.status !== "live");
   const payload = {
-    updatedAt: new Date().toISOString(),
-    profiles: {
-      leetcode: {
-        username: "rishifishyy",
-        url: "https://leetcode.com/u/rishifishyy/"
-      },
-      gfg: {
-        username: "rishifishyy",
-        url: "https://www.geeksforgeeks.org/profile/rishifishyy?tab=activity"
-      }
-    },
-    stats: {
-      totalActiveDaysPastYear: totalActivePastYear,
-      leetcodeActiveDaysPastYear: leetcodeActivePastYear,
-      gfgActiveDaysPastYear: gfgActivePastYear,
-      bothActiveDaysPastYear: bothActivePastYear,
-      currentStreak,
-      maxStreak
-    },
-    days
+    updatedAt: stale ? previous?.updatedAt || null : now.toISOString(),
+    checkedAt: now.toISOString(), profiles, sources, stale, ...summarize(days, now)
   };
-
-  try {
-    fs.writeFileSync(cachePath, JSON.stringify(payload, null, 2));
-  } catch (err) {
-    console.error("Failed to write activity cache file:", err.message);
+  if (results.some(result => result.status === "fulfilled")) {
+    try {
+      fs.mkdirSync(path.dirname(cachePath), { recursive: true });
+      fs.writeFileSync(cachePath, JSON.stringify(payload, null, 2) + "\n");
+    } catch (error) { console.error("Activity cache write failed:", error.message); }
   }
-
   return payload;
 }
 
 async function getCodingActivity(forceRefresh = false) {
-  const now = Date.now();
-  if (!forceRefresh && memoryCache && (now - lastFetchTime < CACHE_TTL_MS)) {
-    return memoryCache;
+  if (pendingFetch) return pendingFetch;
+  const ttl = memoryCache?.stale ? 30000 : CACHE_TTL_MS;
+  if (!forceRefresh && memoryCache && Date.now() - lastFetchTime < ttl) {
+    return { ...memoryCache, ...summarize(memoryCache.days) };
   }
-
-  try {
-    const data = await fetchAndCalculate();
-    if (data) {
-      memoryCache = data;
-      lastFetchTime = now;
-      return memoryCache;
-    }
-  } catch (err) {
-    console.error("Error in getCodingActivity live fetch:", err.message);
-  }
-
-  const diskData = readDiskCache();
-  if (diskData) {
-    memoryCache = diskData;
-    lastFetchTime = now;
-    return diskData;
-  }
-
-  return {
-    updatedAt: new Date().toISOString(),
-    stats: { totalActiveDaysPastYear: 0, currentStreak: 0, maxStreak: 0 },
-    days: {}
-  };
+  pendingFetch = fetchAndCalculate().then(payload => {
+    memoryCache = payload;
+    lastFetchTime = Date.now();
+    return payload;
+  }).finally(() => { pendingFetch = null; });
+  return pendingFetch;
 }
 
-module.exports = { getCodingActivity };
+module.exports = { getCodingActivity, fetchLeetCode, fetchGfg };
+if (require.main === module) {
+  getCodingActivity(true).then(data => {
+    console.log(JSON.stringify({ updatedAt: data.updatedAt, range: data.range, sources: data.sources,
+      latest: Object.entries(data.days).slice(-5) }, null, 2));
+    if (data.stale) process.exitCode = 1;
+  }).catch(error => { console.error(error); process.exitCode = 1; });
+}

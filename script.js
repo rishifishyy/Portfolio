@@ -1364,14 +1364,14 @@ function initCodingActivity() {
   // Fetch combined activity data
   async function loadData() {
     try {
-      const res = await fetch("/api/coding-activity");
+      const res = await fetch("/api/coding-activity?refresh=true", { cache: "no-store" });
       if (res.ok) return await res.json();
     } catch (e) {
       console.warn("API route /api/coding-activity unavailable, trying local fallback:", e.message);
     }
 
     try {
-      const fallbackRes = await fetch("data/coding-activity.json?t=" + Date.now());
+      const fallbackRes = await fetch("data/coding-activity.json?t=" + Date.now(), { cache: "no-store" });
       if (fallbackRes.ok) return await fallbackRes.json();
     } catch (err) {
       console.error("Failed to load activity fallback data:", err);
@@ -1379,48 +1379,50 @@ function initCodingActivity() {
     return null;
   }
 
-  loadData().then(data => {
-    if (!data) {
-      container.innerHTML = `<div class="activity-calendar-loading"><span>Unable to load contribution graph.</span></div>`;
-      return;
-    }
-    renderCalendar(data);
-    setupSectionObserver();
-  });
+  let loading = false;
+  async function refreshCalendar() {
+    if (loading) return;
+    loading = true;
+    try {
+      const data = await loadData();
+      if (!data) {
+        if (!container.querySelector(".activity-cell")) {
+          container.innerHTML = `<div class="activity-calendar-loading"><span>Unable to load contribution graph.</span></div>`;
+        }
+        return;
+      }
+      renderCalendar(data);
+    } finally { loading = false; }
+  }
+  refreshCalendar();
+  setupSectionObserver();
+  setInterval(() => { if (!document.hidden) refreshCalendar(); }, 5 * 60 * 1000);
+  document.addEventListener("visibilitychange", () => { if (!document.hidden) refreshCalendar(); });
+  document.addEventListener("touchstart", e => {
+    if (!e.target.closest(".activity-cell")) hideTooltip();
+  }, { passive: true });
 
   function renderCalendar(data) {
-    const daysData = data.days || {};
     const now = new Date();
+    const { days: daysData } = ActivityCalendar.summarize(data.days || {}, now);
+    const window = ActivityCalendar.range(now);
+    const activeToday = window.end;
+    const activeTodayStr = window.endDate;
+    const formatDate = ActivityCalendar.dateKey;
+    const startDate = new Date(window.start);
+    startDate.setUTCDate(startDate.getUTCDate() - startDate.getUTCDay());
+    const totalWeeks = Math.ceil(((activeToday - startDate) / ActivityCalendar.DAY_MS + 1) / 7);
 
-    const formatDate = (d) => {
-      const y = d.getFullYear();
-      const m = String(d.getMonth() + 1).padStart(2, "0");
-      const day = String(d.getDate()).padStart(2, "0");
-      return `${y}-${m}-${day}`;
-    };
-
-    const localToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-    const localTodayStr = formatDate(localToday);
-
-    const utcToday = new Date(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate());
-    const utcTodayStr = formatDate(utcToday);
-
-    // Platform daily cycles (LeetCode / GFG) reset at 00:00:00 UTC (05:30 AM IST).
-    // If the visitor's local date has crossed midnight ahead of UTC (e.g. 00:00 to 05:30 IST in India),
-    // and local day hasn't recorded submissions yet while current UTC day has active session submissions,
-    // align "today" to the active daily cycle so today's submissions are immediately visible!
-    let activeToday = localToday;
-    let activeTodayStr = localTodayStr;
-
-    if ((!daysData[localTodayStr] || !daysData[localTodayStr].count) && (daysData[utcTodayStr] && daysData[utcTodayStr].count > 0)) {
-      activeToday = utcToday;
-      activeTodayStr = utcTodayStr;
+    const status = document.getElementById("activity-status");
+    if (status) {
+      const updated = data.updatedAt ? new Date(data.updatedAt) : null;
+      const outdated = !updated || Number.isNaN(updated.getTime()) || now - updated > 60 * 60 * 1000;
+      const label = updated && !Number.isNaN(updated.getTime())
+        ? updated.toLocaleString("en-IN", { timeZone: "Asia/Kolkata", month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" }) + " IST"
+        : "unknown";
+      status.textContent = `${data.stale || outdated ? "Saved activity" : "Updated"}: ${label} · Past 365 days`;
+      status.title = "Submissions use platform calendar dates. The chart ends on today's date in India. GitHub Pages activity refreshes through a scheduled workflow.";
     }
-
-    const currentDayOfWeek = activeToday.getDay(); // 0 is Sun, 6 is Sat
-    const totalWeeks = 53;
-    const startDate = new Date(activeToday);
-    startDate.setDate(activeToday.getDate() - (52 * 7 + currentDayOfWeek));
 
     const weeks = [];
     let curr = new Date(startDate);
@@ -1430,7 +1432,7 @@ function initCodingActivity() {
       for (let d = 0; d < 7; d++) {
         const dateObj = new Date(curr);
         const dateStr = formatDate(dateObj);
-        const isFuture = dateObj > activeToday;
+        const isFuture = dateObj > activeToday || dateObj < window.start;
         const isToday = dateStr === activeTodayStr;
 
         const dayInfo = daysData[dateStr] || null;
@@ -1449,11 +1451,11 @@ function initCodingActivity() {
           isToday,
           count,
           level,
-          month: dateObj.getMonth(),
-          year: dateObj.getFullYear()
+          month: dateObj.getUTCMonth(),
+          year: dateObj.getUTCFullYear()
         });
 
-        curr.setDate(curr.getDate() + 1);
+        curr.setUTCDate(curr.getUTCDate() + 1);
       }
       weeks.push(weekDays);
     }
@@ -1542,11 +1544,7 @@ function initCodingActivity() {
       }, { passive: true });
     });
 
-    document.addEventListener("touchstart", (e) => {
-      if (!e.target.closest(".activity-cell")) {
-        hideTooltip();
-      }
-    }, { passive: true });
+
   }
 
   function showTooltip(e) {
