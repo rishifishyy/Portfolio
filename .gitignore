@@ -3,6 +3,7 @@ node_modules/
 dist/
 build/
 .cache/
+.netlify/
 
 # Environment Variables & Logs
 .env

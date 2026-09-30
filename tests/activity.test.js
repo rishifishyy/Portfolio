@@ -113,6 +113,20 @@ test('GFG recent submissions fill calendar gaps without adding duplicates', asyn
   assert.equal(days['2026-09-28'], 4);
 });
 
+test('serverless refresh preserves fresh data without writing to a read-only deployment', async () => {
+  const fixture = serviceFixture((url, payload) => url.includes('leetcode')
+    ? { body: { errors: [{ message: 'Unavailable' }] } }
+    : { body: { result: { '2026-09-29': 1 } } });
+  const data = await fixture.service.getCodingActivity(true, { persist: false, fallbackData: {
+    updatedAt: '2026-09-29T08:00:00Z', days: { '2026-09-29': { leetcode: 7 } }
+  } });
+  assert.equal(data.days['2026-09-29'].leetcode, 7);
+  assert.equal(data.days['2026-09-29'].gfg, 1);
+  assert.equal(data.sources.leetcode.status, 'stale');
+  assert.equal(data.updatedAt, '2026-09-29T08:00:00Z');
+  assert.equal(fixture.writes.length, 0);
+});
+
 test('HTTP failures keep the saved cache and concurrent refreshes share one fetch', async () => {
   const fixture = serviceFixture(() => ({ status: 403, body: {} }));
   const [first, second] = await Promise.all([fixture.service.getCodingActivity(true), fixture.service.getCodingActivity(true)]);
@@ -147,4 +161,51 @@ test('rendered chart has exactly 365 selectable dates and includes latest saved 
   assert.match(container.innerHTML, /cell-today/);
   assert.equal(calls[1].options.cache, 'no-store');
   assert.match(status.textContent, /Past 365 days/);
+});
+
+test('GitHub Pages renders the latest live submission without waiting for a deployment', async () => {
+  const container = { innerHTML: '', querySelectorAll: () => [], classList: { add() {} } };
+  const tooltip = { classList: { remove() {} } };
+  const status = {}, calls = [];
+  const document = { getElementById(id) {
+    return { 'activity-calendar': container, 'activity-tooltip': tooltip, 'activity-status': status }[id] || null;
+  }, addEventListener() {} };
+  const data = { updatedAt: '2026-09-30T07:00:00Z', sources: {
+    leetcode: { status: 'live', updatedAt: '2026-09-30T07:00:00Z' }
+  }, days: { '2026-09-30': { leetcode: 1 } } };
+  const script = fs.readFileSync(require.resolve('../script.js'), 'utf8');
+  vm.runInNewContext(script.slice(script.indexOf('function initCodingActivity()')) + '\ninitCodingActivity();', {
+    document, window: { location: { hostname: 'rishifishyy.github.io' },
+      PORTFOLIO_ACTIVITY_API: 'https://activity.example/api/coding-activity' },
+    ActivityCalendar: calendar, setInterval() {}, console, Date: FixedDate,
+    fetch: async (url, options) => { calls.push({ url, options }); return { ok: true, json: async () => data }; }
+  });
+  await new Promise(resolve => setImmediate(resolve));
+  assert.equal(calls.length, 1);
+  assert.equal(calls[0].url, 'https://activity.example/api/coding-activity');
+  assert.match(container.innerHTML, /data-date="2026-09-30"\s+data-count="1"/);
+  assert.match(status.textContent, /Updated/);
+  assert.match(status.title, /LeetCode: fetched/);
+});
+
+test('a failed live service falls back to the saved deployment and labels old activity', async () => {
+  const container = { innerHTML: '', querySelectorAll: () => [], classList: { add() {} } };
+  const tooltip = { classList: { remove() {} } };
+  const status = {}, calls = [];
+  const document = { getElementById(id) {
+    return { 'activity-calendar': container, 'activity-tooltip': tooltip, 'activity-status': status }[id] || null;
+  }, addEventListener() {} };
+  const data = { updatedAt: '2026-09-30T06:00:00Z', days: { '2026-09-29': { leetcode: 1 } } };
+  const script = fs.readFileSync(require.resolve('../script.js'), 'utf8');
+  vm.runInNewContext(script.slice(script.indexOf('function initCodingActivity()')) + '\ninitCodingActivity();', {
+    document, window: { location: { hostname: 'rishifishyy.github.io' },
+      PORTFOLIO_ACTIVITY_API: 'https://activity.example/api/coding-activity' },
+    ActivityCalendar: calendar, setInterval() {}, console, Date: FixedDate,
+    fetch: async url => { calls.push(url); return { ok: url.startsWith('data/'), json: async () => data }; }
+  });
+  await new Promise(resolve => setImmediate(resolve));
+  assert.equal(calls[0], 'https://activity.example/api/coding-activity');
+  assert.match(calls[1], /^data\/coding-activity.json/);
+  assert.match(container.innerHTML, /data-date="2026-09-29"\s+data-count="1"/);
+  assert.match(status.textContent, /Saved activity/);
 });

@@ -118,8 +118,8 @@ function readDiskCache() {
   catch { return null; }
 }
 
-async function fetchAndCalculate(now = new Date()) {
-  const previous = memoryCache || readDiskCache();
+async function fetchAndCalculate(now = new Date(), { persist = true, fallbackData = null } = {}) {
+  const previous = memoryCache || fallbackData || readDiskCache();
   const results = await Promise.allSettled([fetchLeetCode(now), fetchGfg(now)]);
   const days = {}, sources = {};
   ["leetcode", "gfg"].forEach((platform, index) => {
@@ -142,7 +142,7 @@ async function fetchAndCalculate(now = new Date()) {
     updatedAt: stale ? previous?.updatedAt || null : now.toISOString(),
     checkedAt: now.toISOString(), profiles, sources, stale, ...summarize(days, now)
   };
-  if (results.some(result => result.status === "fulfilled")) {
+  if (persist && results.some(result => result.status === "fulfilled")) {
     try {
       fs.mkdirSync(path.dirname(cachePath), { recursive: true });
       fs.writeFileSync(cachePath, JSON.stringify(payload, null, 2) + "\n");
@@ -151,13 +151,13 @@ async function fetchAndCalculate(now = new Date()) {
   return payload;
 }
 
-async function getCodingActivity(forceRefresh = false) {
+async function getCodingActivity(forceRefresh = false, options = {}) {
   if (pendingFetch) return pendingFetch;
   const ttl = memoryCache?.stale ? 30000 : CACHE_TTL_MS;
   if (!forceRefresh && memoryCache && Date.now() - lastFetchTime < ttl) {
     return { ...memoryCache, ...summarize(memoryCache.days) };
   }
-  pendingFetch = fetchAndCalculate().then(payload => {
+  pendingFetch = fetchAndCalculate(new Date(), options).then(payload => {
     memoryCache = payload;
     lastFetchTime = Date.now();
     return payload;

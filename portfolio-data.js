@@ -1,3 +1,5 @@
+window.PORTFOLIO_ACTIVITY_API = "https://rishifishyy-portfolio-activity.netlify.app/api/coding-activity";
+
 const portfolioData = {
   profile: {
     name: "Rishi Nehra",

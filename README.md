@@ -6,13 +6,32 @@ The contribution chart displays exactly 365 days ending on today's date in
 Asia/Kolkata. Platform calendar dates are preserved, and old/future dates are
 excluded from both the chart and activity statistics.
 
+### Live coding activity
+
+The GitHub Pages frontend reads `window.PORTFOLIO_ACTIVITY_API` from
+`portfolio-data.js`. A small Netlify function fetches LeetCode and GFG activity
+on demand, with a five-minute cache. The frontend fetches on visits, every five
+minutes while visible, and when returning to the tab. Its saved JSON snapshot
+remains a fallback when the live service cannot be reached. Old data is labelled
+"Saved activity"; each platform's fetch time is available in the status tooltip.
+
+The function uses the same activity calculations as the local server and runs
+without writing to the deployment filesystem. It allows browser reads from
+`https://rishifishyy.github.io`. Netlify publishes only `netlify/public` plus the
+function, while the portfolio keeps its existing GitHub Pages address.
+
+To update the live service, authenticate with Netlify and run:
+`npx netlify deploy --site 9ba4d8c2-ddd9-4b54-8ef8-95beaf5f264a --dir netlify/public --functions netlify/functions --no-build --prod`.
+The public data endpoint is
+`https://rishifishyy-portfolio-activity.netlify.app/api/coding-activity`.
+
 ### GitHub Pages setup
 
 GitHub Pages cannot run `server.js`. The `pages.yml` workflow fetches public
 LeetCode and GFG calendars and deploys a fresh static snapshot on each push to
-`main`, on manual runs, and approximately every 15 minutes. GitHub can delay
-scheduled runs; this is periodic refresh, not a live request to the coding
-platforms when a visitor opens the page. The chart displays the snapshot time.
+`main`, on manual runs, and on a requested 15-minute schedule. GitHub can delay
+or skip scheduled runs, so this schedule supplies fallback snapshots and does
+not determine live chart freshness. The chart displays the data's fetch time.
 
 1. Push these changes to `main`.
 2. In the repository's **Settings → Pages → Build and deployment**, select

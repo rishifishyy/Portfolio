@@ -1,6 +1,6 @@
 {
-  "updatedAt": "2026-09-30T08:04:20.152Z",
-  "checkedAt": "2026-09-30T08:04:20.152Z",
+  "updatedAt": "2026-09-30T18:34:49.103Z",
+  "checkedAt": "2026-09-30T18:34:49.103Z",
   "profiles": {
     "leetcode": {
       "username": "rishifishyy",
@@ -14,20 +14,15 @@
   "sources": {
     "leetcode": {
       "status": "live",
-      "updatedAt": "2026-09-30T08:04:20.152Z"
+      "updatedAt": "2026-09-30T18:34:49.103Z"
     },
     "gfg": {
       "status": "live",
-      "updatedAt": "2026-09-30T08:04:20.152Z"
+      "updatedAt": "2026-09-30T18:34:49.103Z"
     }
   },
   "stale": false,
   "days": {
-    "2025-10-01": {
-      "count": 7,
-      "leetcode": 6,
-      "gfg": 1
-    },
     "2025-10-02": {
       "count": 6,
       "leetcode": 4,
@@ -1007,19 +1002,24 @@
       "count": 1,
       "leetcode": 1,
       "gfg": 0
+    },
+    "2026-09-30": {
+      "count": 1,
+      "leetcode": 1,
+      "gfg": 0
     }
   },
   "stats": {
     "totalActiveDaysPastYear": 197,
     "leetcodeActiveDaysPastYear": 197,
-    "gfgActiveDaysPastYear": 70,
-    "bothActiveDaysPastYear": 70,
-    "currentStreak": 28,
-    "maxStreak": 82
+    "gfgActiveDaysPastYear": 69,
+    "bothActiveDaysPastYear": 69,
+    "currentStreak": 29,
+    "maxStreak": 81
   },
   "range": {
-    "startDate": "2025-10-01",
-    "endDate": "2026-09-30",
+    "startDate": "2025-10-02",
+    "endDate": "2026-10-01",
     "dayCount": 365
   }
 }

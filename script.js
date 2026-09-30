@@ -1363,11 +1363,20 @@ function initCodingActivity() {
 
   // Fetch combined activity data
   async function loadData() {
+    const local = ["localhost", "127.0.0.1"].includes(window.location?.hostname);
+    const apiUrl = !local && window.PORTFOLIO_ACTIVITY_API
+      ? window.PORTFOLIO_ACTIVITY_API : "/api/coding-activity?refresh=true";
     try {
-      const res = await fetch("/api/coding-activity?refresh=true", { cache: "no-store" });
-      if (res.ok) return await res.json();
+      const res = await fetch(apiUrl, {
+        cache: "no-store",
+        signal: typeof AbortSignal !== "undefined" ? AbortSignal.timeout(30000) : undefined
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.days && typeof data.days === "object" && !Array.isArray(data.days)) return data;
+      }
     } catch (e) {
-      console.warn("API route /api/coding-activity unavailable, trying local fallback:", e.message);
+      console.warn("Live coding activity unavailable, trying saved activity:", e.message);
     }
 
     try {
@@ -1416,12 +1425,17 @@ function initCodingActivity() {
     const status = document.getElementById("activity-status");
     if (status) {
       const updated = data.updatedAt ? new Date(data.updatedAt) : null;
-      const outdated = !updated || Number.isNaN(updated.getTime()) || now - updated > 60 * 60 * 1000;
+      const outdated = !updated || Number.isNaN(updated.getTime()) || now - updated > 15 * 60 * 1000;
       const label = updated && !Number.isNaN(updated.getTime())
         ? updated.toLocaleString("en-IN", { timeZone: "Asia/Kolkata", month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" }) + " IST"
         : "unknown";
       status.textContent = `${data.stale || outdated ? "Saved activity" : "Updated"}: ${label} · Past 365 days`;
-      status.title = "Submissions use platform calendar dates. The chart ends on today's date in India. GitHub Pages activity refreshes through a scheduled workflow.";
+      status.title = Object.entries(data.sources || {}).map(([platform, source]) => {
+        const time = source.updatedAt ? new Date(source.updatedAt) : null;
+        const label = time && !Number.isNaN(time.getTime())
+          ? time.toLocaleString("en-IN", { timeZone: "Asia/Kolkata" }) + " IST" : "unknown";
+        return `${platform === "leetcode" ? "LeetCode" : "GFG"}: ${source.status === "live" ? "fetched" : "saved"} ${label}`;
+      }).join("\n") + "\nActivity is checked on visits and every five minutes while this page is open. Saved activity is shown when fresh data is unavailable.";
     }
 
     const weeks = [];
