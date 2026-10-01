@@ -16,7 +16,6 @@ document.addEventListener("DOMContentLoaded", () => {
   setupSmoothScroll();
   setupSnakeGame();
   setupNameHoverAnimation();
-  initAmbientParticles();
   initCodingActivity();
 });
 
@@ -502,7 +501,7 @@ function setupSmoothScroll() {
 
         window.scrollTo({
           top: offsetPosition,
-          behavior: "smooth"
+          behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth"
         });
       }
     });
@@ -531,6 +530,7 @@ function setupSnakeGame() {
   let lastTime = 0;
   let score = 0;
   let bestScore = 0;
+  let startingBestScore = 0;
 
   // Continuous physics & path trail
   const headRadius = 10;
@@ -547,51 +547,27 @@ function setupSnakeGame() {
   let food = { x: 336, y: 240 };
   let particles = [];
 
-  const LOCAL_STORAGE_KEY = "portfolio_snake_global_best";
-  const storedLocal = Number(localStorage.getItem(LOCAL_STORAGE_KEY)) || 0;
-  bestScore = Math.max(bestScore, storedLocal);
-  bestElement.textContent = bestScore;
-
-  async function loadBestScore() {
-    try {
-      const response = await fetch("/api/snake-best", { cache: "no-store" });
-      if (!response.ok) return;
-      const data = await response.json();
-      const serverBest = Number(data.bestScore) || 0;
-      if (serverBest > bestScore) {
-        bestScore = serverBest;
-        localStorage.setItem(LOCAL_STORAGE_KEY, String(bestScore));
-        bestElement.textContent = bestScore;
+  const syncStatus = document.getElementById("snake-sync-status");
+  let scoreStorage;
+  try { scoreStorage = window.localStorage; } catch {}
+  const local = ["localhost", "127.0.0.1", "::1"].includes(window.location.hostname) || window.location.hostname.endsWith(".netlify.app");
+  const scoreClient = window.createSnakeScoreClient({
+    endpoint: local ? "/api/snake-best" : window.PORTFOLIO_SNAKE_API,
+    storage: scoreStorage,
+    onChange: state => {
+      bestScore = state.bestScore ?? 0;
+      const displayScore = String(state.bestScore ?? "—");
+      if (bestElement.textContent !== displayScore) bestElement.textContent = displayScore;
+      if (syncStatus) {
+        if (syncStatus.textContent !== state.status) syncStatus.textContent = state.status;
+        syncStatus.dataset.state = state.state;
+        syncStatus.hidden = !state.status;
       }
-    } catch {
-      // Local fallback maintains score even offline
     }
-  }
-
-  async function submitBestScore(value) {
-    if (value > bestScore) {
-      bestScore = value;
-      bestElement.textContent = bestScore;
-      localStorage.setItem(LOCAL_STORAGE_KEY, String(bestScore));
-    }
-    try {
-      const response = await fetch("/api/snake-best", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ score: value })
-      });
-      if (!response.ok) return;
-      const data = await response.json();
-      const serverBest = Number(data.bestScore) || bestScore;
-      bestScore = Math.max(bestScore, serverBest);
-      bestElement.textContent = bestScore;
-      localStorage.setItem(LOCAL_STORAGE_KEY, String(bestScore));
-    } catch {
-      // A failed score submission never interrupts an active game.
-    }
-  }
-
-  loadBestScore();
+  });
+  const loadBestScore = () => scoreClient.refresh();
+  const submitBestScore = value => scoreClient.submit(value);
+  void loadBestScore();
 
   // Distance from point (px, py) to line segment (x1, y1)-(x2, y2)
   function distToSegment(px, py, x1, y1, x2, y2) {
@@ -645,6 +621,7 @@ function setupSnakeGame() {
   }
 
   function resetGame() {
+    startingBestScore = bestScore;
     head = { x: 192, y: 240 };
     direction = { x: 1, y: 0 };
     inputQueue = [];
@@ -789,12 +766,7 @@ function setupSnakeGame() {
     if (Math.hypot(head.x - food.x, head.y - food.y) < headRadius + foodRadius + 1) {
       score += 1;
       scoreElement.textContent = score;
-      if (score > bestScore) {
-        bestScore = score;
-        bestElement.textContent = bestScore;
-        localStorage.setItem(LOCAL_STORAGE_KEY, String(bestScore));
-        submitBestScore(score);
-      }
+      if (score > bestScore) void submitBestScore(score);
       numSegments += 3;
 
       // Sparkle burst
@@ -834,11 +806,12 @@ function setupSnakeGame() {
     const cellSize = canvas.width / gridSize;
 
     // Clear board background
-    context.fillStyle = "#07110a";
+    const lightTheme = document.documentElement.dataset.theme === "light";
+    context.fillStyle = lightTheme ? "#e7efd9" : "#07110a";
     context.fillRect(0, 0, canvas.width, canvas.height);
 
     // Subtle grid lines
-    context.strokeStyle = "rgba(135, 181, 89, 0.08)";
+    context.strokeStyle = lightTheme ? "rgba(56, 83, 28, 0.1)" : "rgba(135, 181, 89, 0.08)";
     context.lineWidth = 1;
     for (let index = 0; index <= gridSize; index++) {
       const p = index * cellSize;
@@ -903,7 +876,7 @@ function setupSnakeGame() {
         const ratio = 1 - (i / Math.max(segments.length, 1)) * 0.42;
 
         context.beginPath();
-        context.strokeStyle = `rgba(130, 185, 60, ${Math.max(0.68, ratio)})`;
+        context.strokeStyle = lightTheme ? `rgba(55, 105, 32, ${Math.max(0.8, ratio)})` : `rgba(130, 185, 60, ${Math.max(0.68, ratio)})`;
         context.lineWidth = bodyRadius * 2;
         context.moveTo(p1.x, p1.y);
         context.lineTo(p2.x, p2.y);
@@ -930,7 +903,7 @@ function setupSnakeGame() {
     if (segments.length > 0) {
       const h = segments[0];
       context.save();
-      context.fillStyle = "#d7f886";
+      context.fillStyle = lightTheme ? "#457b2a" : "#d7f886";
       context.shadowColor = "rgba(215, 248, 134, 0.65)";
       context.shadowBlur = 12;
       context.beginPath();
@@ -1003,12 +976,9 @@ function setupSnakeGame() {
     cancelAnimationFrame(frameId);
     running = false;
     draw(segments);
-    if (score > bestScore) {
-      bestScore = score;
-      bestElement.textContent = bestScore;
-      localStorage.setItem(LOCAL_STORAGE_KEY, String(bestScore));
-      submitBestScore(score);
-      message.innerHTML = `🏆 <strong style="color: #4ade80;">NEW ALL-TIME RECORD: ${score}!</strong><br><span style="font-size: 0.8rem; color: var(--text-muted);">Recorded globally forever!</span>`;
+    const recordState = scoreClient.getState();
+    if (score > startingBestScore && recordState.connected && recordState.bestScore === score) {
+      message.textContent = `New global record: ${score}!`;
     } else {
       message.textContent = `Game over — score ${score}`;
     }
@@ -1030,13 +1000,14 @@ function setupSnakeGame() {
     modal.classList.add("open");
     modal.setAttribute("aria-hidden", "false");
     document.body.classList.add("snake-open");
-    loadBestScore();
+    scoreClient.setActive(!document.hidden);
     if (!running) resetGame();
     closeButton.focus();
   }
 
   function closeGame() {
     pauseGame();
+    scoreClient.setActive(false);
     modal.classList.remove("open");
     modal.setAttribute("aria-hidden", "true");
     document.body.classList.remove("snake-open");
@@ -1137,7 +1108,12 @@ function setupSnakeGame() {
 
   document.addEventListener("visibilitychange", () => {
     if (document.hidden) pauseGame();
+    scoreClient.setActive(!document.hidden && modal.classList.contains("open"));
   });
+  window.addEventListener("online", () => { void loadBestScore(); });
+  window.addEventListener("pagehide", () => scoreClient.setActive(false));
+  window.addEventListener("pageshow", () => scoreClient.setActive(!document.hidden && modal.classList.contains("open")));
+  document.addEventListener("portfolio-theme-change", () => { if (modal.classList.contains("open")) draw(); });
 }
 
 class TextScramble {
@@ -1148,6 +1124,11 @@ class TextScramble {
   }
 
   setText(newText) {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      cancelAnimationFrame(this.frameRequest);
+      this.el.textContent = newText;
+      return Promise.resolve();
+    }
     const oldText = this.el.innerText;
     const length = Math.max(oldText.length, newText.length);
     const promise = new Promise((resolve) => this.resolve = resolve);
@@ -1227,85 +1208,6 @@ function escapeHtml(str) {
     .replace(/'/g, "&#039;");
 }
 
-function initAmbientParticles() {
-  const canvas = document.createElement("canvas");
-  canvas.id = "ambient-particles";
-  canvas.style.cssText =
-    "position:fixed;inset:0;pointer-events:none;z-index:0;opacity:0.7;";
-  
-  const ambientBg = document.querySelector(".ambient-bg");
-  if (ambientBg) {
-    ambientBg.after(canvas);
-  } else {
-    document.body.prepend(canvas);
-  }
-
-  const ctx = canvas.getContext("2d");
-  let w, h;
-
-  const isMobile = window.innerWidth < 768;
-  const PARTICLE_COUNT = isMobile ? 18 : 45;
-  const particles = [];
-
-  function resize() {
-    w = canvas.width = window.innerWidth;
-    h = canvas.height = window.innerHeight;
-  }
-  resize();
-  window.addEventListener("resize", resize);
-
-  const colors = [
-    "rgba(56, 189, 248, ",
-    "rgba(129, 140, 248, ",
-    "rgba(168, 85, 247, ",
-    "rgba(45, 212, 191, ",
-    "rgba(255, 255, 255, ",
-  ];
-
-  for (let i = 0; i < PARTICLE_COUNT; i++) {
-    particles.push({
-      x: Math.random() * w,
-      y: Math.random() * h,
-      vx: (Math.random() - 0.5) * 0.3,
-      vy: (Math.random() - 0.5) * 0.3,
-      radius: Math.random() * 2 + 0.5,
-      color: colors[Math.floor(Math.random() * colors.length)],
-      alpha: Math.random() * 0.6 + 0.2,
-      alphaDir: (Math.random() - 0.5) * 0.005,
-    });
-  }
-
-  function animate() {
-    if (document.body.classList.contains("snake-open")) {
-      requestAnimationFrame(animate);
-      return;
-    }
-    ctx.clearRect(0, 0, w, h);
-
-    for (const p of particles) {
-      p.x += p.vx;
-      p.y += p.vy;
-
-      if (p.x < -10) p.x = w + 10;
-      if (p.x > w + 10) p.x = -10;
-      if (p.y < -10) p.y = h + 10;
-      if (p.y > h + 10) p.y = -10;
-
-      p.alpha += p.alphaDir;
-      if (p.alpha > 0.8 || p.alpha < 0.1) p.alphaDir *= -1;
-
-      ctx.beginPath();
-      ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
-      ctx.fillStyle = p.color + p.alpha.toFixed(2) + ")";
-      ctx.fill();
-    }
-
-    requestAnimationFrame(animate);
-  }
-
-  animate();
-}
-
 function copyEmailToClipboard(email) {
   if (navigator.clipboard && navigator.clipboard.writeText) {
     navigator.clipboard.writeText(email)
@@ -1363,7 +1265,7 @@ function initCodingActivity() {
 
   // Fetch combined activity data
   async function loadData() {
-    const local = ["localhost", "127.0.0.1"].includes(window.location?.hostname);
+    const local = ["localhost", "127.0.0.1"].includes(window.location?.hostname) || window.location?.hostname?.endsWith(".netlify.app");
     const apiUrl = !local && window.PORTFOLIO_ACTIVITY_API
       ? window.PORTFOLIO_ACTIVITY_API : "/api/coding-activity?refresh=true";
     try {

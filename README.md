@@ -46,3 +46,18 @@ its saved counts and timestamp are preserved while the other platform updates.
 For local use, run `node server.js` and open `http://localhost:4173`.
 Run `node activity-service.js` to refresh the saved snapshot, and
 `node --test tests/*.test.js` to verify date boundaries and upstream failures.
+
+### Snake global record
+
+The game reads and submits scores to `PORTFOLIO_SNAKE_API` in `portfolio-data.js`.
+A Netlify function stores one shared record in a site-wide Blobs store.
+Conditional writes keep a lower simultaneous score from replacing a higher one.
+The record survives deployments. An open game checks for updates every 10 seconds.
+
+A failed upload stays pending and retries when the connection returns.
+The displayed global record changes only after the server confirms it.
+
+Deploy the Netlify service before publishing the frontend. The same deployment
+command above includes `snake-best.mts`. GitHub Pages hosts the UI; Netlify hosts
+the record API. `node server.js` proxies the API for local play. Set `PORT` to
+change the local port, or `SNAKE_API_URL` to test a draft API.

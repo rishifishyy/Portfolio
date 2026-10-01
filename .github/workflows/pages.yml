@@ -50,7 +50,7 @@ jobs:
       - name: Prepare static website
         run: |
           mkdir -p _site/data
-          cp index.html style.css script.js portfolio-data.js activity-calendar.js _site/
+          cp index.html style.css script.js appearance.css appearance.js snake-score-client.js portfolio-data.js activity-calendar.js _site/
           cp -r assets _site/assets
           cp data/coding-activity.json _site/data/
           cp Rishi_Nehra_Resume.tex _site/

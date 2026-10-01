@@ -1,3 +1,4 @@
+window.PORTFOLIO_SNAKE_API = "https://rishifishyy-portfolio-activity.netlify.app/api/snake-best";
 window.PORTFOLIO_ACTIVITY_API = "https://rishifishyy-portfolio-activity.netlify.app/api/coding-activity";
 
 const portfolioData = {
