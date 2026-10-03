@@ -423,11 +423,8 @@ function openProjectModal(projectId) {
   const typeEl = document.getElementById("modal-project-type");
   const imgEl = document.getElementById("modal-project-img");
   const overviewEl = document.getElementById("modal-project-overview");
-  const problemEl = document.getElementById("modal-project-problem");
-  const solutionEl = document.getElementById("modal-project-solution");
   const outcomesEl = document.getElementById("modal-project-outcomes");
   const techStackEl = document.getElementById("modal-project-techstack");
-  const roleEl = document.getElementById("modal-project-role");
   const liveLink = document.getElementById("modal-live-link");
   const githubLink = document.getElementById("modal-github-link");
 
@@ -438,9 +435,6 @@ function openProjectModal(projectId) {
     imgEl.alt = project.title;
   }
   if (overviewEl) overviewEl.textContent = project.fullDescription || project.shortDescription;
-  if (problemEl) problemEl.textContent = project.problemStatement;
-  if (solutionEl) solutionEl.textContent = project.solution;
-  if (roleEl) roleEl.textContent = project.role;
 
   if (outcomesEl) {
     outcomesEl.innerHTML = (project.outcomes || [])

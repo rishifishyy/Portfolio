@@ -104,10 +104,7 @@ I love to tackle algorithmic challenges and design interactive frontend interfac
       shortDescription: "A real-time matchmaking & squad finder platform that connects players across 8 global server regions with live invites and in-app chat.",
       fullDescription: "TeamUP is a full-stack player matchmaking web application engineered to eliminate the frustration of random queues. It connects competitive and casual gamers across 8 official server regions, matching them by Game Mode, Build Setting, Platform, Mic preference, and Languages with live matchmaking pools and integrated real-time match chat.",
       image: "assets/teamup-preview.png",
-      problemStatement: "Gamers struggle with toxic random queues, mismatched skill levels, communication hurdles, and lack of verified party finders when searching for reliable squadmates.",
-      solution: "Engineered a responsive MERN application featuring granular multi-attribute matchmaking filters, real-time match requests, instant notification modals, and direct in-app match chat rooms.",
       techStack: ["React.js", "Node.js", "Express.js", "MongoDB", "Framer Motion", "Tailwind CSS", "REST APIs", "Render"],
-      role: "Lead Full Stack Developer & UI Designer",
       outcomes: [
         "Live player matchmaking pool supporting 8 server regions and custom mode filters",
         "Interactive request workflow with match notifications, toast alerts, and live in-browser chat",
@@ -126,10 +123,7 @@ I love to tackle algorithmic challenges and design interactive frontend interfac
       shortDescription: "An AI-powered study companion that helps students generate concise exam notes, high-yield summaries, and quick-revision flashcards.",
       fullDescription: "AI Exam Notes is an intelligent web application designed to accelerate exam preparation. It takes lecture notes, textbook passages, or topic outlines and uses AI to distill them into crisp summaries, formula cheat sheets, and predicted high-probability exam questions.",
       image: "assets/aiexamnotes-preview.svg",
-      problemStatement: "Students spend hours sifting through lengthy textbook chapters and disjointed lecture slides trying to figure out what actually matters for upcoming exams.",
-      solution: "Engineered an intuitive AI tool that automatically extracts key concepts, organizes high-yield bullet points, and generates structured revision cards in seconds.",
       techStack: ["React.js", "Node.js", "Express.js", "JavaScript", "Tailwind CSS", "REST APIs", "AI Integration"],
-      role: "Creator & Full Stack Developer",
       outcomes: [
         "Instant summarization and exam note extraction using AI prompts",
         "Clean, responsive study interface with copy-to-clipboard and export options",
@@ -137,6 +131,26 @@ I love to tackle algorithmic challenges and design interactive frontend interfac
       ],
       links: {
         github: "https://github.com/rishifishyy/aiexamnotes"
+      }
+    },
+    {
+      id: "digital-chalisa",
+      title: "Digital Chalisa",
+      type: "Devotional Audio Web App",
+      badge: "Live App",
+      shortDescription: "A devotional player for six Chalisas with synchronized audio, Hindi and Romanized English lyrics, and customizable playback.",
+      fullDescription: "Digital Chalisa brings Hanuman, Shiva, Durga, Ganesh, Shani, and Saraswati Chalisa into one responsive devotional player. Choose a prayer to load its recording, artwork, and bilingual lyrics. Timed lyric cues highlight the current verse and scroll with the audio, while clicking a verse seeks directly to that part of the recitation.",
+      image: "assets/digital-chalisa-preview.png",
+      techStack: ["HTML5", "CSS3", "JavaScript", "HTML5 Audio", "JSON", "LocalStorage"],
+      outcomes: [
+        "Six Chalisas with a prayer selector that updates the audio, lyrics, artwork, and devotional accent",
+        "Hindi and Romanized English lyrics with active-verse highlighting, automatic scrolling, and verse seeking",
+        "Play/pause, five-second skips, volume, playback speed, continuous looping, and a recitation counter",
+        "Light and dark themes, adjustable lyric size, and remembered prayer, language, and appearance preferences",
+        "Responsive layouts, keyboard controls, and devotional animations that respect reduced-motion preferences"
+      ],
+      links: {
+        live: "https://digitalchalisa.netlify.app/"
       }
     },
     {
@@ -148,10 +162,7 @@ I love to tackle algorithmic challenges and design interactive frontend interfac
       shortDescription: "A comprehensive crypto portfolio tracker with real-time pictorial charts, balance breakdown, and automated best vs worst performer analytics.",
       fullDescription: "Currently developing a full-featured cryptocurrency portfolio tracking dashboard built on the MERN stack. It connects to live crypto market feeds to give users visual representations of their asset allocation, 30-day profit/loss trends, and spotlight alerts for top gainers and biggest losers in their portfolio.",
       image: "assets/crypto-tracker.png",
-      problemStatement: "Crypto investors holding assets across multiple wallets and exchanges lack a single visual dashboard to see their total balance, asset distribution percentage, and historical ROI performance at a glance.",
-      solution: "Building a responsive MERN application with dynamic donut charts for asset allocation, smooth area graphs for portfolio growth, and automated categorization of best vs worst performing tokens.",
       techStack: ["MongoDB", "Express.js", "React.js", "Node.js", "Tailwind CSS", "REST APIs", "Chart.js"],
-      role: "Lead Developer (In Active Development)",
       outcomes: [
         "Interactive pictorial charts for portfolio allocation (BTC, ETH, SOL, etc.)",
         "Real-time asset balance computation with live market price feeds",
