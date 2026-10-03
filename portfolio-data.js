@@ -19,7 +19,7 @@ I love to tackle algorithmic challenges and design interactive frontend interfac
       codolio: "https://codolio.com/profile/rishifishyy",
       leetcode: "https://leetcode.com/u/rishifishyy/",
       gfg: "https://www.geeksforgeeks.org/profile/rishifishyy?tab=activity",
-      resume: "https://drive.google.com/file/d/13uvqbCScoFd13uWVoayfTZnQ4QRvWp9O/view?usp=sharing"
+      resume: "https://drive.google.com/file/d/1BeZnAko11LOQJIrppl92JM5njJelI8dp/view?usp=sharing"
     },
     skills: [
       "React.js",
