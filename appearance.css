@@ -176,6 +176,6 @@ html[data-theme=light] .ambient-bg { background: #f7f9fc; }
   .reveal-fade-up, .activity-cell { opacity: 1; }
 }
 
-.snake-sync-status { margin: 0 0 .7rem; min-height: 1.2em; font-size: .72rem; color: var(--text-secondary); }
+.snake-sync-status { margin: 0 0 .7rem; height: 1.2em; line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: .72rem; color: var(--text-secondary); }
 .snake-sync-status[data-state=live] { color: var(--status-green); }
 .snake-sync-status[data-state=pending] { color: var(--accent-cyan); }

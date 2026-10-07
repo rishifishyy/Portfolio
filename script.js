@@ -544,20 +544,22 @@ function setupSnakeGame() {
   const syncStatus = document.getElementById("snake-sync-status");
   let scoreStorage;
   try { scoreStorage = window.localStorage; } catch {}
+  function renderScoreState(state) {
+    bestScore = state.bestScore ?? 0;
+    const displayScore = String(state.bestScore ?? "—");
+    if (bestElement.textContent !== displayScore) bestElement.textContent = displayScore;
+    if (syncStatus) {
+      // Keep sync messages out of active play without collapsing their layout space.
+      const status = running ? "" : state.status;
+      if (syncStatus.textContent !== status) syncStatus.textContent = status;
+      syncStatus.dataset.state = state.state;
+    }
+  }
   const local = ["localhost", "127.0.0.1", "::1"].includes(window.location.hostname) || window.location.hostname.endsWith(".netlify.app");
   const scoreClient = window.createSnakeScoreClient({
     endpoint: local ? "/api/snake-best" : window.PORTFOLIO_SNAKE_API,
     storage: scoreStorage,
-    onChange: state => {
-      bestScore = state.bestScore ?? 0;
-      const displayScore = String(state.bestScore ?? "—");
-      if (bestElement.textContent !== displayScore) bestElement.textContent = displayScore;
-      if (syncStatus) {
-        if (syncStatus.textContent !== state.status) syncStatus.textContent = state.status;
-        syncStatus.dataset.state = state.state;
-        syncStatus.hidden = !state.status;
-      }
-    }
+    onChange: renderScoreState
   });
   const loadBestScore = () => scoreClient.refresh();
   const submitBestScore = value => scoreClient.submit(value);
@@ -961,6 +963,7 @@ function setupSnakeGame() {
     cancelAnimationFrame(frameId);
     resetGame();
     running = true;
+    renderScoreState(scoreClient.getState());
     screen.hidden = true;
     lastTime = 0;
     frameId = requestAnimationFrame(animate);
@@ -971,6 +974,7 @@ function setupSnakeGame() {
     running = false;
     draw(segments);
     const recordState = scoreClient.getState();
+    renderScoreState(recordState);
     if (score > startingBestScore && recordState.connected && recordState.bestScore === score) {
       message.textContent = `New global record: ${score}!`;
     } else {
@@ -984,6 +988,7 @@ function setupSnakeGame() {
     if (!running) return;
     cancelAnimationFrame(frameId);
     running = false;
+    renderScoreState(scoreClient.getState());
     message.textContent = "Game paused — press Start to play again";
     startButton.textContent = "Start game";
     screen.hidden = false;
