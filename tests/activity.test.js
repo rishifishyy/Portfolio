@@ -150,7 +150,7 @@ test('rendered chart has exactly 365 selectable dates and includes latest saved 
   const script = fs.readFileSync(require.resolve('../script.js'), 'utf8');
   const calls = [];
   vm.runInNewContext(script.slice(script.indexOf('function initCodingActivity()')) + '\ninitCodingActivity();', {
-    document, window: {}, ActivityCalendar: calendar, setInterval() {}, console, Date: FixedDate,
+    document, window: { addEventListener() {} }, ActivityCalendar: calendar, setInterval() {}, console, Date: FixedDate,
     fetch: async (url, options) => { calls.push({ url, options }); return {
       ok: !url.startsWith('/api/'), json: async () => data
     }; }
@@ -175,7 +175,7 @@ test('GitHub Pages renders the latest live submission without waiting for a depl
   }, days: { '2026-09-30': { leetcode: 1 } } };
   const script = fs.readFileSync(require.resolve('../script.js'), 'utf8');
   vm.runInNewContext(script.slice(script.indexOf('function initCodingActivity()')) + '\ninitCodingActivity();', {
-    document, window: { location: { hostname: 'rishifishyy.github.io' },
+    document, window: { addEventListener() {}, location: { hostname: 'rishifishyy.github.io' },
       PORTFOLIO_ACTIVITY_API: 'https://activity.example/api/coding-activity' },
     ActivityCalendar: calendar, setInterval() {}, console, Date: FixedDate,
     fetch: async (url, options) => { calls.push({ url, options }); return { ok: true, json: async () => data }; }
@@ -198,7 +198,7 @@ test('a failed live service falls back to the saved deployment and labels old ac
   const data = { updatedAt: '2026-09-30T06:00:00Z', days: { '2026-09-29': { leetcode: 1 } } };
   const script = fs.readFileSync(require.resolve('../script.js'), 'utf8');
   vm.runInNewContext(script.slice(script.indexOf('function initCodingActivity()')) + '\ninitCodingActivity();', {
-    document, window: { location: { hostname: 'rishifishyy.github.io' },
+    document, window: { addEventListener() {}, location: { hostname: 'rishifishyy.github.io' },
       PORTFOLIO_ACTIVITY_API: 'https://activity.example/api/coding-activity' },
     ActivityCalendar: calendar, setInterval() {}, console, Date: FixedDate,
     fetch: async url => { calls.push(url); return { ok: url.startsWith('data/'), json: async () => data }; }

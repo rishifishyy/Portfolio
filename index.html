@@ -30,8 +30,9 @@
       } catch {}
     })();
   </script>
-  <link rel="stylesheet" href="style.css?v=3.6">
-  <link rel="stylesheet" href="appearance.css?v=4.3">
+  <link rel="stylesheet" href="style.css?v=3.9">
+  <link rel="stylesheet" href="appearance.css?v=4.6">
+  <link rel="stylesheet" href="learning.css?v=1.1">
   <link rel="icon" type="image/svg+xml" href="assets/avatar.png">
 </head>
 <body>
@@ -297,12 +298,18 @@
       <div class="education-list" id="education-list"></div>
     </section>
 
-    <section class="learning-section" id="learning" style="margin-top: 4.5rem;">
+    <section class="learning-section" id="learning" aria-labelledby="learning-heading" style="margin-top: 4.5rem;">
       <div class="section-header">
-        <h2 class="section-title">Skills I am learning</h2>
+        <h2 class="section-title" id="learning-heading">Skills I am learning</h2>
         <div class="section-divider"></div>
       </div>
-      <div class="learning-grid" id="learning-list"></div>
+      <p class="learning-intro">Small experiments. Better understanding.</p>
+      <div id="learning-list">
+        <div class="learning-fallback">
+          <article><h3>Python</h3><p>Learning Python fundamentals, object-oriented programming, and automation.</p></article>
+          <article><h3>Artificial Intelligence</h3><p>Exploring machine learning basics, language models, and AI integration.</p></article>
+        </div>
+      </div>
     </section>
 
     <!-- DSA Contribution Graph (LeetCode Style) -->
@@ -415,10 +422,10 @@
     </div>
   </footer>
 
-  <script src="portfolio-data.js?v=4.2"></script>
+  <script src="portfolio-data.js?v=4.5"></script>
   <script src="activity-calendar.js?v=3.7"></script>
-  <script src="appearance.js?v=4.2"></script>
+  <script src="appearance.js?v=4.5"></script>
   <script src="snake-score-client.js?v=1.1"></script>
-  <script src="script.js?v=4.4"></script>
+  <script src="script.js?v=4.9"></script>
 </body>
 </html>

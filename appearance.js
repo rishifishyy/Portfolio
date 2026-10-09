@@ -5,7 +5,8 @@
   const context = canvas?.getContext('2d');
   if (!themeButton) return;
   const save = (key, value) => { try { localStorage.setItem(key, value); } catch {} };
-  const motion = true;
+  // Ignore the former toggle's saved state so motion cannot remain stuck off.
+  root.dataset.motion = 'on';
   let frame = 0, lastTime = 0, elapsed = 0, width = 0, height = 0, compact = false;
   let glowSprites = [], lineGradient, cursor = { x: 0, y: 0, targetX: 0, targetY: 0 };
   let renderInterval = 33, paintCost = 0, scrollOffset = 0, targetScroll = 0;
@@ -20,8 +21,8 @@
   }
   function updatePalette() {
     palette = root.dataset.theme === 'light'
-      ? { colors: ['44,146,166', '111,99,198'], light: '66,112,171', lineAlpha: .22, glowAlpha: .13 }
-      : { colors: ['65,184,190', '136,116,214'], light: '186,235,240', lineAlpha: .23, glowAlpha: .16 };
+      ? { colors: ['44,146,166', '111,99,198'], light: '45,99,155', lineAlpha: .35, glowAlpha: .18 }
+      : { colors: ['65,184,190', '136,116,214'], light: '186,235,240', lineAlpha: .38, glowAlpha: .23 };
     glowSprites = palette.colors.map(color => {
       const sprite = document.createElement('canvas');
       sprite.width = sprite.height = 256;
@@ -66,8 +67,8 @@
   function curve(side, index) {
     const gap = compact ? 10 : 13;
     const spread = index * gap;
-    const drift = Math.sin(elapsed * .34 + side * 2) * (compact ? 25 : 42);
-    const bend = Math.cos(elapsed * .23 + index * .09) * 22;
+    const drift = Math.sin(elapsed * .55 + side * 2) * (compact ? 48 : 88);
+    const bend = Math.cos(elapsed * .4 + index * .09) * 40;
     const px = cursor.x * .018, py = cursor.y * .018 + scrollOffset;
     return side === 0
       ? [[width * 1.12, -height * .2 + spread],
@@ -90,8 +91,8 @@
     const size = Math.min(Math.max(width * .68, height * .8), 1400);
     glowSprites.forEach((sprite, i) => {
       if (!sprite) return;
-      const x = width * (i ? .03 : .93) + Math.sin(elapsed * .2 + i * 3) * 55 + cursor.x * .012;
-      const y = height * (i ? .78 : .24) + Math.cos(elapsed * .26 + i * 2) * 45 + scrollOffset;
+      const x = width * (i ? .03 : .93) + Math.sin(elapsed * .3 + i * 3) * 100 + cursor.x * .012;
+      const y = height * (i ? .78 : .24) + Math.cos(elapsed * .38 + i * 2) * 75 + scrollOffset;
       context.drawImage(sprite, x - size / 2, y - size / 2, size, size);
     });
     const count = compact ? 9 : 15;
@@ -104,26 +105,26 @@
         context.bezierCurveTo(...points[1], ...points[2], ...points[3]); context.stroke();
       }
       for (let i = 0; i < (compact ? 1 : 2); i++) {
-        const t = (elapsed * .045 + i * .47 + side * .31) % 1;
+        const t = (elapsed * .09 + i * .47 + side * .31) % 1;
         const points = curve(side, i * 5 - 3);
         const visibility = Math.sin(t * Math.PI);
         context.lineWidth = 1.5;
         for (let segment = 0; segment < 12; segment++) {
           const p0 = pointOnCurve(points, Math.max(0, t - .055 + segment * .0045));
           const p1 = pointOnCurve(points, Math.max(0, t - .055 + (segment + 1) * .0045));
-          context.strokeStyle = `rgba(${palette.light},${segment / 12 * visibility * .65})`;
+          context.strokeStyle = `rgba(${palette.light},${segment / 12 * visibility * .9})`;
           context.beginPath(); context.moveTo(...p0); context.lineTo(...p1); context.stroke();
         }
         const head = pointOnCurve(points, t);
-        context.fillStyle = `rgba(${palette.light},${visibility * .65})`;
-        context.beginPath(); context.arc(...head, 1.3, 0, Math.PI * 2); context.fill();
+        context.fillStyle = `rgba(${palette.light},${visibility * .9})`;
+        context.beginPath(); context.arc(...head, 2.2, 0, Math.PI * 2); context.fill();
       }
       context.lineWidth = compact ? .75 : .85;
     }
   }
   function animate(time) {
     frame = 0;
-    if (!motion || document.hidden || hasOpenDialog()) return;
+    if (document.hidden || hasOpenDialog()) return;
     if (time - lastTime >= renderInterval) {
       elapsed += Math.min((time - lastTime) / 1000, .1); lastTime = time;
       cursor.x += (cursor.targetX - cursor.x) * .06; cursor.y += (cursor.targetY - cursor.y) * .06;
@@ -136,7 +137,7 @@
   }
   function sync() {
     cancelAnimationFrame(frame); frame = 0;
-    const paused = !motion || document.hidden || hasOpenDialog();
+    const paused = document.hidden || hasOpenDialog();
     document.body.classList.toggle('ambient-paused', paused);
     paint(); lastTime = performance.now();
     if (context && !paused) frame = requestAnimationFrame(animate);
@@ -151,7 +152,7 @@
     });
   }, { passive: true });
   window.addEventListener('pointermove', event => {
-    if (!motion || compact || !finePointer.matches || event.pointerType === 'touch') return;
+    if (compact || !finePointer.matches || event.pointerType === 'touch') return;
     cursor.targetX = event.clientX - width / 2; cursor.targetY = event.clientY - height / 2;
   }, { passive: true });
   window.addEventListener('pointerout', event => {

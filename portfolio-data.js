@@ -45,28 +45,18 @@ I love to tackle algorithmic challenges and design interactive frontend interfac
 
   learningSkills: [
     {
-      id: "learn-java",
-      name: "Java",
-      category: "Backend & OOP",
-      description: "Deepening concepts in Object-Oriented Architecture, multithreading, data structures, and enterprise backend engineering.",
-      icon: "☕",
-      color: "linear-gradient(135deg, #f97316, #ef4444)"
+      id: "learn-python",
+      name: "Python",
+      category: "Programming & Automation",
+      description: "Learning the language through small scripts, object-oriented programming, and everyday automation.",
+      topics: ["Fundamentals", "OOP", "Automation"]
     },
     {
-      id: "learn-nextjs",
-      name: "Next.js",
-      category: "Full Stack Framework",
-      description: "Mastering App Router, React Server Components (RSC), server actions, optimized routing, and edge rendering.",
-      icon: "▲",
-      color: "linear-gradient(135deg, #38bdf8, #818cf8)"
-    },
-    {
-      id: "learn-devops",
-      name: "DevOps",
-      category: "Cloud & CI/CD Pipelines",
-      description: "Exploring containerization with Docker, automated CI/CD GitHub Actions, Linux administration, and scalable cloud deployment.",
-      icon: "⚡",
-      color: "linear-gradient(135deg, #10b981, #06b6d4)"
+      id: "learn-ai",
+      name: "Artificial Intelligence",
+      category: "AI Foundations & Applications",
+      description: "Understanding machine learning basics and experimenting with language models in web applications.",
+      topics: ["Machine learning", "Language models", "AI integration"]
     }
   ],
 
@@ -103,7 +93,10 @@ I love to tackle algorithmic challenges and design interactive frontend interfac
       badge: "Live App",
       shortDescription: "A real-time matchmaking & squad finder platform that connects players across 8 global server regions with live invites and in-app chat.",
       fullDescription: "TeamUP is a full-stack player matchmaking web application engineered to eliminate the frustration of random queues. It connects competitive and casual gamers across 8 official server regions, matching them by Game Mode, Build Setting, Platform, Mic preference, and Languages with live matchmaking pools and integrated real-time match chat.",
-      image: "assets/teamup-preview.png",
+      image: "assets/teamup-home.png",
+      imageSrcset: "assets/teamup-home-small.png 954w, assets/teamup-home.png 1908w",
+      imageAlt: "TeamUP homepage with the Good games, Great teammates headline and squad matching radar",
+      previewAspect: "wide",
       techStack: ["React.js", "Node.js", "Express.js", "MongoDB", "Framer Motion", "Tailwind CSS", "REST APIs", "Render"],
       outcomes: [
         "Live player matchmaking pool supporting 8 server regions and custom mode filters",

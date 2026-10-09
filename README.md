@@ -44,6 +44,14 @@ does not commit generated data back to the repository. If one platform fails,
 its saved counts and timestamp are preserved while the other platform updates.
 
 For local use, run `node server.js` and open `http://localhost:4173`.
+The learning section uses React and GSAP, bundled locally with esbuild. Run
+`npm install` once, then `npm start` to rebuild the component and start the site.
+After editing `learning-experience.jsx`, run `npm run build`. The generated
+`learning.bundle.js` is included with the static GitHub Pages website.
+The background and name reveal run automatically. Background rendering pauses
+while the browser tab is hidden or a dialog is open, then resumes automatically.
+TeamUP uses the supplied homepage screenshot cropped below the browser chrome,
+with a smaller responsive image for mobile and the full image in project details.
 Run `node activity-service.js` to refresh the saved snapshot, and
 `node --test tests/*.test.js` to verify date boundaries and upstream failures.
 

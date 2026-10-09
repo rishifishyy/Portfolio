@@ -202,10 +202,11 @@ function renderProjects() {
         role="button"
         aria-label="View project details for ${escapeHtml(project.title)}"
       >
-        <div class="project-media-box">
+        <div class="project-media-box${project.previewAspect ? ' project-media-wide' : ''}">
           <img 
             src="${escapeHtml(project.image)}" 
-            alt="${escapeHtml(project.title)}" 
+            ${project.imageSrcset ? `srcset="${escapeHtml(project.imageSrcset)}" sizes="(min-width: 1024px) 540px, (min-width: 768px) 46vw, 100vw"` : ''}
+            alt="${escapeHtml(project.imageAlt || project.title)}"
             class="project-preview-img"
             loading="lazy"
           >
@@ -283,25 +284,20 @@ function renderEducation() {
 function renderLearningSkills() {
   const container = document.getElementById("learning-list");
   if (!container || !portfolioData.learningSkills) return;
-
-  container.innerHTML = portfolioData.learningSkills.map(skill => {
-    return `
-      <div class="learning-card" id="${escapeHtml(skill.id)}">
-        <div class="learning-header">
-          <div class="learning-icon-box" style="background: ${skill.color || 'var(--bg-muted)'};">
-            <span class="learning-icon">${skill.icon || '🚀'}</span>
-          </div>
-          <div class="learning-title-wrap">
-            <div class="learning-title-row">
-              <h3 class="learning-title">${escapeHtml(skill.name)}</h3>
-            </div>
-            <span class="learning-category">${escapeHtml(skill.category)}</span>
-          </div>
-        </div>
-        <p class="learning-desc">${escapeHtml(skill.description)}</p>
-      </div>
-    `;
-  }).join("");
+  window.PORTFOLIO_LEARNING_SKILLS = portfolioData.learningSkills;
+  const load = () => {
+    const script = document.createElement('script');
+    script.src = 'learning.bundle.js?v=1.0';
+    script.async = true;
+    document.body.appendChild(script);
+  };
+  if (!("IntersectionObserver" in window)) return load();
+  const observer = new IntersectionObserver(entries => {
+    if (!entries.some(entry => entry.isIntersecting)) return;
+    observer.disconnect();
+    load();
+  }, { rootMargin: '600px' });
+  observer.observe(container);
 }
 
 function setupMobileNavigation() {
@@ -432,7 +428,15 @@ function openProjectModal(projectId) {
   if (typeEl) typeEl.textContent = project.type;
   if (imgEl) {
     imgEl.src = project.image;
-    imgEl.alt = project.title;
+    if (project.imageSrcset) {
+      imgEl.srcset = project.imageSrcset;
+      imgEl.sizes = '(min-width: 960px) 840px, 90vw';
+    } else {
+      imgEl.removeAttribute('srcset');
+      imgEl.removeAttribute('sizes');
+    }
+    imgEl.alt = project.imageAlt || project.title;
+    imgEl.closest('.modal-hero-media').classList.toggle('project-media-wide', !!project.previewAspect);
   }
   if (overviewEl) overviewEl.textContent = project.fullDescription || project.shortDescription;
 
@@ -1115,86 +1119,70 @@ function setupSnakeGame() {
   document.addEventListener("portfolio-theme-change", () => { if (modal.classList.contains("open")) draw(); });
 }
 
-class TextScramble {
-  constructor(el) {
-    this.el = el;
-    this.chars = '!<>-_\\/[]{}—=+*^?#________';
-    this.update = this.update.bind(this);
-  }
-
-  setText(newText) {
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      cancelAnimationFrame(this.frameRequest);
-      this.el.textContent = newText;
-      return Promise.resolve();
-    }
-    const oldText = this.el.innerText;
-    const length = Math.max(oldText.length, newText.length);
-    const promise = new Promise((resolve) => this.resolve = resolve);
-    this.queue = [];
-    for (let i = 0; i < length; i++) {
-      const from = oldText[i] || '';
-      const to = newText[i] || '';
-      const start = Math.floor(Math.random() * 8);
-      const end = start + Math.floor(Math.random() * 8) + 6;
-      this.queue.push({ from, to, start, end, char: '' });
-    }
-    cancelAnimationFrame(this.frameRequest);
-    this.frame = 0;
-    this.update();
-    return promise;
-  }
-
-  update() {
-    let output = '';
-    let complete = 0;
-    for (let i = 0, n = this.queue.length; i < n; i++) {
-      let { from, to, start, end, char } = this.queue[i];
-      if (this.frame >= end) {
-        complete++;
-        output += to;
-      } else if (this.frame >= start) {
-        if (!char || Math.random() < 0.28) {
-          char = this.chars[Math.floor(Math.random() * this.chars.length)];
-          this.queue[i].char = char;
-        }
-        output += `<span class="scramble-char">${char}</span>`;
-      } else {
-        output += from;
-      }
-    }
-    this.el.innerHTML = output;
-    if (complete === this.queue.length) {
-      this.resolve();
-    } else {
-      this.frameRequest = requestAnimationFrame(this.update);
-      this.frame++;
-    }
-  }
-}
-
 function setupNameHoverAnimation() {
-  const heroName = document.getElementById("hero-name");
-  if (!heroName) return;
+  const originalName = portfolioData.profile.name;
+  const aliasName = 'Rishifishyy';
+  const finePointer = window.matchMedia('(hover: hover) and (pointer: fine)');
 
-  const scrambler = new TextScramble(heroName);
-  const originalName = "Rishi Nehra";
-  const aliasName = "Rishifishyy";
-  let isToggled = false;
+  function makeLetters(element) {
+    const row = (name, kind) => '<span class="name-' + kind + '-row">' +
+      Array.from(name, (char, index) => '<span class="name-letter"><span class="name-' + kind + '" style="--letter-delay: ' + (index * 100) + 'ms">' + escapeHtml(char) + '</span></span>').join('') + '</span>';
+    element.innerHTML = '<span class="name-switch-track" aria-hidden="true">' + row(originalName, 'original') + row(aliasName, 'alias') + '</span>';
+  }
 
-  heroName.addEventListener("mouseenter", () => {
-    scrambler.setText(aliasName);
-  });
+  // A quick pass of the pointer still completes the reveal before returning.
+  function hoverReveal(target, show) {
+    let started = 0, resetTimer = 0;
+    const enter = () => {
+      clearTimeout(resetTimer);
+      started = performance.now();
+      show(true);
+    };
+    const leave = () => {
+      clearTimeout(resetTimer);
+      const hold = document.documentElement.dataset.motion === 'off' ? 0 : 3100;
+      resetTimer = setTimeout(() => show(false), Math.max(0, hold - (performance.now() - started)));
+    };
+    target.addEventListener('pointerenter', event => { if (event.pointerType !== 'touch') enter(); });
+    target.addEventListener('pointerleave', event => { if (event.pointerType !== 'touch') leave(); });
+    return () => clearTimeout(resetTimer);
+  }
 
-  heroName.addEventListener("mouseleave", () => {
-    scrambler.setText(originalName);
-  });
+  const heroName = document.getElementById('hero-name');
+  if (heroName) {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'name-switch';
+    button.id = 'hero-name-trigger';
+    button.title = 'Hover or tap to reveal my nickname';
+    makeLetters(button);
+    heroName.replaceChildren(button);
+    let alias = false;
+    const show = value => {
+      alias = value;
+      button.classList.toggle('is-alias', value);
+      button.dataset.name = value ? aliasName : originalName;
+      button.setAttribute('aria-label', value ? aliasName + ' — show Rishi Nehra' : originalName + ' — show Rishifishyy');
+      button.setAttribute('aria-pressed', String(value));
+    };
+    show(false);
+    const cancelReset = hoverReveal(button, show);
+    button.addEventListener('click', event => {
+      if (event.detail === 0 || !finePointer.matches) { cancelReset(); show(!alias); }
+    });
+    button.addEventListener('blur', () => { cancelReset(); show(false); });
+  }
 
-  // Tap-to-scramble support for mobile touch users
-  heroName.addEventListener("click", () => {
-    isToggled = !isToggled;
-    scrambler.setText(isToggled ? aliasName : originalName);
-  });
+  const brand = document.getElementById('brand-logo');
+  const brandName = document.getElementById('nav-brand-name');
+  if (brand && brandName) {
+    makeLetters(brandName);
+    brandName.classList.add('name-switch', 'name-switch-brand');
+    brand.setAttribute('aria-label', 'Rishi Nehra — home');
+    const cancelReset = hoverReveal(brand, value => brandName.classList.toggle('is-alias', value));
+    brand.addEventListener('focus', () => brandName.classList.add('is-alias'));
+    brand.addEventListener('blur', () => { cancelReset(); brandName.classList.remove('is-alias'); });
+  }
 }
 
 function escapeHtml(str) {
@@ -1311,6 +1299,8 @@ function initCodingActivity() {
   document.addEventListener("touchstart", e => {
     if (!e.target.closest(".activity-cell")) hideTooltip();
   }, { passive: true });
+  window.addEventListener('scroll', hideTooltip, { passive: true, capture: true });
+  window.addEventListener('resize', hideTooltip, { passive: true });
 
   function renderCalendar(data) {
     const now = new Date();
@@ -1450,8 +1440,9 @@ function initCodingActivity() {
     const cells = container.querySelectorAll(".activity-cell:not(.lvl-future)");
 
     cells.forEach(cell => {
-      cell.addEventListener("mouseenter", showTooltip);
-      cell.addEventListener("mouseleave", hideTooltip);
+      cell.addEventListener("pointerenter", event => { if (event.pointerType !== 'touch') showTooltip(event); });
+      cell.addEventListener("pointerleave", event => { if (event.pointerType !== 'touch') hideTooltip(); });
+      cell.addEventListener("click", showTooltip);
       cell.addEventListener("focus", showTooltip);
       cell.addEventListener("blur", hideTooltip);
       cell.addEventListener("touchstart", (e) => {
@@ -1482,7 +1473,8 @@ function initCodingActivity() {
     tooltip.textContent = message;
 
     const rect = cell.getBoundingClientRect();
-    const tooltipX = rect.left + rect.width / 2;
+    const halfWidth = tooltip.offsetWidth / 2;
+    const tooltipX = Math.max(halfWidth + 8, Math.min(window.innerWidth - halfWidth - 8, rect.left + rect.width / 2));
     const tooltipY = rect.top;
 
     tooltip.style.left = `${tooltipX}px`;
