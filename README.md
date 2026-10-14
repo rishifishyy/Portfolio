@@ -26,7 +26,8 @@ Saved question details are only used when they belong to today's IST date.
 The frontend reuses fresh activity for five minutes, keeps unchanged chart cells
 and question links in place, and checks for a date change while visible. Calendar
 tooltips share event listeners, and date formatting is reused across submissions.
-Background motion follows the device's reduced-motion preference. Project images
+The animated background and name reveal run by default; background rendering pauses
+in hidden tabs and while a dialog is open. Project images
 and the learning bundle load lazily; game records are fetched when the game opens
 or a saved pending score needs syncing. The game adapts to short landscape screens,
 and links and controls have larger touch targets on phones and touch devices.

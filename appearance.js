@@ -5,8 +5,7 @@
   const context = canvas?.getContext('2d');
   if (!themeButton) return;
   const save = (key, value) => { try { localStorage.setItem(key, value); } catch {} };
-  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
-  root.dataset.motion = reducedMotion.matches ? 'off' : 'on';
+  root.dataset.motion = 'on';
   let frame = 0, lastTime = 0, elapsed = 0, width = 0, height = 0, compact = false;
   let glowSprites = [], lineGradient, cursor = { x: 0, y: 0, targetX: 0, targetY: 0 };
   let renderInterval = 33, paintCost = 0, scrollOffset = 0, targetScroll = 0;
@@ -124,7 +123,7 @@
   }
   function animate(time) {
     frame = 0;
-    if (document.hidden || hasOpenDialog() || reducedMotion.matches) return;
+    if (document.hidden || hasOpenDialog()) return;
     if (time - lastTime >= renderInterval) {
       elapsed += Math.min((time - lastTime) / 1000, .1); lastTime = time;
       cursor.x += (cursor.targetX - cursor.x) * .06; cursor.y += (cursor.targetY - cursor.y) * .06;
@@ -137,7 +136,7 @@
   }
   function sync() {
     cancelAnimationFrame(frame); frame = 0;
-    const paused = document.hidden || hasOpenDialog() || reducedMotion.matches;
+    const paused = document.hidden || hasOpenDialog();
     document.body.classList.toggle('ambient-paused', paused);
     paint(); lastTime = performance.now();
     if (context && !paused) frame = requestAnimationFrame(animate);
@@ -162,10 +161,6 @@
     targetScroll = -Math.min(window.scrollY, height * 2) * .025;
   }, { passive: true });
   document.addEventListener('visibilitychange', sync);
-  reducedMotion.addEventListener('change', () => {
-    root.dataset.motion = reducedMotion.matches ? 'off' : 'on';
-    sync();
-  });
   window.addEventListener('pagehide', () => { cancelAnimationFrame(frame); frame = 0; });
   window.addEventListener('pageshow', sync);
   if (!finePointer.matches) cursor.targetX = cursor.targetY = 0;
