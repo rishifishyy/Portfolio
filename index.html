@@ -30,8 +30,8 @@
       } catch {}
     })();
   </script>
-  <link rel="stylesheet" href="style.css?v=3.9">
-  <link rel="stylesheet" href="appearance.css?v=4.6">
+  <link rel="stylesheet" href="style.css?v=4.2">
+  <link rel="stylesheet" href="appearance.css?v=4.8">
   <link rel="stylesheet" href="learning.css?v=1.1">
   <link rel="icon" type="image/svg+xml" href="assets/avatar.png">
 </head>
@@ -54,8 +54,6 @@
           <li><a href="#experience" class="nav-link">Experience</a></li>
           <li><a href="#projects" class="nav-link">Projects</a></li>
           <li><a href="#education" class="nav-link">Education</a></li>
-          <li><a href="#learning" class="nav-link">Learning</a></li>
-          <li><a href="#coding-activity" class="nav-link">DSA Graph</a></li>
           <li><a href="https://drive.google.com/file/d/1BeZnAko11LOQJIrppl92JM5njJelI8dp/view?usp=sharing" target="_blank" rel="noopener noreferrer" class="nav-link">Resume</a></li>
         </ul>
       </nav>
@@ -156,18 +154,8 @@
           <span class="mobile-nav-title">Education</span>
           <svg class="mobile-nav-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
         </a>
-        <a href="#learning" class="mobile-nav-link" data-section="learning">
-          <span class="mobile-nav-num">05</span>
-          <span class="mobile-nav-title">Learning</span>
-          <svg class="mobile-nav-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
-        </a>
-        <a href="#coding-activity" class="mobile-nav-link" data-section="coding-activity">
-          <span class="mobile-nav-num">06</span>
-          <span class="mobile-nav-title">DSA Graph</span>
-          <svg class="mobile-nav-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
-        </a>
         <a href="https://drive.google.com/file/d/1BeZnAko11LOQJIrppl92JM5njJelI8dp/view?usp=sharing" target="_blank" rel="noopener noreferrer" class="mobile-nav-link mobile-nav-resume">
-          <span class="mobile-nav-num">07</span>
+          <span class="mobile-nav-num">05</span>
           <span class="mobile-nav-title">Resume</span>
           <svg class="mobile-nav-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
         </a>
@@ -205,7 +193,7 @@
       <div class="hero-profile-row">
         <div class="avatar-wrapper">
           <div class="avatar-img-box">
-            <img src="assets/avatar.png" alt="Rishi Nehra" class="avatar-img" id="hero-avatar">
+            <img src="assets/avatar.png" alt="Rishi Nehra" class="avatar-img" id="hero-avatar" width="256" height="256" fetchpriority="high" decoding="async">
           </div>
           <div class="avatar-status-dot" id="avatar-status-indicator" title="Available for opportunities"></div>
         </div>
@@ -328,18 +316,10 @@
           </div>
         </div>
 
-        <div class="leetcode-footer">
-          <span id="activity-status" class="activity-status" aria-live="polite"></span>
-          <div class="leetcode-legend">
-            <span class="legend-text">Less</span>
-            <span class="legend-cell lvl-0"></span>
-            <span class="legend-cell lvl-1"></span>
-            <span class="legend-cell lvl-2"></span>
-            <span class="legend-cell lvl-3"></span>
-            <span class="legend-cell lvl-4"></span>
-            <span class="legend-text">More</span>
-          </div>
-        </div>
+        <details class="today-solved" id="today-solved">
+          <summary>Solved today</summary>
+          <div id="today-solved-content" aria-live="polite"></div>
+        </details>
       </div>
     </section>
 
@@ -362,7 +342,7 @@
 
       <div class="modal-body">
         <div class="modal-hero-media">
-          <img id="modal-project-img" src="" alt="Project Visual Preview">
+          <img id="modal-project-img" alt="Project Visual Preview" decoding="async">
         </div>
 
         <div class="modal-grid">
@@ -423,9 +403,9 @@
   </footer>
 
   <script src="portfolio-data.js?v=4.5"></script>
-  <script src="activity-calendar.js?v=3.7"></script>
-  <script src="appearance.js?v=4.5"></script>
+  <script src="activity-calendar.js?v=3.8"></script>
+  <script src="appearance.js?v=4.6"></script>
   <script src="snake-score-client.js?v=1.1"></script>
-  <script src="script.js?v=4.9"></script>
+  <script src="script.js?v=5.3"></script>
 </body>
 </html>

@@ -38,7 +38,21 @@ function postJson(url, payload, referer) {
   });
 }
 
-async function fetchLeetCode(now) {
+function todaysQuestions(submissions, now) {
+  const today = range(now).endDate;
+  const questions = new Map();
+  for (const sub of submissions) {
+    if (!sub.title || !sub.slug || Number.isNaN(sub.date.getTime()) || sub.date > now) continue;
+    if (range(sub.date).endDate !== today) continue;
+    const previous = questions.get(sub.slug);
+    if (!previous || previous.solvedAt < sub.date.toISOString()) {
+      questions.set(sub.slug, { title: sub.title, slug: sub.slug, solvedAt: sub.date.toISOString() });
+    }
+  }
+  return [...questions.values()].sort((a, b) => b.solvedAt.localeCompare(a.solvedAt));
+}
+
+async function fetchLeetCode(now, solvedToday) {
   const window = range(now);
   const years = [...new Set([window.start.getUTCFullYear(), window.end.getUTCFullYear()])];
   const calendars = await Promise.all(years.map(async year => {
@@ -64,6 +78,7 @@ async function fetchLeetCode(now) {
     const json = await postJson("https://leetcode.com/graphql", {
       query: `query($username: String!) {
         recentSubmissionList(username: $username, limit: 20) { id timestamp }
+        recentAcSubmissionList(username: $username, limit: 20) { title titleSlug timestamp }
       }`, variables: { username }
     }, profiles.leetcode.url);
     const recent = {}, seen = new Set();
@@ -76,11 +91,20 @@ async function fetchLeetCode(now) {
       recent[key] = (recent[key] || 0) + 1;
     }
     for (const [key, count] of Object.entries(recent)) days[key] = Math.max(days[key] || 0, count);
+    if (solvedToday) {
+      const accepted = json.data?.recentAcSubmissionList;
+      if (!Array.isArray(accepted)) throw new Error("Missing LeetCode solved questions");
+      solvedToday.questions = todaysQuestions(accepted.map(sub => ({
+        title: sub.title, slug: sub.titleSlug, date: new Date(Number(sub.timestamp) * 1000)
+      })), now);
+      solvedToday.status = "live";
+      solvedToday.updatedAt = now.toISOString();
+    }
   } catch (error) { console.warn("LeetCode recent submissions:", error.message); }
   return days;
 }
 
-async function fetchGfg(now) {
+async function fetchGfg(now, solvedToday) {
   const window = range(now);
   const years = [...new Set([window.start.getUTCFullYear(), window.end.getUTCFullYear()])];
   const calendars = await Promise.all(years.map(async year => {
@@ -97,7 +121,10 @@ async function fetchGfg(now) {
     const json = await postJson("https://practiceapi.geeksforgeeks.org/api/v1/user/problems/submissions/", {
       handle: username, requestType: "getUserSubmissions", page: 1
     }, "https://www.geeksforgeeks.org/");
-    const recent = {};
+    if (!json.result || typeof json.result !== "object" || Array.isArray(json.result)) {
+      throw new Error("Missing GFG solved questions");
+    }
+    const recent = {}, submissions = [];
     for (const group of Object.values(json.result || {})) {
       for (const sub of Object.values(group || {})) {
         if (!sub?.user_subtime) continue;
@@ -106,9 +133,15 @@ async function fetchGfg(now) {
         if (Number.isNaN(date.getTime())) continue;
         const key = dateKey(date);
         recent[key] = (recent[key] || 0) + 1;
+        submissions.push({ title: sub.pname, slug: sub.slug, date });
       }
     }
     for (const [key, count] of Object.entries(recent)) days[key] = Math.max(Number(days[key]) || 0, count);
+    if (solvedToday) {
+      solvedToday.questions = todaysQuestions(submissions, now);
+      solvedToday.status = "live";
+      solvedToday.updatedAt = now.toISOString();
+    }
   } catch (error) { console.warn("GFG recent submissions:", error.message); }
   return days;
 }
@@ -120,7 +153,13 @@ function readDiskCache() {
 
 async function fetchAndCalculate(now = new Date(), { persist = true, fallbackData = null } = {}) {
   const previous = memoryCache || fallbackData || readDiskCache();
-  const results = await Promise.allSettled([fetchLeetCode(now), fetchGfg(now)]);
+  const solvedToday = { date: range(now).endDate, timeZone: "Asia/Kolkata", platforms: {
+    leetcode: { status: "unavailable", updatedAt: null, questions: [] },
+    gfg: { status: "unavailable", updatedAt: null, questions: [] }
+  } };
+  const results = await Promise.allSettled([
+    fetchLeetCode(now, solvedToday.platforms.leetcode), fetchGfg(now, solvedToday.platforms.gfg)
+  ]);
   const days = {}, sources = {};
   ["leetcode", "gfg"].forEach((platform, index) => {
     const result = results[index], ok = result.status === "fulfilled";
@@ -132,6 +171,11 @@ async function fetchAndCalculate(now = new Date(), { persist = true, fallbackDat
       updatedAt: ok ? now.toISOString() : (previous?.sources?.[platform]?.updatedAt || previous?.updatedAt || null),
       ...(ok ? {} : { error: result.reason.message })
     };
+    const savedQuestions = previous?.solvedToday?.platforms?.[platform];
+    if (solvedToday.platforms[platform].status !== "live" && previous?.solvedToday?.date === solvedToday.date
+        && Array.isArray(savedQuestions?.questions)) {
+      solvedToday.platforms[platform] = { ...savedQuestions, status: "stale" };
+    }
     for (const [key, count] of Object.entries(counts)) {
       if (!days[key]) days[key] = { leetcode: 0, gfg: 0 };
       days[key][platform] = count;
@@ -140,7 +184,7 @@ async function fetchAndCalculate(now = new Date(), { persist = true, fallbackDat
   const stale = Object.values(sources).some(source => source.status !== "live");
   const payload = {
     updatedAt: stale ? previous?.updatedAt || null : now.toISOString(),
-    checkedAt: now.toISOString(), profiles, sources, stale, ...summarize(days, now)
+    checkedAt: now.toISOString(), profiles, sources, stale, solvedToday, ...summarize(days, now)
   };
   if (persist && results.some(result => result.status === "fulfilled")) {
     try {
@@ -154,7 +198,7 @@ async function fetchAndCalculate(now = new Date(), { persist = true, fallbackDat
 async function getCodingActivity(forceRefresh = false, options = {}) {
   if (pendingFetch) return pendingFetch;
   const ttl = memoryCache?.stale ? 30000 : CACHE_TTL_MS;
-  if (!forceRefresh && memoryCache && Date.now() - lastFetchTime < ttl) {
+  if (!forceRefresh && memoryCache?.solvedToday?.date === range(new Date()).endDate && Date.now() - lastFetchTime < ttl) {
     return { ...memoryCache, ...summarize(memoryCache.days) };
   }
   pendingFetch = fetchAndCalculate(new Date(), options).then(payload => {

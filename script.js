@@ -138,7 +138,7 @@ function renderExperience() {
       .join("");
 
     const logoContent = exp.logoUrl 
-      ? `<img src="${escapeHtml(exp.logoUrl)}" alt="${escapeHtml(exp.company)}" class="company-logo-img">`
+      ? `<img src="${escapeHtml(exp.logoUrl)}" alt="${escapeHtml(exp.company)}" class="company-logo-img" loading="lazy" decoding="async">`
       : escapeHtml(exp.logoText || exp.company.substring(0, 2).toUpperCase());
 
     return `
@@ -209,6 +209,7 @@ function renderProjects() {
             alt="${escapeHtml(project.imageAlt || project.title)}"
             class="project-preview-img"
             loading="lazy"
+            decoding="async"
           >
           <div class="project-type-badge">${escapeHtml(project.type)}</div>
           ${comingSoonOverlayHtml}
@@ -567,7 +568,7 @@ function setupSnakeGame() {
   });
   const loadBestScore = () => scoreClient.refresh();
   const submitBestScore = value => scoreClient.submit(value);
-  void loadBestScore();
+  if (scoreClient.getState().pending) void loadBestScore();
 
   // Distance from point (px, py) to line segment (x1, y1)-(x2, y2)
   function distToSegment(px, py, x1, y1, x2, y2) {
@@ -1113,7 +1114,9 @@ function setupSnakeGame() {
     if (document.hidden) pauseGame();
     scoreClient.setActive(!document.hidden && modal.classList.contains("open"));
   });
-  window.addEventListener("online", () => { void loadBestScore(); });
+  window.addEventListener("online", () => {
+    if (modal.classList.contains("open") || scoreClient.getState().pending) void loadBestScore();
+  });
   window.addEventListener("pagehide", () => scoreClient.setActive(false));
   window.addEventListener("pageshow", () => scoreClient.setActive(!document.hidden && modal.classList.contains("open")));
   document.addEventListener("portfolio-theme-change", () => { if (modal.classList.contains("open")) draw(); });
@@ -1254,11 +1257,12 @@ function initCodingActivity() {
   async function loadData() {
     const local = ["localhost", "127.0.0.1"].includes(window.location?.hostname) || window.location?.hostname?.endsWith(".netlify.app");
     const apiUrl = !local && window.PORTFOLIO_ACTIVITY_API
-      ? window.PORTFOLIO_ACTIVITY_API : "/api/coding-activity?refresh=true";
+      ? window.PORTFOLIO_ACTIVITY_API : "/api/coding-activity";
     try {
       const res = await fetch(apiUrl, {
         cache: "no-store",
-        signal: typeof AbortSignal !== "undefined" ? AbortSignal.timeout(30000) : undefined
+        signal: typeof AbortSignal !== "undefined" && typeof AbortSignal.timeout === "function"
+          ? AbortSignal.timeout(30000) : undefined
       });
       if (res.ok) {
         const data = await res.json();
@@ -1277,9 +1281,14 @@ function initCodingActivity() {
     return null;
   }
 
-  let loading = false;
+  let loading = false, lastLoadTime = 0, renderedDay = null, chartKey = null, latestData = null;
+  let followingLatest = true;
   async function refreshCalendar() {
+    const today = ActivityCalendar.range(new Date()).endDate;
+    if (renderedDay && renderedDay !== today) renderTodayQuestions(null);
     if (loading) return;
+    const ttl = latestData?.stale ? 30000 : 5 * 60 * 1000;
+    if (latestData && renderedDay === today && Date.now() - lastLoadTime < ttl) return;
     loading = true;
     try {
       const data = await loadData();
@@ -1287,23 +1296,72 @@ function initCodingActivity() {
         if (!container.querySelector(".activity-cell")) {
           container.innerHTML = `<div class="activity-calendar-loading"><span>Unable to load contribution graph.</span></div>`;
         }
+        renderTodayQuestions(null);
         return;
       }
+      latestData = data;
+      lastLoadTime = Date.now();
+      renderedDay = today;
       renderCalendar(data);
     } finally { loading = false; }
   }
   refreshCalendar();
   setupSectionObserver();
+  attachCellEvents();
   setInterval(() => { if (!document.hidden) refreshCalendar(); }, 5 * 60 * 1000);
+  setInterval(() => {
+    if (!document.hidden && renderedDay !== ActivityCalendar.range(new Date()).endDate) refreshCalendar();
+  }, 60000);
   document.addEventListener("visibilitychange", () => { if (!document.hidden) refreshCalendar(); });
   document.addEventListener("touchstart", e => {
     if (!e.target.closest(".activity-cell")) hideTooltip();
   }, { passive: true });
   window.addEventListener('scroll', hideTooltip, { passive: true, capture: true });
   window.addEventListener('resize', hideTooltip, { passive: true });
+  if (scrollArea) {
+    scrollArea.addEventListener('scroll', () => {
+      followingLatest = scrollArea.scrollLeft >= scrollArea.scrollWidth - scrollArea.clientWidth - 2;
+    }, { passive: true });
+    const keepLatestVisible = () => {
+      if (followingLatest) scrollArea.scrollLeft = scrollArea.scrollWidth;
+    };
+    if (typeof ResizeObserver !== 'undefined') new ResizeObserver(keepLatestVisible).observe(scrollArea);
+    else window.addEventListener('resize', keepLatestVisible, { passive: true });
+  }
+
+  function renderTodayQuestions(data) {
+    const content = document.getElementById("today-solved-content");
+    if (!content) return;
+    const now = new Date();
+    const today = ActivityCalendar.range(now).endDate;
+    const dateLabel = new Date(today + "T00:00:00Z").toLocaleDateString("en-IN", {
+      timeZone: "UTC", day: "numeric", month: "short", year: "numeric"
+    });
+    const details = data?.solvedToday?.date === today ? data.solvedToday : null;
+    const escape = value => String(value).replace(/[&<>"']/g, char => ({
+      "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+    })[char]);
+    const links = ["leetcode", "gfg"].map(platform => {
+      const source = details?.platforms?.[platform];
+      const questions = (source?.questions || []).filter(question => {
+        const solved = new Date(question.solvedAt);
+        return question.title && question.slug && !Number.isNaN(solved.getTime()) && solved <= now
+          && ActivityCalendar.range(solved).endDate === today;
+      });
+      return questions.map(question => {
+        const url = platform === "leetcode"
+          ? `https://leetcode.com/problems/${encodeURIComponent(question.slug)}/`
+          : `https://www.geeksforgeeks.org/problems/${encodeURIComponent(question.slug)}/1`;
+        return `<li><a href="${url}" target="_blank" rel="noopener noreferrer">${escape(question.title)} <span aria-hidden="true">↗</span></a></li>`;
+      }).join("");
+    }).join("");
+    const html = `<p class="today-solved-date">${dateLabel}</p>${links ? `<ul class="today-solved-list">${links}</ul>` : ""}`;
+    if (content.innerHTML !== html) content.innerHTML = html;
+  }
 
   function renderCalendar(data) {
     const now = new Date();
+    renderTodayQuestions(data);
     const { days: daysData } = ActivityCalendar.summarize(data.days || {}, now);
     const window = ActivityCalendar.range(now);
     const activeToday = window.end;
@@ -1313,22 +1371,12 @@ function initCodingActivity() {
     startDate.setUTCDate(startDate.getUTCDate() - startDate.getUTCDay());
     const totalWeeks = Math.ceil(((activeToday - startDate) / ActivityCalendar.DAY_MS + 1) / 7);
 
-    const status = document.getElementById("activity-status");
-    if (status) {
-      const updated = data.updatedAt ? new Date(data.updatedAt) : null;
-      const outdated = !updated || Number.isNaN(updated.getTime()) || now - updated > 15 * 60 * 1000;
-      const label = updated && !Number.isNaN(updated.getTime())
-        ? updated.toLocaleString("en-IN", { timeZone: "Asia/Kolkata", month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" }) + " IST"
-        : "unknown";
-      status.textContent = `${data.stale || outdated ? "Saved activity" : "Updated"}: ${label} · Past 365 days`;
-      status.title = Object.entries(data.sources || {}).map(([platform, source]) => {
-        const time = source.updatedAt ? new Date(source.updatedAt) : null;
-        const label = time && !Number.isNaN(time.getTime())
-          ? time.toLocaleString("en-IN", { timeZone: "Asia/Kolkata" }) + " IST" : "unknown";
-        return `${platform === "leetcode" ? "LeetCode" : "GFG"}: ${source.status === "live" ? "fetched" : "saved"} ${label}`;
-      }).join("\n") + "\nActivity is checked on visits and every five minutes while this page is open. Saved activity is shown when fresh data is unavailable.";
-    }
-
+    const nextChartKey = JSON.stringify([activeTodayStr, daysData]);
+    if (chartKey === nextChartKey) return;
+    const firstRender = chartKey === null;
+    chartKey = nextChartKey;
+    const previousScroll = scrollArea?.scrollLeft || 0;
+    hideTooltip();
     const weeks = [];
     let curr = new Date(startDate);
 
@@ -1427,34 +1475,24 @@ function initCodingActivity() {
 
     container.innerHTML = monthsRowHtml + gridBodyHtml;
 
-    attachCellEvents();
-
     if (scrollArea) {
       requestAnimationFrame(() => {
-        scrollArea.scrollLeft = scrollArea.scrollWidth;
+        scrollArea.scrollLeft = firstRender || followingLatest ? scrollArea.scrollWidth : previousScroll;
       });
     }
   }
 
   function attachCellEvents() {
-    const cells = container.querySelectorAll(".activity-cell:not(.lvl-future)");
-
-    cells.forEach(cell => {
-      cell.addEventListener("pointerenter", event => { if (event.pointerType !== 'touch') showTooltip(event); });
-      cell.addEventListener("pointerleave", event => { if (event.pointerType !== 'touch') hideTooltip(); });
-      cell.addEventListener("click", showTooltip);
-      cell.addEventListener("focus", showTooltip);
-      cell.addEventListener("blur", hideTooltip);
-      cell.addEventListener("touchstart", (e) => {
-        showTooltip(e);
-      }, { passive: true });
-    });
-
-
+    // One set of listeners handles all dates, including future refreshes.
+    container.addEventListener("pointerover", event => { if (event.pointerType !== "touch") showTooltip(event); });
+    container.addEventListener("pointerout", hideTooltip);
+    container.addEventListener("click", showTooltip);
+    container.addEventListener("focusin", showTooltip);
+    container.addEventListener("focusout", hideTooltip);
   }
 
   function showTooltip(e) {
-    const cell = e.currentTarget || e.target;
+    const cell = e.target.closest(".activity-cell");
     if (!cell || cell.classList.contains("lvl-future")) return;
 
     const dateStr = cell.getAttribute("data-date");

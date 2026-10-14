@@ -4,11 +4,12 @@
   else root.ActivityCalendar = calendar;
 })(typeof globalThis !== "undefined" ? globalThis : this, function () {
   const DAY_MS = 86400000;
+  const dayFormatter = new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Asia/Kolkata", year: "numeric", month: "2-digit", day: "2-digit"
+  });
   function dateKey(date) { return date.toISOString().slice(0, 10); }
   function range(now = new Date()) {
-    const parts = new Intl.DateTimeFormat("en-CA", {
-      timeZone: "Asia/Kolkata", year: "numeric", month: "2-digit", day: "2-digit"
-    }).formatToParts(now);
+    const parts = dayFormatter.formatToParts(now);
     const part = type => parts.find(p => p.type === type).value;
     const end = new Date(`${part("year")}-${part("month")}-${part("day")}T00:00:00Z`);
     const start = new Date(end.getTime() - 364 * DAY_MS);

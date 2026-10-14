@@ -12,8 +12,24 @@ The GitHub Pages frontend reads `window.PORTFOLIO_ACTIVITY_API` from
 `portfolio-data.js`. A small Netlify function fetches LeetCode and GFG activity
 on demand, with a five-minute cache. The frontend fetches on visits, every five
 minutes while visible, and when returning to the tab. Its saved JSON snapshot
-remains a fallback when the live service cannot be reached. Old data is labelled
-"Saved activity"; each platform's fetch time is available in the status tooltip.
+remains a fallback when the live service cannot be reached. The card displays
+only the graph and "Solved today", without update labels or a colour legend.
+
+Under the chart, "Solved today" shows the date and linked question names
+for the current date in Asia/Kolkata. Repeated solves
+of the same question appear once. LeetCode uses its 20 most recent accepted
+submissions, so busy days may have an incomplete list. GFG uses the problem names
+and submission times from its public solved-problems response; timestamps without
+an explicit timezone follow the existing activity service's UTC convention.
+Saved question details are only used when they belong to today's IST date.
+
+The frontend reuses fresh activity for five minutes, keeps unchanged chart cells
+and question links in place, and checks for a date change while visible. Calendar
+tooltips share event listeners, and date formatting is reused across submissions.
+Background motion follows the device's reduced-motion preference. Project images
+and the learning bundle load lazily; game records are fetched when the game opens
+or a saved pending score needs syncing. The game adapts to short landscape screens,
+and links and controls have larger touch targets on phones and touch devices.
 
 The function uses the same activity calculations as the local server and runs
 without writing to the deployment filesystem. It allows browser reads from
@@ -31,7 +47,7 @@ GitHub Pages cannot run `server.js`. The `pages.yml` workflow fetches public
 LeetCode and GFG calendars and deploys a fresh static snapshot on each push to
 `main`, on manual runs, and on a requested 15-minute schedule. GitHub can delay
 or skip scheduled runs, so this schedule supplies fallback snapshots and does
-not determine live chart freshness. The chart displays the data's fetch time.
+not determine live chart freshness.
 
 1. Push these changes to `main`.
 2. In the repository's **Settings → Pages → Build and deployment**, select
