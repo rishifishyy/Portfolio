@@ -127,11 +127,12 @@ async function fetchGfg(now, solvedToday) {
     const recent = {}, submissions = [];
     for (const group of Object.values(json.result || {})) {
       for (const sub of Object.values(group || {})) {
-        if (!sub?.user_subtime) continue;
-        const raw = sub.user_subtime.replace(" ", "T");
-        const date = new Date(/[zZ]$|[+-]\d{2}:?\d{2}$/.test(raw) ? raw : raw + "Z");
-        if (Number.isNaN(date.getTime())) continue;
-        const key = dateKey(date);
+        if (typeof sub?.user_subtime !== "string") continue;
+        const raw = sub.user_subtime.trim().replace(" ", "T");
+        // GFG's timezone-less submission times are IST, matching its calendar dates.
+        const date = new Date(/[zZ]$|[+-]\d{2}:?\d{2}$/.test(raw) ? raw : raw + "+05:30");
+        if (Number.isNaN(date.getTime()) || date > now) continue;
+        const key = range(date).endDate;
         recent[key] = (recent[key] || 0) + 1;
         submissions.push({ title: sub.pname, slug: sub.slug, date });
       }

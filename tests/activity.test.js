@@ -129,8 +129,8 @@ test('solved questions use today in IST, deduplicate accepted questions, and exc
       return { body: { data: { matchedUser: { userCalendar: { submissionCalendar: '{}' } } } } };
     }
     return { body: { result: payload.requestType === 'getUserSubmissions' ? { Easy: {
-      a: { pname: 'Power of Four', slug: 'power-of-four', user_subtime: '2026-09-29 19:00:00' },
-      b: { pname: 'Yesterday', slug: 'old', user_subtime: '2026-09-29 18:29:59' }
+      a: { pname: 'Power of Four', slug: 'power-of-four', user_subtime: '2026-09-30 00:00:00' },
+      b: { pname: 'Yesterday', slug: 'old', user_subtime: '2026-09-29 23:59:59' }
     } } : {} } };
   });
   const data = await fixture.service.getCodingActivity(true);
@@ -141,6 +141,30 @@ test('solved questions use today in IST, deduplicate accepted questions, and exc
   assert.equal(data.solvedToday.platforms.leetcode.questions[0].solvedAt, '2026-09-30T06:00:00.000Z');
   assert.equal(data.solvedToday.platforms.gfg.questions.length, 1);
   assert.equal(data.solvedToday.platforms.gfg.questions[0].title, 'Power of Four');
+});
+
+test('GFG treats local times as IST, preserves explicit timezones, and buckets solves by IST day', async () => {
+  const fixture = serviceFixture((url, payload) => ({ body: { result:
+    payload.requestType === 'getUserSubmissions' ? { Medium: {
+      rotate: { pname: 'Rotate by 90 degree', slug: 'rotate-by-90-degree', user_subtime: '2026-09-30 11:45:00' },
+      midnight: { pname: 'After midnight', slug: 'after-midnight', user_subtime: '2026-09-30 00:15:00' },
+      utc: { pname: 'Explicit UTC', slug: 'explicit-utc', user_subtime: '2026-09-30T06:00:00Z' },
+      offset: { pname: 'Explicit offset', slug: 'explicit-offset', user_subtime: '2026-09-30T11:15:00+05:30' },
+      yesterday: { pname: 'Yesterday', slug: 'yesterday', user_subtime: '2026-09-29 23:59:59' },
+      future: { pname: 'Future', slug: 'future', user_subtime: '2026-09-30 13:00:00' },
+      invalid: { pname: 'Invalid', slug: 'invalid', user_subtime: 'not-a-date' },
+      missing: { pname: 'Missing', slug: 'missing', user_subtime: 123 }
+    } } : {}
+  } }));
+  const details = {};
+  const days = await fixture.service.fetchGfg(new Date('2026-09-30T07:00:00Z'), details);
+  assert.equal(details.status, 'live');
+  assert.equal(details.questions.length, 4);
+  assert.equal(details.questions[0].title, 'Rotate by 90 degree');
+  assert.equal(details.questions[0].solvedAt, '2026-09-30T06:15:00.000Z');
+  assert.equal(details.questions.find(question => question.slug === 'after-midnight').solvedAt, '2026-09-29T18:45:00.000Z');
+  assert.equal(days['2026-09-30'], 4);
+  assert.equal(days['2026-09-29'], 1);
 });
 
 test('question failures preserve only same-day saved questions independently of calendar success', async () => {

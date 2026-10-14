@@ -20,7 +20,7 @@ for the current date in Asia/Kolkata. Repeated solves
 of the same question appear once. LeetCode uses its 20 most recent accepted
 submissions, so busy days may have an incomplete list. GFG uses the problem names
 and submission times from its public solved-problems response; timestamps without
-an explicit timezone follow the existing activity service's UTC convention.
+an explicit timezone are interpreted as IST, and calendar overlays use IST dates.
 Saved question details are only used when they belong to today's IST date.
 
 The frontend reuses fresh activity for five minutes, keeps unchanged chart cells
