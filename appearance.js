@@ -4,7 +4,6 @@
   const canvas = document.getElementById('portfolio-ambient-canvas');
   const context = canvas?.getContext('2d');
   if (!themeButton) return;
-  const save = (key, value) => { try { localStorage.setItem(key, value); } catch {} };
   root.dataset.motion = 'on';
   let frame = 0, lastTime = 0, elapsed = 0, width = 0, height = 0, compact = false;
   let glowSprites = [], lineGradient, cursor = { x: 0, y: 0, targetX: 0, targetY: 0 };
@@ -38,14 +37,8 @@
   }
   themeButton.addEventListener('click', () => {
     root.dataset.theme = root.dataset.theme === 'dark' ? 'light' : 'dark';
-    save('portfolio-theme', root.dataset.theme); updatePalette(); paint();
+    updatePalette(); paint();
     document.dispatchEvent(new Event('portfolio-theme-change'));
-  });
-  window.addEventListener('storage', event => {
-    if (event.key === 'portfolio-theme' && ['light', 'dark'].includes(event.newValue)) {
-      root.dataset.theme = event.newValue; updatePalette(); paint();
-      document.dispatchEvent(new Event('portfolio-theme-change'));
-    }
   });
   function updateGradient() {
     if (!context || !width) return;
