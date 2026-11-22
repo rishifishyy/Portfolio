@@ -211,12 +211,10 @@ test('HTTP failures keep the saved cache and concurrent refreshes share one fetc
   assert.equal(fixture.requests.length, 4);
 });
 
-test('rendered chart has exactly 365 selectable dates and includes latest saved submission', async () => {
-  const container = { innerHTML: '', addEventListener() {}, querySelectorAll: () => [], classList: { add() {} } };
-  const tooltip = { classList: { remove() {} } };
-  const status = {};
+test('rendered chart has 365 date buttons and one tab stop at today', async () => {
+  const container = { innerHTML: '', addEventListener() {} };
   const document = { getElementById(id) {
-    return { 'activity-calendar': container, 'activity-tooltip': tooltip, 'activity-status': status }[id] || null;
+    return id === 'activity-calendar' ? container : null;
   }, addEventListener() {} };
   const data = { updatedAt: '2026-09-30T07:00:00Z', days: {
     '2026-09-29': { leetcode: 1 }, '2025-09-30': { leetcode: 99 }, '2026-10-01': { leetcode: 99 }
@@ -230,18 +228,19 @@ test('rendered chart has exactly 365 selectable dates and includes latest saved 
     }; }
   });
   await new Promise(resolve => setImmediate(resolve));
-  assert.equal((container.innerHTML.match(/tabindex="0"/g) || []).length, 365);
+  assert.equal((container.innerHTML.match(/<button type="button" class="activity-cell/g) || []).length, 365);
+  assert.equal((container.innerHTML.match(/tabindex="0"/g) || []).length, 1);
   assert.match(container.innerHTML, /data-date="2026-09-29"\s+data-count="1"/);
-  assert.match(container.innerHTML, /cell-today/);
+  assert.match(container.innerHTML, /cell-today"\s+data-date="2026-09-30" data-count="0" tabindex="0"/);
+  assert.match(container.innerHTML, /aria-label="[^"]*1 submission"/);
   assert.equal(calls[1].options.cache, 'no-store');
 });
 
 test('GitHub Pages renders live submissions on browsers without AbortSignal.timeout', async () => {
-  const container = { innerHTML: '', addEventListener() {}, querySelectorAll: () => [], classList: { add() {} } };
-  const tooltip = { classList: { remove() {} } };
-  const status = {}, calls = [];
+  const container = { innerHTML: '', addEventListener() {} };
+  const calls = [];
   const document = { getElementById(id) {
-    return { 'activity-calendar': container, 'activity-tooltip': tooltip, 'activity-status': status }[id] || null;
+    return id === 'activity-calendar' ? container : null;
   }, addEventListener() {} };
   const data = { updatedAt: '2026-09-30T07:00:00Z', sources: {
     leetcode: { status: 'live', updatedAt: '2026-09-30T07:00:00Z' }
@@ -260,11 +259,10 @@ test('GitHub Pages renders live submissions on browsers without AbortSignal.time
 });
 
 test('a failed live service displays activity from the saved deployment', async () => {
-  const container = { innerHTML: '', addEventListener() {}, querySelectorAll: () => [], classList: { add() {} } };
-  const tooltip = { classList: { remove() {} } };
-  const status = {}, calls = [];
+  const container = { innerHTML: '', addEventListener() {} };
+  const calls = [];
   const document = { getElementById(id) {
-    return { 'activity-calendar': container, 'activity-tooltip': tooltip, 'activity-status': status }[id] || null;
+    return id === 'activity-calendar' ? container : null;
   }, addEventListener() {} };
   const data = { updatedAt: '2026-09-30T06:00:00Z', days: { '2026-09-29': { leetcode: 1 } } };
   const script = fs.readFileSync(require.resolve('../script.js'), 'utf8');
@@ -281,11 +279,10 @@ test('a failed live service displays activity from the saved deployment', async 
 });
 
 test('today panel renders safe problem links and excludes yesterday from current-day details', async () => {
-  const container = { innerHTML: '', addEventListener() {}, querySelectorAll: () => [], classList: { add() {} } };
+  const container = { innerHTML: '', addEventListener() {} };
   const content = {};
   const document = { getElementById(id) {
-    return { 'activity-calendar': container, 'activity-tooltip': { classList: { remove() {} } },
-      'today-solved-content': content }[id] || null;
+    return { 'activity-calendar': container, 'today-solved-content': content }[id] || null;
   }, addEventListener() {} };
   const data = { days: {}, solvedToday: { date: '2026-09-30', platforms: {
     leetcode: { status: 'live', updatedAt: '2026-09-30T07:00:00Z', questions: [
@@ -317,11 +314,10 @@ test('activity reuses fresh data and unchanged markup, but clears yesterday at I
   const content = {};
   const container = {
     get innerHTML() { return html; }, set innerHTML(value) { chartWrites++; html = value; },
-    addEventListener(name, callback) { cellEvents[name] = callback; }, classList: { add() {} }
+    addEventListener(name, callback) { cellEvents[name] = callback; }
   };
   const document = { hidden: false, getElementById(id) {
-    return { 'activity-calendar': container, 'activity-tooltip': { classList: { remove() {} } },
-      'today-solved-content': content }[id] || null;
+    return { 'activity-calendar': container, 'today-solved-content': content }[id] || null;
   }, addEventListener(name, callback) { events[name] = callback; } };
   const script = fs.readFileSync(require.resolve('../script.js'), 'utf8');
   vm.runInNewContext(script.slice(script.indexOf('function initCodingActivity()')) + '\ninitCodingActivity();', {
@@ -348,7 +344,7 @@ test('activity reuses fresh data and unchanged markup, but clears yesterday at I
   await settled();
   assert.equal(calls, 2);
   assert.equal(chartWrites, 1, 'unchanged dates should preserve the existing chart');
-  assert.equal(Object.keys(cellEvents).length, 5, 'listeners should be shared across dates');
+  assert.deepEqual(Object.keys(cellEvents).sort(), ['click', 'focusin', 'focusout', 'keydown', 'pointerout', 'pointerover']);
   clock = Date.parse('2026-09-29T18:30:00Z');
   timers[60000]();
   assert.doesNotMatch(content.innerHTML, /Question 2026-09-29/);

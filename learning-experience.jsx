@@ -1,9 +1,6 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import { gsap } from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
-
-gsap.registerPlugin(ScrollTrigger);
 
 const pythonExamples = [
   { label: 'Squares', file: 'squares.py', code: '# A little Python, every day\nnumbers = [1, 2, 3, 4, 5]\nsquares = [n ** 2 for n in numbers]\nprint(squares)', output: '[1, 4, 9, 16, 25]' },
@@ -168,24 +165,6 @@ function LearningExperience({ skills }) {
     return () => { resize.disconnect(); gsap.killTweensOf(indicator.current); };
   }, [active, reduced]);
 
-  useLayoutEffect(() => {
-    if (reduced && !allowMotion) return;
-    const context = gsap.context(() => {
-      gsap.from('.learning-copy > *', { x: -24, opacity: 0, duration: .6, stagger: .08, ease: 'power3.out' });
-      gsap.from('.learning-demo', { y: 28, opacity: 0, duration: .75, ease: 'power3.out' });
-    }, root);
-    return () => context.revert();
-  }, [active, reduced, allowMotion]);
-
-  useLayoutEffect(() => {
-    const media = gsap.matchMedia();
-    media.add('(prefers-reduced-motion: no-preference)', () => {
-      gsap.fromTo(root.current.querySelector('.learning-scroll-line'), { scaleX: 0 }, { scaleX: 1, ease: 'none', scrollTrigger: { trigger: root.current, start: 'top 95%', end: 'bottom 25%', scrub: .4 } });
-    });
-    ScrollTrigger.refresh();
-    return () => media.revert();
-  }, []);
-
   const changeTabByKey = event => {
     if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
     event.preventDefault();
@@ -198,24 +177,21 @@ function LearningExperience({ skills }) {
     else setPaused(true);
   };
 
-  return <div className={`learning-experience ${active === 1 ? 'learning-ai' : 'learning-python'}`} ref={root}>
+  return <div className="learning-experience" ref={root}>
     <div className="learning-controls">
       <div className="learning-tabs" role="tablist" aria-label="Skills I am learning" onKeyDown={changeTabByKey}>
-        {skills.map((item, index) => <button key={item.id} type="button" role="tab" id={`learning-tab-${index}`} aria-controls="learning-panel" aria-selected={active === index} tabIndex={active === index ? 0 : -1} ref={el => tabs.current[index] = el} onClick={() => setActive(index)}><span className="tab-number">0{index + 1}</span>{item.name}</button>)}
+        {skills.map((item, index) => <button key={item.id} type="button" role="tab" id={`learning-tab-${index}`} aria-controls="learning-panel" aria-selected={active === index} tabIndex={active === index ? 0 : -1} ref={el => tabs.current[index] = el} onClick={() => setActive(index)}>{item.name}</button>)}
         <span className="learning-tab-indicator" ref={indicator} aria-hidden="true" />
       </div>
       <button className="learning-motion-toggle" type="button" onClick={toggleMotion} aria-label={playing ? 'Pause learning animations' : 'Play learning animations'}><span aria-hidden="true">{playing ? 'Ⅱ' : '▶'}</span>{playing ? 'Pause' : 'Play'}</button>
     </div>
     <div className="learning-workbench" role="tabpanel" id="learning-panel" aria-labelledby={`learning-tab-${active}`}>
       <div className="learning-copy" key={skill.id}>
-        <div className="learning-eyebrow"><span className="learning-status-dot" />CURRENTLY LEARNING</div>
         <h3>{skill.name}</h3><p>{skill.description}</p>
-        <div className="learning-focus"><span>MY FOCUS</span><ul>{skill.topics.map((topic, index) => <li key={topic}><span className="focus-index">0{index + 1}</span>{topic}</li>)}</ul></div>
-        <p className="learning-demo-hint">{active === 0 ? 'Try a different Python example →' : 'Switch prompts to follow the flow →'}</p>
+        <ul className="skills-list">{skill.topics.map(topic => <li key={topic}>{topic}</li>)}</ul>
       </div>
       {active === 0 ? <PythonDemo playing={playing} /> : <AIDemo playing={playing} />}
     </div>
-    <div className="learning-bottom-line" aria-hidden="true"><span className="learning-scroll-line" /></div>
   </div>;
 }
 

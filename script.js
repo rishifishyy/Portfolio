@@ -1,517 +1,193 @@
 document.addEventListener("DOMContentLoaded", () => {
-  if (typeof portfolioData === "undefined") {
-    console.error("portfolioData is missing!");
-    return;
-  }
-
   renderProfile();
-  renderSkills();
   renderExperience();
   renderProjects();
   renderEducation();
-  renderLearningSkills();
-  setupMobileNavigation();
-  setupActiveNavObserver();
-  setupModalHandlers();
-  setupSmoothScroll();
+  setupLearning();
   setupSnakeGame();
-  setupNameHoverAnimation();
   initCodingActivity();
 });
 
 function renderProfile() {
   const { profile } = portfolioData;
+  document.getElementById("hero-tagline").textContent = profile.tagline;
+  document.getElementById("about-summary-text").textContent = profile.summary;
+  document.getElementById("availability").hidden = !profile.statusAvailable;
+  document.getElementById("status-badge-text").textContent = profile.statusBadge;
+  document.getElementById("current-year").textContent = new Date().getFullYear();
+  document.getElementById("skills-list").innerHTML = renderListItems(profile.skills);
 
-  const navBrand = document.getElementById("nav-brand-name");
-  const mobileBrand = document.getElementById("mobile-brand-name");
-  const heroName = document.getElementById("hero-name");
-  const heroTagline = document.getElementById("hero-tagline");
-  const footerName = document.getElementById("footer-name");
-  const heroAvatar = document.getElementById("hero-avatar");
-  const statusBadge = document.getElementById("status-badge-text");
-  const statusIndicator = document.getElementById("avatar-status-indicator");
-  const aboutSummary = document.getElementById("about-summary-text");
-  const currentYear = document.getElementById("current-year");
-
-  if (navBrand) navBrand.textContent = profile.name;
-  if (mobileBrand) mobileBrand.textContent = profile.name;
-  if (heroName) heroName.textContent = profile.name;
-  if (footerName) footerName.textContent = profile.name;
-  if (heroTagline) heroTagline.textContent = profile.tagline;
-  if (aboutSummary) aboutSummary.textContent = profile.summary;
-  if (currentYear) currentYear.textContent = new Date().getFullYear();
-
-  if (heroAvatar && profile.avatarUrl) {
-    heroAvatar.src = profile.avatarUrl;
-    heroAvatar.alt = profile.name;
+  for (const link of document.querySelectorAll("[data-contact]")) {
+    const channel = link.dataset.contact;
+    if (channel === "email") {
+      link.href = profile.contact.mailUrl;
+      link.addEventListener("click", () => copyEmailToClipboard(profile.contact.email));
+    } else {
+      link.href = profile.contact[channel];
+    }
   }
-
-  if (statusBadge && profile.statusBadge) {
-    statusBadge.textContent = profile.statusBadge;
-  }
-
-  if (statusIndicator && !profile.statusAvailable) {
-    statusIndicator.style.display = "none";
-  }
-
-  const ctaBtn = document.getElementById("cta-contact-btn");
-  const linkEmail = document.getElementById("social-email");
-  const linkLinkedin = document.getElementById("social-linkedin");
-  const linkGithub = document.getElementById("social-github");
-  const linkCodolio = document.getElementById("social-codolio");
-  const footerEmail = document.getElementById("footer-email");
-  const footerLinkedin = document.getElementById("footer-linkedin");
-  const footerGithub = document.getElementById("footer-github");
-  const footerCodolio = document.getElementById("footer-codolio");
-
-  const mobileNavEmail = document.getElementById("mobile-nav-email-btn");
-  const mobileDrawerEmail = document.getElementById("mobile-drawer-email");
-  const mobileDrawerGithub = document.getElementById("mobile-drawer-github");
-  const mobileDrawerLinkedin = document.getElementById("mobile-drawer-linkedin");
-  const mobileDrawerCodolio = document.getElementById("mobile-drawer-codolio");
-
-  const emailRaw = profile.contact && profile.contact.email ? profile.contact.email.replace(/^mailto:/, "") : "rishinehra1@gmail.com";
-  const mailUrl = (profile.contact && profile.contact.mailUrl) 
-    ? profile.contact.mailUrl 
-    : `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(emailRaw)}`;
-
-  if (ctaBtn) {
-    ctaBtn.href = mailUrl;
-    ctaBtn.target = "_blank";
-    ctaBtn.rel = "noopener noreferrer";
-    ctaBtn.onclick = () => copyEmailToClipboard(emailRaw);
-  }
-
-  if (linkEmail) {
-    linkEmail.href = mailUrl;
-    linkEmail.target = "_blank";
-    linkEmail.rel = "noopener noreferrer";
-    linkEmail.onclick = () => copyEmailToClipboard(emailRaw);
-  }
-
-  if (footerEmail) {
-    footerEmail.href = mailUrl;
-    footerEmail.target = "_blank";
-    footerEmail.rel = "noopener noreferrer";
-    footerEmail.onclick = () => copyEmailToClipboard(emailRaw);
-  }
-
-  if (mobileNavEmail) {
-    mobileNavEmail.href = mailUrl;
-    mobileNavEmail.onclick = () => copyEmailToClipboard(emailRaw);
-  }
-
-  if (mobileDrawerEmail) {
-    mobileDrawerEmail.href = mailUrl;
-    mobileDrawerEmail.onclick = () => copyEmailToClipboard(emailRaw);
-  }
-
-  if (linkLinkedin && profile.contact.linkedin) linkLinkedin.href = profile.contact.linkedin;
-  if (linkGithub && profile.contact.github) linkGithub.href = profile.contact.github;
-  if (linkCodolio && profile.contact.codolio) linkCodolio.href = profile.contact.codolio;
-
-  if (footerLinkedin && profile.contact.linkedin) footerLinkedin.href = profile.contact.linkedin;
-  if (footerGithub && profile.contact.github) footerGithub.href = profile.contact.github;
-  if (footerCodolio && profile.contact.codolio) footerCodolio.href = profile.contact.codolio;
-
-  if (mobileDrawerLinkedin && profile.contact.linkedin) mobileDrawerLinkedin.href = profile.contact.linkedin;
-  if (mobileDrawerGithub && profile.contact.github) mobileDrawerGithub.href = profile.contact.github;
-  if (mobileDrawerCodolio && profile.contact.codolio) mobileDrawerCodolio.href = profile.contact.codolio;
 }
 
-function renderSkills() {
-  const container = document.getElementById("skills-list");
-  if (!container || !portfolioData.profile.skills) return;
-
-  container.innerHTML = portfolioData.profile.skills
-    .map(skill => `<span class="skill-tag">${escapeHtml(skill)}</span>`)
-    .join("");
+function renderListItems(items) {
+  return items.map(item => `<li>${escapeHtml(item)}</li>`).join("");
 }
 
 function renderExperience() {
-  const container = document.getElementById("experience-list");
-  if (!container || !portfolioData.experiences) return;
-
-  container.innerHTML = portfolioData.experiences.map(exp => {
-    const techPills = (exp.technologies || [])
-      .map(t => `<span class="tech-tag">${escapeHtml(t)}</span>`)
-      .join("");
-
-    const logoContent = exp.logoUrl 
-      ? `<img src="${escapeHtml(exp.logoUrl)}" alt="${escapeHtml(exp.company)}" class="company-logo-img" loading="lazy" decoding="async">`
-      : escapeHtml(exp.logoText || exp.company.substring(0, 2).toUpperCase());
-
-    return `
-      <div class="experience-card" id="${escapeHtml(exp.id)}">
-        <div class="experience-header-row">
-          <div class="company-badge" style="background: ${exp.logoColor || 'var(--bg-muted)'};">
-            ${logoContent}
-          </div>
-          
-          <div class="experience-meta">
-            <div class="experience-title-row">
-              <div class="company-name">
-                ${escapeHtml(exp.company)}
-                <span class="role-name">(${escapeHtml(exp.role)})</span>
-              </div>
-              <div class="duration-chip">${escapeHtml(exp.duration)}</div>
-            </div>
-            
-            <p class="experience-summary">${escapeHtml(exp.summary)}</p>
-            
-            <div class="tech-tags">
-              ${techPills}
-            </div>
-          </div>
-        </div>
+  document.getElementById("experience-list").innerHTML = portfolioData.experiences.map(exp => `
+    <article class="entry-row" id="${escapeHtml(exp.id)}">
+      <div class="entry-meta">
+        <span>${escapeHtml(exp.company)}</span>
+        <span>${escapeHtml(exp.duration)}</span>
       </div>
-    `;
-  }).join("");
+      <div class="entry-content">
+        <h3>${escapeHtml(exp.role)}</h3>
+        <p>${escapeHtml(exp.summary)}</p>
+      </div>
+    </article>
+  `).join("");
 }
 
 function renderProjects() {
   const container = document.getElementById("projects-grid");
-  if (!container || !portfolioData.projects) return;
+  const modal = document.getElementById("project-modal");
 
-  container.innerHTML = portfolioData.projects.map((project) => {
-    const visibleTech = (project.techStack || []).slice(0, 4);
-    const overflowCount = (project.techStack || []).length - visibleTech.length;
+  container.innerHTML = portfolioData.projects.map(project => {
+    const metadata = escapeHtml(project.isComingSoon ? `${project.type} · In progress` : project.type);
+    const title = `
+      <h3>
+        <button type="button" class="project-trigger" data-project-id="${escapeHtml(project.id)}" aria-haspopup="dialog" aria-controls="project-modal">${escapeHtml(project.title)}</button>
+      </h3>
+    `;
+    const description = `<p class="project-description">${escapeHtml(project.shortDescription)}</p>`;
 
-    const techTagsHtml = visibleTech
-      .map(tech => `<span class="bento-tech-pill">${escapeHtml(tech)}</span>`)
-      .join("") + (overflowCount > 0 ? `<span class="bento-tech-pill">+${overflowCount}</span>` : "");
+    if (project.featured) {
+      const responsiveImage = project.imageSrcset
+        ? `srcset="${escapeHtml(project.imageSrcset)}" sizes="(min-width: 1056px) 594px, (min-width: 673px) 56vw, 92vw"`
+        : "";
 
-    const isComingSoon = !!project.isComingSoon;
-    const cardClass = isComingSoon ? 'bento-project-card coming-soon-card' : 'bento-project-card';
-    const footerActionText = isComingSoon ? 'In Progress' : 'View project';
-
-    const comingSoonOverlayHtml = isComingSoon ? `
-      <div class="coming-soon-overlay" aria-hidden="true">
-        <div class="coming-soon-badge-anim">
-          <span class="coming-soon-pulse-dot"></span>
-          <span class="coming-soon-text">COMING SOON</span>
-        </div>
-      </div>
-    ` : '';
+      return `
+        <article class="project-row is-featured">
+          <figure class="project-visual">
+            <img src="${escapeHtml(project.image)}" ${responsiveImage} alt="${escapeHtml(project.imageAlt || project.title)}" decoding="async">
+          </figure>
+          <div class="project-feature-info">
+            ${title}
+            ${description}
+            <p class="project-meta">${project.techStack.slice(0, 4).map(escapeHtml).join(" / ")}</p>
+            <span class="project-cta" aria-hidden="true">View project <span>→</span></span>
+          </div>
+        </article>
+      `;
+    }
 
     return `
-      <article 
-        class="${cardClass}" 
-        data-project-id="${escapeHtml(project.id)}"
-        tabindex="0"
-        role="button"
-        aria-label="View project details for ${escapeHtml(project.title)}"
-      >
-        <div class="project-media-box${project.previewAspect ? ' project-media-wide' : ''}">
-          <img 
-            src="${escapeHtml(project.image)}" 
-            ${project.imageSrcset ? `srcset="${escapeHtml(project.imageSrcset)}" sizes="(min-width: 1024px) 540px, (min-width: 768px) 46vw, 100vw"` : ''}
-            alt="${escapeHtml(project.imageAlt || project.title)}"
-            class="project-preview-img"
-            loading="lazy"
-            decoding="async"
-          >
-          <div class="project-type-badge">${escapeHtml(project.type)}</div>
-          ${comingSoonOverlayHtml}
+      <article class="project-row">
+        <div>
+          ${title}
+          <p class="project-meta">${metadata}</p>
         </div>
-
-        <div class="project-card-body">
-          <h3 class="project-card-title">${escapeHtml(project.title)}</h3>
-          <p class="project-card-desc">${escapeHtml(project.shortDescription)}</p>
-
-          <div class="project-tech-row">
-            ${techTagsHtml}
-          </div>
-
-          <div class="project-card-footer">
-            <span class="view-project-text">${footerActionText}</span>
-            <div class="view-arrow-circle" aria-hidden="true">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                <line x1="7" y1="17" x2="17" y2="7"></line>
-                <polyline points="7 7 17 7 17 17"></polyline>
-              </svg>
-            </div>
-          </div>
-        </div>
+        ${description}
+        <span class="project-arrow" aria-hidden="true">→</span>
       </article>
     `;
   }).join("");
 
-  document.querySelectorAll(".bento-project-card").forEach(card => {
-    const projectId = card.getAttribute("data-project-id");
-    card.addEventListener("click", () => openProjectModal(projectId));
-    card.addEventListener("keydown", (e) => {
-      if (e.key === "Enter" || e.key === " ") {
-        e.preventDefault();
-        openProjectModal(projectId);
-      }
-    });
+  container.addEventListener("click", event => {
+    const trigger = event.target.closest(".project-trigger");
+    if (trigger) openProjectModal(modal, trigger.dataset.projectId);
   });
+  setupDialogDismissal(modal, document.getElementById("modal-close-btn"));
 }
 
 function renderEducation() {
-  const container = document.getElementById("education-list");
-  if (!container || !portfolioData.education) return;
-
-  container.innerHTML = portfolioData.education.map(edu => {
-    return `
-      <div class="education-card" id="${escapeHtml(edu.id)}">
-        <div class="education-header-row">
-          <div class="education-icon-box">
-            <span class="education-icon">${edu.icon || '🎓'}</span>
-          </div>
-          
-          <div class="education-meta">
-            <div class="education-title-row">
-              <div class="education-degree-group">
-                <h3 class="education-degree">${escapeHtml(edu.degree)}</h3>
-                <span class="education-institution">${escapeHtml(edu.institution)}</span>
-              </div>
-              <div class="education-score-chip">${escapeHtml(edu.score)}</div>
-            </div>
-            
-            <div class="education-duration-row">
-              <span class="education-duration">${escapeHtml(edu.duration)}</span>
-            </div>
-            
-            <p class="education-desc">${escapeHtml(edu.description)}</p>
-          </div>
-        </div>
+  document.getElementById("education-list").innerHTML = portfolioData.education.map(education => `
+    <article class="entry-row" id="${escapeHtml(education.id)}">
+      <div class="entry-meta">
+        <span>${escapeHtml(education.duration)}</span>
+        <span>${escapeHtml(education.score)}</span>
       </div>
-    `;
-  }).join("");
+      <div class="entry-content">
+        <h3>${escapeHtml(education.degree)}</h3>
+        <p>${escapeHtml(education.institution)}</p>
+      </div>
+    </article>
+  `).join("");
 }
 
-function renderLearningSkills() {
-  const container = document.getElementById("learning-list");
-  if (!container || !portfolioData.learningSkills) return;
-  window.PORTFOLIO_LEARNING_SKILLS = portfolioData.learningSkills;
-  const load = () => {
-    const script = document.createElement('script');
-    script.src = 'learning.bundle.js?v=1.0';
+function setupLearning() {
+  const details = document.getElementById("learning-details");
+
+  function loadDemo() {
+    if (!details.open) return;
+    details.removeEventListener("toggle", loadDemo);
+    window.PORTFOLIO_LEARNING_SKILLS = portfolioData.learningSkills;
+    const script = document.createElement("script");
+    script.src = "learning.bundle.js?v=1.1";
     script.async = true;
+    script.addEventListener("error", () => {
+      script.remove();
+      details.addEventListener("toggle", loadDemo);
+    }, { once: true });
     document.body.appendChild(script);
-  };
-  if (!("IntersectionObserver" in window)) return load();
-  const observer = new IntersectionObserver(entries => {
-    if (!entries.some(entry => entry.isIntersecting)) return;
-    observer.disconnect();
-    load();
-  }, { rootMargin: '600px' });
-  observer.observe(container);
-}
-
-function setupMobileNavigation() {
-  const menuBtn = document.getElementById("mobile-menu-btn");
-  const drawer = document.getElementById("mobile-nav-drawer");
-  const backdrop = document.getElementById("mobile-nav-backdrop");
-  const closeBtn = document.getElementById("mobile-nav-close");
-  const navLinks = document.querySelectorAll(".mobile-nav-link");
-
-  if (!menuBtn || !drawer) return;
-
-  function openDrawer() {
-    drawer.classList.add("open");
-    drawer.setAttribute("aria-hidden", "false");
-    menuBtn.classList.add("active");
-    menuBtn.setAttribute("aria-expanded", "true");
-    document.body.style.overflow = "hidden";
   }
 
-  function closeDrawer() {
-    drawer.classList.remove("open");
-    drawer.setAttribute("aria-hidden", "true");
-    menuBtn.classList.remove("active");
-    menuBtn.setAttribute("aria-expanded", "false");
-    document.body.style.overflow = "";
-  }
-
-  menuBtn.addEventListener("click", () => {
-    if (drawer.classList.contains("open")) {
-      closeDrawer();
-    } else {
-      openDrawer();
-    }
-  });
-
-  if (closeBtn) closeBtn.addEventListener("click", closeDrawer);
-  if (backdrop) backdrop.addEventListener("click", closeDrawer);
-
-  document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape" && drawer.classList.contains("open")) {
-      closeDrawer();
-    }
-  });
-
-  navLinks.forEach(link => {
-    link.addEventListener("click", () => {
-      closeDrawer();
-    });
-  });
+  details.addEventListener("toggle", loadDemo);
+  loadDemo();
 }
 
-function setupActiveNavObserver() {
-  const sections = document.querySelectorAll("section[id]");
-  const mobileLinks = document.querySelectorAll(".mobile-nav-link[data-section]");
-  const desktopLinks = document.querySelectorAll(".nav-link[href^='#']");
-
-  if (!sections.length || !("IntersectionObserver" in window)) return;
-
-  const observerOptions = {
-    root: null,
-    rootMargin: "-20% 0px -60% 0px",
-    threshold: 0
-  };
-
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        const id = entry.target.getAttribute("id");
-
-        mobileLinks.forEach(link => {
-          if (link.getAttribute("data-section") === id) {
-            link.classList.add("active");
-          } else {
-            link.classList.remove("active");
-          }
-        });
-
-        desktopLinks.forEach(link => {
-          if (link.getAttribute("href") === `#${id}`) {
-            link.style.color = "var(--text-primary)";
-          } else {
-            link.style.color = "";
-          }
-        });
-      }
-    });
-  }, observerOptions);
-
-  sections.forEach(section => observer.observe(section));
-}
-
-function setupModalHandlers() {
-  const modal = document.getElementById("project-modal");
-  const closeBtn = document.getElementById("modal-close-btn");
-
-  if (!modal || !closeBtn) return;
-
-  closeBtn.addEventListener("click", closeProjectModal);
-
-  modal.addEventListener("click", (e) => {
-    if (e.target === modal) {
-      closeProjectModal();
-    }
-  });
-
-  document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape" && modal.classList.contains("open")) {
-      closeProjectModal();
+function setupDialogDismissal(dialog, closeButton) {
+  closeButton.addEventListener("click", () => dialog.close());
+  dialog.addEventListener("click", event => {
+    if (event.target !== dialog) return;
+    const rect = dialog.getBoundingClientRect();
+    if (event.clientX < rect.left || event.clientX > rect.right ||
+        event.clientY < rect.top || event.clientY > rect.bottom) {
+      dialog.close();
     }
   });
 }
 
-function openProjectModal(projectId) {
-  const project = (portfolioData.projects || []).find(p => p.id === projectId);
-  if (!project) return;
+function openProjectModal(modal, projectId) {
+  const project = portfolioData.projects.find(item => item.id === projectId);
+  if (!project || modal.open) return;
 
-  const modal = document.getElementById("project-modal");
-  const titleEl = document.getElementById("modal-project-title");
-  const typeEl = document.getElementById("modal-project-type");
-  const imgEl = document.getElementById("modal-project-img");
-  const overviewEl = document.getElementById("modal-project-overview");
-  const outcomesEl = document.getElementById("modal-project-outcomes");
-  const techStackEl = document.getElementById("modal-project-techstack");
-  const liveLink = document.getElementById("modal-live-link");
-  const githubLink = document.getElementById("modal-github-link");
+  document.getElementById("modal-project-title").textContent = project.title;
+  document.getElementById("modal-project-type").textContent = project.type;
 
-  if (titleEl) titleEl.textContent = project.title;
-  if (typeEl) typeEl.textContent = project.type;
-  if (imgEl) {
-    imgEl.src = project.image;
-    if (project.imageSrcset) {
-      imgEl.srcset = project.imageSrcset;
-      imgEl.sizes = '(min-width: 960px) 840px, 90vw';
-    } else {
-      imgEl.removeAttribute('srcset');
-      imgEl.removeAttribute('sizes');
-    }
-    imgEl.alt = project.imageAlt || project.title;
-    imgEl.closest('.modal-hero-media').classList.toggle('project-media-wide', !!project.previewAspect);
+  const image = document.getElementById("modal-project-img");
+  if (project.imageSrcset) {
+    image.sizes = "(min-width: 900px) 824px, 86vw";
+    image.srcset = project.imageSrcset;
+  } else {
+    image.removeAttribute("srcset");
+    image.removeAttribute("sizes");
   }
-  if (overviewEl) overviewEl.textContent = project.fullDescription || project.shortDescription;
+  image.src = project.image;
+  image.alt = project.imageAlt || project.title;
+  image.parentElement.classList.toggle("project-media-wide", Boolean(project.previewAspect));
 
-  if (outcomesEl) {
-    outcomesEl.innerHTML = (project.outcomes || [])
-      .map(outcome => `<li>${escapeHtml(outcome)}</li>`)
-      .join("");
+  document.getElementById("modal-project-overview").textContent = project.fullDescription || project.shortDescription;
+  document.getElementById("modal-project-outcomes").innerHTML = renderListItems(project.outcomes || []);
+  document.getElementById("modal-project-techstack").innerHTML = renderListItems(project.techStack || []);
+
+  for (const [id, url] of [
+    ["modal-live-link", project.links?.live],
+    ["modal-github-link", project.links?.github]
+  ]) {
+    const link = document.getElementById(id);
+    link.hidden = !url;
+    if (url) link.href = url;
+    else link.removeAttribute("href");
   }
 
-  if (techStackEl) {
-    techStackEl.innerHTML = (project.techStack || [])
-      .map(tech => `<span class="skill-tag">${escapeHtml(tech)}</span>`)
-      .join("");
-  }
-
-  if (liveLink) {
-    if (project.links && project.links.live) {
-      liveLink.href = project.links.live;
-      liveLink.style.display = "inline-flex";
-    } else {
-      liveLink.style.display = "none";
-    }
-  }
-
-  if (githubLink) {
-    if (project.links && project.links.github) {
-      githubLink.href = project.links.github;
-      githubLink.style.display = "inline-flex";
-    } else {
-      githubLink.style.display = "none";
-    }
-  }
-
-  modal.classList.add("open");
-  modal.setAttribute("aria-hidden", "false");
-  document.body.style.overflow = "hidden";
-}
-
-function closeProjectModal() {
-  const modal = document.getElementById("project-modal");
-  if (!modal) return;
-
-  modal.classList.remove("open");
-  modal.setAttribute("aria-hidden", "true");
-  document.body.style.overflow = "";
-}
-
-function setupSmoothScroll() {
-  document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-    anchor.addEventListener("click", function(e) {
-      const targetId = this.getAttribute("href");
-      if (targetId === "#") return;
-
-      const targetEl = document.querySelector(targetId);
-      if (targetEl) {
-        e.preventDefault();
-        const headerOffset = 70;
-        const elementPosition = targetEl.getBoundingClientRect().top;
-        const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
-
-        window.scrollTo({
-          top: offsetPosition,
-          behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth"
-        });
-      }
-    });
-  });
+  modal.showModal();
+  modal.querySelector(".modal-body").scrollTop = 0;
 }
 
 function setupSnakeGame() {
   const modal = document.getElementById("snake-modal");
   const openButton = document.getElementById("game-toggle-btn");
   const closeButton = document.getElementById("snake-close-btn");
-  const backdrop = document.getElementById("snake-modal-backdrop");
   const canvas = document.getElementById("snake-canvas");
   const screen = document.getElementById("snake-screen");
   const message = document.getElementById("snake-message");
@@ -807,12 +483,11 @@ function setupSnakeGame() {
     const cellSize = canvas.width / gridSize;
 
     // Clear board background
-    const lightTheme = document.documentElement.dataset.theme === "light";
-    context.fillStyle = lightTheme ? "#e7efd9" : "#07110a";
+    context.fillStyle = "#07110a";
     context.fillRect(0, 0, canvas.width, canvas.height);
 
     // Subtle grid lines
-    context.strokeStyle = lightTheme ? "rgba(56, 83, 28, 0.1)" : "rgba(135, 181, 89, 0.08)";
+    context.strokeStyle = "rgba(135, 181, 89, 0.08)";
     context.lineWidth = 1;
     for (let index = 0; index <= gridSize; index++) {
       const p = index * cellSize;
@@ -877,7 +552,7 @@ function setupSnakeGame() {
         const ratio = 1 - (i / Math.max(segments.length, 1)) * 0.42;
 
         context.beginPath();
-        context.strokeStyle = lightTheme ? `rgba(55, 105, 32, ${Math.max(0.8, ratio)})` : `rgba(130, 185, 60, ${Math.max(0.68, ratio)})`;
+        context.strokeStyle = `rgba(130, 185, 60, ${Math.max(0.68, ratio)})`;
         context.lineWidth = bodyRadius * 2;
         context.moveTo(p1.x, p1.y);
         context.lineTo(p2.x, p2.y);
@@ -904,7 +579,7 @@ function setupSnakeGame() {
     if (segments.length > 0) {
       const h = segments[0];
       context.save();
-      context.fillStyle = lightTheme ? "#457b2a" : "#d7f886";
+      context.fillStyle = "#d7f886";
       context.shadowColor = "rgba(215, 248, 134, 0.65)";
       context.shadowBlur = 12;
       context.beginPath();
@@ -1000,27 +675,21 @@ function setupSnakeGame() {
   }
 
   function openGame() {
-    openButton.classList.add("activated");
-    modal.classList.add("open");
-    modal.setAttribute("aria-hidden", "false");
-    document.body.classList.add("snake-open");
+    if (modal.open) return;
+    modal.showModal();
+    modal.scrollTop = 0;
     scoreClient.setActive(!document.hidden);
     if (!running) resetGame();
-    closeButton.focus();
   }
 
   function closeGame() {
     pauseGame();
     scoreClient.setActive(false);
-    modal.classList.remove("open");
-    modal.setAttribute("aria-hidden", "true");
-    document.body.classList.remove("snake-open");
-    openButton.focus();
   }
 
   openButton.addEventListener("click", openGame);
-  closeButton.addEventListener("click", closeGame);
-  backdrop.addEventListener("click", closeGame);
+  modal.addEventListener("close", closeGame);
+  setupDialogDismissal(modal, closeButton);
   startButton.addEventListener("click", () => running ? null : startGame());
 
   // On-screen direction controls (Mobile & Tablet)
@@ -1040,11 +709,14 @@ function setupSnakeGame() {
     };
     button.addEventListener("touchstart", handleControlInput, { passive: false });
     button.addEventListener("pointerdown", handleControlInput, { passive: false });
+    button.addEventListener("click", event => {
+      if (event.detail === 0) handleControlInput(event);
+    });
   });
 
   // Keyboard controls (Desktop)
   document.addEventListener("keydown", (event) => {
-    if (!modal.classList.contains("open")) return;
+    if (!modal.open) return;
     const keys = {
       ArrowUp: "up", w: "up", W: "up",
       ArrowDown: "down", s: "down", S: "down",
@@ -1058,8 +730,7 @@ function setupSnakeGame() {
       }
       queueDirection(keys[event.key]);
     }
-    if (event.key === "Escape") closeGame();
-    if (event.key === " ") {
+    if (event.key === " " && !event.target.closest("button")) {
       event.preventDefault();
       if (!running) startGame();
     }
@@ -1079,7 +750,7 @@ function setupSnakeGame() {
   }, { passive: true });
 
   canvas.addEventListener("touchmove", (e) => {
-    if (!modal.classList.contains("open")) return;
+    if (!modal.open) return;
     e.preventDefault(); // Prevents page scroll while playing
 
     if (isSwiping && e.touches.length === 1) {
@@ -1112,80 +783,13 @@ function setupSnakeGame() {
 
   document.addEventListener("visibilitychange", () => {
     if (document.hidden) pauseGame();
-    scoreClient.setActive(!document.hidden && modal.classList.contains("open"));
+    scoreClient.setActive(!document.hidden && modal.open);
   });
   window.addEventListener("online", () => {
-    if (modal.classList.contains("open") || scoreClient.getState().pending) void loadBestScore();
+    if (modal.open || scoreClient.getState().pending) void loadBestScore();
   });
   window.addEventListener("pagehide", () => scoreClient.setActive(false));
-  window.addEventListener("pageshow", () => scoreClient.setActive(!document.hidden && modal.classList.contains("open")));
-  document.addEventListener("portfolio-theme-change", () => { if (modal.classList.contains("open")) draw(); });
-}
-
-function setupNameHoverAnimation() {
-  const originalName = portfolioData.profile.name;
-  const aliasName = 'Rishifishyy';
-  const finePointer = window.matchMedia('(hover: hover) and (pointer: fine)');
-
-  function makeLetters(element) {
-    const row = (name, kind) => '<span class="name-' + kind + '-row">' +
-      Array.from(name, (char, index) => '<span class="name-letter"><span class="name-' + kind + '" style="--letter-delay: ' + (index * 100) + 'ms">' + escapeHtml(char) + '</span></span>').join('') + '</span>';
-    element.innerHTML = '<span class="name-switch-track" aria-hidden="true">' + row(originalName, 'original') + row(aliasName, 'alias') + '</span>';
-  }
-
-  // A quick pass of the pointer still completes the reveal before returning.
-  function hoverReveal(target, show) {
-    let started = 0, resetTimer = 0;
-    const enter = () => {
-      clearTimeout(resetTimer);
-      started = performance.now();
-      show(true);
-    };
-    const leave = () => {
-      clearTimeout(resetTimer);
-      const hold = document.documentElement.dataset.motion === 'off' ? 0 : 3100;
-      resetTimer = setTimeout(() => show(false), Math.max(0, hold - (performance.now() - started)));
-    };
-    target.addEventListener('pointerenter', event => { if (event.pointerType !== 'touch') enter(); });
-    target.addEventListener('pointerleave', event => { if (event.pointerType !== 'touch') leave(); });
-    return () => clearTimeout(resetTimer);
-  }
-
-  const heroName = document.getElementById('hero-name');
-  if (heroName) {
-    const button = document.createElement('button');
-    button.type = 'button';
-    button.className = 'name-switch';
-    button.id = 'hero-name-trigger';
-    button.title = 'Hover or tap to reveal my nickname';
-    makeLetters(button);
-    heroName.replaceChildren(button);
-    let alias = false;
-    const show = value => {
-      alias = value;
-      button.classList.toggle('is-alias', value);
-      button.dataset.name = value ? aliasName : originalName;
-      button.setAttribute('aria-label', value ? aliasName + ' — show Rishi Nehra' : originalName + ' — show Rishifishyy');
-      button.setAttribute('aria-pressed', String(value));
-    };
-    show(false);
-    const cancelReset = hoverReveal(button, show);
-    button.addEventListener('click', event => {
-      if (event.detail === 0 || !finePointer.matches) { cancelReset(); show(!alias); }
-    });
-    button.addEventListener('blur', () => { cancelReset(); show(false); });
-  }
-
-  const brand = document.getElementById('brand-logo');
-  const brandName = document.getElementById('nav-brand-name');
-  if (brand && brandName) {
-    makeLetters(brandName);
-    brandName.classList.add('name-switch', 'name-switch-brand');
-    brand.setAttribute('aria-label', 'Rishi Nehra — home');
-    const cancelReset = hoverReveal(brand, value => brandName.classList.toggle('is-alias', value));
-    brand.addEventListener('focus', () => brandName.classList.add('is-alias'));
-    brand.addEventListener('blur', () => { cancelReset(); brandName.classList.remove('is-alias'); });
-  }
+  window.addEventListener("pageshow", () => scoreClient.setActive(!document.hidden && modal.open));
 }
 
 function escapeHtml(str) {
@@ -1198,60 +802,44 @@ function escapeHtml(str) {
     .replace(/'/g, "&#039;");
 }
 
+let toastTimeout;
+
 function copyEmailToClipboard(email) {
-  if (navigator.clipboard && navigator.clipboard.writeText) {
-    navigator.clipboard.writeText(email)
-      .then(() => showToast(`Copied ${email} to clipboard!`))
-      .catch(() => showToast(`Opening compose for ${email}...`));
-  } else {
-    showToast(`Opening compose for ${email}...`);
-  }
+  navigator.clipboard?.writeText(email)
+    .then(() => {
+      let toast = document.getElementById("portfolio-toast");
+      if (!toast) {
+        toast = document.createElement("div");
+        toast.id = "portfolio-toast";
+        toast.className = "portfolio-toast";
+        toast.setAttribute("role", "status");
+        document.body.appendChild(toast);
+      }
+
+      toast.textContent = "Email address copied";
+      clearTimeout(toastTimeout);
+      toastTimeout = setTimeout(() => toast.remove(), 3000);
+    })
+    .catch(() => {
+      // The email link can still open when clipboard access is denied.
+    });
 }
-
-function showToast(message) {
-  let toast = document.getElementById("portfolio-toast");
-  if (!toast) {
-    toast = document.createElement("div");
-    toast.id = "portfolio-toast";
-    toast.className = "portfolio-toast";
-    document.body.appendChild(toast);
-  }
-  toast.innerHTML = `
-    <div class="toast-content">
-      <svg class="toast-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-        <polyline points="20 6 9 17 4 12"></polyline>
-      </svg>
-      <span>${escapeHtml(message)}</span>
-    </div>
-  `;
-  toast.classList.remove("show");
-  void toast.offsetWidth;
-  toast.classList.add("show");
-
-  clearTimeout(toast._timeout);
-  toast._timeout = setTimeout(() => {
-    toast.classList.remove("show");
-  }, 3000);
-}
-
-/* ==========================================================================
-   DSA Contribution Graph (LeetCode Style)
-   ========================================================================== */
 
 function initCodingActivity() {
   const container = document.getElementById("activity-calendar");
-  const scrollArea = document.getElementById("activity-scroll-area");
-
   if (!container) return;
 
-  // Create floating tooltip
-  let tooltip = document.getElementById("activity-tooltip");
-  if (!tooltip) {
-    tooltip = document.createElement("div");
-    tooltip.id = "activity-tooltip";
-    tooltip.className = "activity-tooltip";
-    document.body.appendChild(tooltip);
-  }
+  const scrollArea = document.getElementById("activity-scroll-area");
+  const weekdays = document.getElementById("activity-weekdays");
+  const tooltip = document.getElementById("activity-tooltip");
+  const dateFormatter = new Intl.DateTimeFormat("en-IN", {
+    timeZone: "UTC", weekday: "short", day: "numeric", month: "short", year: "numeric"
+  });
+  const monthFormatter = new Intl.DateTimeFormat("en-IN", { timeZone: "UTC", month: "short" });
+  const { DAY_MS, dateKey } = ActivityCalendar;
+  let selectedDate = null;
+  let tooltipCell = null;
+  let followingLatest = true;
 
   // Fetch combined activity data
   async function loadData() {
@@ -1274,7 +862,7 @@ function initCodingActivity() {
 
     try {
       const fallbackRes = await fetch("data/coding-activity.json?t=" + Date.now(), { cache: "no-store" });
-      if (fallbackRes.ok) return await fallbackRes.json();
+      if (fallbackRes.ok) return { ...await fallbackRes.json(), stale: true };
     } catch (err) {
       console.error("Failed to load activity fallback data:", err);
     }
@@ -1282,7 +870,6 @@ function initCodingActivity() {
   }
 
   let loading = false, lastLoadTime = 0, renderedDay = null, chartKey = null, latestData = null;
-  let followingLatest = true;
   async function refreshCalendar() {
     const today = ActivityCalendar.range(new Date()).endDate;
     if (renderedDay && renderedDay !== today) renderTodayQuestions(null);
@@ -1293,41 +880,59 @@ function initCodingActivity() {
     try {
       const data = await loadData();
       if (!data) {
-        if (!container.querySelector(".activity-cell")) {
-          container.innerHTML = `<div class="activity-calendar-loading"><span>Unable to load contribution graph.</span></div>`;
+        if (!chartKey) {
+          container.innerHTML = '<p class="activity-calendar-loading" role="status">Unable to load coding activity.</p>';
         }
         renderTodayQuestions(null);
         return;
       }
       latestData = data;
       lastLoadTime = Date.now();
-      renderedDay = today;
       renderCalendar(data);
-    } finally { loading = false; }
+      renderedDay = today;
+    } finally {
+      loading = false;
+    }
   }
+
+  container.addEventListener("pointerover", event => {
+    if (event.pointerType === "touch") return;
+    const cell = event.target.closest(".activity-cell");
+    if (cell) showTooltip(cell);
+  });
+  container.addEventListener("pointerout", event => {
+    if (event.pointerType !== "touch" && event.target === tooltipCell) hideTooltip();
+  });
+  container.addEventListener("click", selectFromEvent);
+  container.addEventListener("focusin", selectFromEvent);
+  container.addEventListener("focusout", hideTooltip);
+  container.addEventListener("keydown", navigateCalendar);
+
+  document.addEventListener("pointerdown", event => {
+    if (!container.contains(event.target)) hideTooltip();
+  });
+  window.addEventListener("scroll", positionTooltip, { capture: true, passive: true });
+  window.addEventListener("resize", positionTooltip, { passive: true });
+
+  if (scrollArea) {
+    const updateScrollPosition = () => {
+      followingLatest = scrollArea.scrollLeft >= scrollArea.scrollWidth - scrollArea.clientWidth - 2;
+    };
+    scrollArea.addEventListener("scroll", updateScrollPosition, { passive: true });
+    const handleResize = () => {
+      if (followingLatest) scrollArea.scrollLeft = scrollArea.scrollWidth;
+      updateScrollPosition();
+    };
+    if (typeof ResizeObserver !== "undefined") new ResizeObserver(handleResize).observe(scrollArea);
+    else window.addEventListener("resize", handleResize, { passive: true });
+  }
+
   refreshCalendar();
-  setupSectionObserver();
-  attachCellEvents();
   setInterval(() => { if (!document.hidden) refreshCalendar(); }, 5 * 60 * 1000);
   setInterval(() => {
     if (!document.hidden && renderedDay !== ActivityCalendar.range(new Date()).endDate) refreshCalendar();
   }, 60000);
   document.addEventListener("visibilitychange", () => { if (!document.hidden) refreshCalendar(); });
-  document.addEventListener("touchstart", e => {
-    if (!e.target.closest(".activity-cell")) hideTooltip();
-  }, { passive: true });
-  window.addEventListener('scroll', hideTooltip, { passive: true, capture: true });
-  window.addEventListener('resize', hideTooltip, { passive: true });
-  if (scrollArea) {
-    scrollArea.addEventListener('scroll', () => {
-      followingLatest = scrollArea.scrollLeft >= scrollArea.scrollWidth - scrollArea.clientWidth - 2;
-    }, { passive: true });
-    const keepLatestVisible = () => {
-      if (followingLatest) scrollArea.scrollLeft = scrollArea.scrollWidth;
-    };
-    if (typeof ResizeObserver !== 'undefined') new ResizeObserver(keepLatestVisible).observe(scrollArea);
-    else window.addEventListener('resize', keepLatestVisible, { passive: true });
-  }
 
   function renderTodayQuestions(data) {
     const content = document.getElementById("today-solved-content");
@@ -1362,185 +967,141 @@ function initCodingActivity() {
   function renderCalendar(data) {
     const now = new Date();
     renderTodayQuestions(data);
-    const { days: daysData } = ActivityCalendar.summarize(data.days || {}, now);
-    const window = ActivityCalendar.range(now);
-    const activeToday = window.end;
-    const activeTodayStr = window.endDate;
-    const formatDate = ActivityCalendar.dateKey;
-    const startDate = new Date(window.start);
-    startDate.setUTCDate(startDate.getUTCDate() - startDate.getUTCDay());
-    const totalWeeks = Math.ceil(((activeToday - startDate) / ActivityCalendar.DAY_MS + 1) / 7);
-
-    const nextChartKey = JSON.stringify([activeTodayStr, daysData]);
+    const { days } = ActivityCalendar.summarize(data.days || {}, now);
+    const { start, end, startDate, endDate } = ActivityCalendar.range(now);
+    const nextChartKey = JSON.stringify([endDate, days]);
     if (chartKey === nextChartKey) return;
-    const firstRender = chartKey === null;
+
+    const previousScroll = scrollArea?.scrollLeft ?? 0;
+    const showLatest = chartKey === null || followingLatest;
+    const restoreFocus = document.activeElement?.classList.contains("activity-cell");
     chartKey = nextChartKey;
-    const previousScroll = scrollArea?.scrollLeft || 0;
-    hideTooltip();
-    const weeks = [];
-    let curr = new Date(startDate);
-
-    for (let w = 0; w < totalWeeks; w++) {
-      const weekDays = [];
-      for (let d = 0; d < 7; d++) {
-        const dateObj = new Date(curr);
-        const dateStr = formatDate(dateObj);
-        const isFuture = dateObj > activeToday || dateObj < window.start;
-        const isToday = dateStr === activeTodayStr;
-
-        const dayInfo = daysData[dateStr] || null;
-        const count = (!isFuture && dayInfo) ? (dayInfo.count || 0) : 0;
-
-        let level = 0;
-        if (count >= 9) level = 4;
-        else if (count >= 6) level = 3;
-        else if (count >= 3) level = 2;
-        else if (count >= 1) level = 1;
-
-        weekDays.push({
-          dateStr,
-          dateObj,
-          isFuture,
-          isToday,
-          count,
-          level,
-          month: dateObj.getUTCMonth(),
-          year: dateObj.getUTCFullYear()
-        });
-
-        curr.setUTCDate(curr.getUTCDate() + 1);
-      }
-      weeks.push(weekDays);
+    if (!selectedDate || (selectedDate === renderedDay && showLatest) || selectedDate < startDate || selectedDate > endDate) {
+      selectedDate = endDate;
     }
 
-    // Build Months Row
-    const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-    let monthsRowHtml = '<div class="activity-months-row">';
-    let lastLabeledCol = -10;
+    const firstSunday = start.getTime() - start.getUTCDay() * DAY_MS;
+    const weekCount = Math.ceil(((end.getTime() - firstSunday) / DAY_MS + 1) / 7);
+    const months = [];
+    const weeks = Array.from({ length: weekCount }, (_, column) => {
+      const cells = Array.from({ length: 7 }, (_, weekday) => {
+        const date = new Date(firstSunday + (column * 7 + weekday) * DAY_MS);
+        const key = dateKey(date);
+        if (key < startDate || key > endDate) return '<span aria-hidden="true"></span>';
 
-    weeks.forEach((week, wIdx) => {
-      const firstDay = week[0];
-      const prevWeekFirstDay = wIdx > 0 ? weeks[wIdx - 1][0] : null;
+        if (key === startDate || date.getUTCDate() === 1) {
+          const previous = months.at(-1);
+          if (previous && column - previous.column < 2) months.pop();
+          months.push({ column, label: monthFormatter.format(date) });
+        }
 
-      const isNewMonth = !prevWeekFirstDay || (firstDay.month !== prevWeekFirstDay.month);
-      if (isNewMonth && (wIdx - lastLabeledCol >= 3) && (wIdx < totalWeeks - 1)) {
-        const leftPx = wIdx * 15;
-        monthsRowHtml += `<span class="activity-month-label" style="left: ${leftPx}px">${monthNames[firstDay.month]}</span>`;
-        lastLabeledCol = wIdx;
-      }
-    });
-    monthsRowHtml += '</div>';
-
-    // Build Grid Body
-    let gridBodyHtml = '<div class="activity-grid-body">';
-
-    // Left Day Labels (Mon, Wed, Fri)
-    gridBodyHtml += '<div class="activity-days-col">';
-    for (let r = 0; r < 7; r++) {
-      let label = "";
-      if (r === 1) label = "Mon";
-      else if (r === 3) label = "Wed";
-      else if (r === 5) label = "Fri";
-      gridBodyHtml += `<div class="activity-day-label">${label}</div>`;
-    }
-    gridBodyHtml += '</div>';
-
-    // Weeks Grid
-    gridBodyHtml += '<div class="activity-weeks-grid">';
-    weeks.forEach((week, wIdx) => {
-      gridBodyHtml += `<div class="activity-week-col" data-col="${wIdx}">`;
-      week.forEach((day, dIdx) => {
-        let classes = `activity-cell lvl-${day.level}`;
-        if (day.isFuture) classes = "activity-cell lvl-future";
-        if (day.isToday) classes += " cell-today";
-
-        const animDelay = Math.min((wIdx * 12 + dIdx * 8), 650);
-
-        gridBodyHtml += `
-          <div class="${classes}"
-               data-date="${day.dateStr}"
-               data-count="${day.count}"
-               data-future="${day.isFuture}"
-               style="animation-delay: ${animDelay}ms"
-               tabindex="${day.isFuture ? '-1' : '0'}"
-               role="gridcell"
-               aria-label="${day.dateStr}">
-          </div>
-        `;
+        const count = days[key]?.count || 0;
+        const level = count === 0 ? 0 : Math.min(4, 1 + Math.floor(count / 3));
+        const today = key === endDate;
+        const selected = key === selectedDate;
+        return `<button type="button" class="activity-cell lvl-${level}${today ? " cell-today" : ""}"
+          data-date="${key}" data-count="${count}" tabindex="${selected ? 0 : -1}"
+          aria-label="${dateFormatter.format(date)} · ${submissionLabel(count)}"${today ? ' aria-current="date"' : ""}></button>`;
       });
-      gridBodyHtml += '</div>';
+      return `<div class="activity-week-col">${cells.join("")}</div>`;
     });
-    gridBodyHtml += '</div>';
-    gridBodyHtml += '</div>';
 
-    container.innerHTML = monthsRowHtml + gridBodyHtml;
+    const monthLabels = months.map(({ column, label }) => {
+      const endClass = column === weekCount - 1 ? " activity-month-label-end" : "";
+      return `<span class="activity-month-label${endClass}" style="grid-column: ${column + 1}">${label}</span>`;
+    }).join("");
+
+    hideTooltip();
+    container.innerHTML = `
+      <div class="activity-months-row" style="--activity-week-count: ${weekCount}" aria-hidden="true">${monthLabels}</div>
+      <div class="activity-weeks-grid">${weeks.join("")}</div>`;
+    if (weekdays) weekdays.hidden = false;
 
     if (scrollArea) {
-      requestAnimationFrame(() => {
-        scrollArea.scrollLeft = firstRender || followingLatest ? scrollArea.scrollWidth : previousScroll;
-      });
+      scrollArea.scrollLeft = showLatest ? scrollArea.scrollWidth : previousScroll;
     }
+    if (restoreFocus) findCell(selectedDate)?.focus({ preventScroll: true });
   }
 
-  function attachCellEvents() {
-    // One set of listeners handles all dates, including future refreshes.
-    container.addEventListener("pointerover", event => { if (event.pointerType !== "touch") showTooltip(event); });
-    container.addEventListener("pointerout", hideTooltip);
-    container.addEventListener("click", showTooltip);
-    container.addEventListener("focusin", showTooltip);
-    container.addEventListener("focusout", hideTooltip);
+  function submissionLabel(count) {
+    return `${count} submission${count === 1 ? "" : "s"}`;
   }
 
-  function showTooltip(e) {
-    const cell = e.target.closest(".activity-cell");
-    if (!cell || cell.classList.contains("lvl-future")) return;
-
-    const dateStr = cell.getAttribute("data-date");
-    const count = Number(cell.getAttribute("data-count")) || 0;
-    if (!dateStr) return;
-
-    const [y, m, d] = dateStr.split("-").map(Number);
-    const dateObj = new Date(y, m - 1, d);
-    const options = { month: "short", day: "numeric", year: "numeric" };
-    const dateFormatted = dateObj.toLocaleDateString("en-US", options);
-
-    const message = count > 0 
-      ? `${count} submission${count === 1 ? '' : 's'} on ${dateFormatted}`
-      : `No submissions on ${dateFormatted}`;
-
-    tooltip.textContent = message;
-
-    const rect = cell.getBoundingClientRect();
-    const halfWidth = tooltip.offsetWidth / 2;
-    const tooltipX = Math.max(halfWidth + 8, Math.min(window.innerWidth - halfWidth - 8, rect.left + rect.width / 2));
-    const tooltipY = rect.top;
-
-    tooltip.style.left = `${tooltipX}px`;
-    tooltip.style.top = `${tooltipY}px`;
-    tooltip.classList.add("show");
+  function showTooltip(cell) {
+    if (!tooltip) return;
+    tooltipCell = cell;
+    tooltip.textContent = cell.getAttribute("aria-label");
+    tooltip.hidden = false;
+    positionTooltip();
   }
 
   function hideTooltip() {
-    tooltip.classList.remove("show");
+    tooltipCell = null;
+    if (tooltip) tooltip.hidden = true;
   }
 
-  function setupSectionObserver() {
-    const section = document.getElementById("coding-activity");
-    if (!section || !("IntersectionObserver" in window)) {
-      container.classList.add("animated");
+  function positionTooltip() {
+    if (!tooltipCell) return;
+    const cell = tooltipCell.getBoundingClientRect();
+    const chart = scrollArea.getBoundingClientRect();
+    if (cell.right <= chart.left || cell.left >= chart.right || cell.bottom <= 0 || cell.top >= window.innerHeight) {
+      hideTooltip();
       return;
     }
 
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          container.classList.add("animated");
-          observer.unobserve(entry.target);
-        }
-      });
-    }, { threshold: 0.1 });
+    const { offsetWidth: width, offsetHeight: height } = tooltip;
+    const left = cell.left + (cell.width - width) / 2;
+    const above = cell.top - height - 6;
+    tooltip.style.left = `${Math.max(8, Math.min(left, window.innerWidth - width - 8))}px`;
+    tooltip.style.top = `${above >= 8 ? above : cell.bottom + 6}px`;
+  }
 
-    observer.observe(section);
+  function findCell(date) {
+    return date ? container.querySelector(`.activity-cell[data-date="${date}"]`) : null;
+  }
+
+  function selectFromEvent(event) {
+    const cell = event.target.closest(".activity-cell");
+    if (!cell) return;
+
+    const date = cell.dataset.date;
+    if (date !== selectedDate) {
+      findCell(selectedDate).tabIndex = -1;
+      selectedDate = date;
+      cell.tabIndex = 0;
+    }
+    showTooltip(cell);
+  }
+
+  function navigateCalendar(event) {
+    const cell = event.target.closest(".activity-cell");
+    if (!cell) return;
+    if (event.key === "Escape") {
+      hideTooltip();
+      return;
+    }
+
+    const day = new Date(`${cell.dataset.date}T00:00:00Z`);
+    const steps = { ArrowLeft: -7, ArrowRight: 7, ArrowUp: -1, ArrowDown: 1 };
+    let next;
+    if (event.key === "Home") {
+      next = container.querySelector(".activity-cell");
+    } else if (event.key === "End") {
+      next = container.querySelector(".cell-today");
+    } else if (Object.hasOwn(steps, event.key)) {
+      const weekday = day.getUTCDay();
+      if ((event.key !== "ArrowUp" || weekday > 0) && (event.key !== "ArrowDown" || weekday < 6)) {
+        day.setUTCDate(day.getUTCDate() + steps[event.key]);
+        next = findCell(dateKey(day));
+      }
+    } else {
+      return;
+    }
+    event.preventDefault();
+    if (!next) return;
+    next.focus();
+    if (scrollArea && event.key === "Home") scrollArea.scrollLeft = 0;
+    if (scrollArea && event.key === "End") scrollArea.scrollLeft = scrollArea.scrollWidth;
+    showTooltip(next);
   }
 }
-

@@ -12,8 +12,11 @@ The GitHub Pages frontend reads `window.PORTFOLIO_ACTIVITY_API` from
 `portfolio-data.js`. A small Netlify function fetches LeetCode and GFG activity
 on demand, with a five-minute cache. The frontend fetches on visits, every five
 minutes while visible, and when returning to the tab. Its saved JSON snapshot
-remains a fallback when the live service cannot be reached. The card displays
-only the graph and "Solved today", without update labels or a colour legend.
+remains a fallback when the live service cannot be reached.
+
+Hover over a date, tap it, or focus it with the keyboard to see its submission
+count. Swipe the chart on smaller screens to browse earlier dates. The Codolio
+profile link is in the Coding activity section.
 
 Under the chart, "Solved today" shows the date and linked question names
 for the current date in Asia/Kolkata. Repeated solves
@@ -26,11 +29,11 @@ Saved question details are only used when they belong to today's IST date.
 The frontend reuses fresh activity for five minutes, keeps unchanged chart cells
 and question links in place, and checks for a date change while visible. Calendar
 tooltips share event listeners, and date formatting is reused across submissions.
-The animated background and name reveal run by default; background rendering pauses
-in hidden tabs and while a dialog is open. Project images
-and the learning bundle load lazily; game records are fetched when the game opens
-or a saved pending score needs syncing. The game adapts to short landscape screens,
-and links and controls have larger touch targets on phones and touch devices.
+The portfolio uses a dark theme.
+Fine pointers get a custom crosshair that changes shape over controls.
+Project details load their images on demand, and the learning bundle loads when
+the Learning section opens. Game records are fetched when Snake opens or a
+saved pending score needs syncing.
 
 The function uses the same activity calculations as the local server and runs
 without writing to the deployment filesystem. It allows browser reads from
@@ -65,8 +68,6 @@ The learning section uses React and GSAP, bundled locally with esbuild. Run
 `npm install` once, then `npm start` to rebuild the component and start the site.
 After editing `learning-experience.jsx`, run `npm run build`. The generated
 `learning.bundle.js` is included with the static GitHub Pages website.
-The background and name reveal run automatically. Background rendering pauses
-while the browser tab is hidden or a dialog is open, then resumes automatically.
 TeamUP uses the supplied homepage screenshot cropped below the browser chrome,
 with a smaller responsive image for mobile and the full image in project details.
 Run `node activity-service.js` to refresh the saved snapshot, and
