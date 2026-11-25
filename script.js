@@ -11,9 +11,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
 function setupContourMotion() {
   const backdrop = document.querySelector(".contour-background");
-  const motion = window.matchMedia("screen and (prefers-reduced-motion: no-preference) and (forced-colors: none)");
-  const previewMotion = ["127.0.0.1", "localhost"].includes(location.hostname)
-    && new URLSearchParams(location.search).get("motion") === "on";
+  const toggle = document.getElementById("background-motion");
+  const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+  const visible = window.matchMedia("screen and (forced-colors: none)");
+  const key = "portfolio-background-motion";
+  let preference = new URLSearchParams(location.search).get("motion");
+  if (preference !== "on" && preference !== "off") {
+    try { preference = localStorage.getItem(key); } catch { preference = null; }
+  }
+  let moving = false;
   let pointerX = 0;
   let pointerY = 0;
   let frame = 0;
@@ -26,21 +32,30 @@ function setupContourMotion() {
   }
 
   function queueUpdate() {
-    if ((previewMotion || motion.matches) && !frame) frame = requestAnimationFrame(update);
+    if (moving && !frame) frame = requestAnimationFrame(update);
   }
 
   window.addEventListener("pointermove", event => {
-    if ((!previewMotion && !motion.matches) || event.pointerType === "touch") return;
+    if (!moving || event.pointerType === "touch") return;
     pointerX = (event.clientX / window.innerWidth - 0.5) * 120;
     pointerY = (event.clientY / window.innerHeight - 0.5) * 90;
     queueUpdate();
   }, { passive: true });
   window.addEventListener("scroll", queueUpdate, { passive: true });
   function syncMotion() {
-    backdrop.classList.toggle("is-moving", previewMotion || motion.matches);
+    moving = visible.matches && (preference === "on" || (preference !== "off" && !reducedMotion.matches));
+    backdrop.classList.toggle("is-moving", moving);
+    toggle.hidden = !visible.matches;
+    toggle.textContent = moving ? "Pause background" : "Play background";
     queueUpdate();
   }
-  motion.addEventListener("change", syncMotion);
+  toggle.addEventListener("click", () => {
+    preference = moving ? "off" : "on";
+    try { localStorage.setItem(key, preference); } catch { /* Use the choice for this visit. */ }
+    syncMotion();
+  });
+  reducedMotion.addEventListener("change", syncMotion);
+  visible.addEventListener("change", syncMotion);
   syncMotion();
 }
 
