@@ -45,6 +45,7 @@ function setupContourMotion() {
   function syncMotion() {
     moving = visible.matches && (preference === "on" || (preference !== "off" && !reducedMotion.matches));
     backdrop.classList.toggle("is-moving", moving);
+    backdrop.classList.toggle("is-paused", preference === "off");
     toggle.hidden = !visible.matches;
     toggle.textContent = moving ? "Pause background" : "Play background";
     queueUpdate();

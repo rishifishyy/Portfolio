@@ -39,26 +39,39 @@ body {
     height: min(80vh, 48rem);
     background:
       radial-gradient(ellipse at 104% 4%,
-        transparent calc(46% - 1px), rgb(229 171 126 / .27) 46%, transparent calc(46% + 1px),
-        transparent calc(50% - 1px), rgb(229 171 126 / .18) 50%, transparent calc(50% + 1px),
-        transparent calc(57% - 1px), rgb(229 171 126 / .11) 57%, transparent calc(57% + 1px)),
-      radial-gradient(ellipse at 104% 4%, rgb(178 112 72 / .13), transparent 68%);
+        transparent calc(46% - 1px), rgb(229 171 126 / .40) 46%, transparent calc(46% + 1px),
+        transparent calc(50% - 1px), rgb(229 171 126 / .26) 50%, transparent calc(50% + 1px),
+        transparent calc(57% - 1px), rgb(229 171 126 / .16) 57%, transparent calc(57% + 1px)),
+      radial-gradient(ellipse at 104% 4%, rgb(178 112 72 / .19), transparent 68%);
     mask-image: radial-gradient(ellipse at 91% 42%, black 12%, transparent 75%);
     transform-origin: right center;
+    animation: contour-drift 5s ease-in-out -2s infinite alternate;
+  }
+
+  .contour-background.is-moving::before {
+    translate: var(--contour-x, 0px) var(--contour-y, 0px);
+    transition: translate 240ms ease-out;
+  }
+
+  .contour-background.is-paused::before {
+    animation: none;
   }
 }
 
-@media screen and (forced-colors: none) {
-  .contour-background.is-moving::before {
-    animation: contour-drift 7s ease-in-out -3s infinite alternate;
-    translate: var(--contour-x, 0px) var(--contour-y, 0px);
-    transition: translate 240ms ease-out;
+@media screen and (prefers-reduced-motion: reduce) and (forced-colors: none) {
+  .contour-background:not(.is-moving, .is-paused)::before {
+    animation: contour-fade 4s ease-out both;
   }
 }
 
 @keyframes contour-drift {
-  from { transform: translateY(-4vh) scale(.82, .94); }
-  to { transform: translateY(5vh) scale(1.08, 1.06); }
+  from { transform: translateY(-6vh) scale(.78, .94); opacity: .72; }
+  to { transform: translateY(8vh) scale(1.12, 1.06); opacity: 1; }
+}
+
+@keyframes contour-fade {
+  from { opacity: .42; }
+  to { opacity: 1; }
 }
 
 @media (hover: hover) and (pointer: fine) and (forced-colors: none) {
