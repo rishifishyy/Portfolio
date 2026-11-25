@@ -16,6 +16,51 @@
   --chart-4: #ffe3cb;
 }
 
+body {
+  isolation: isolate;
+}
+
+/* A few copper contours at the edge of the reading column. */
+@media screen and (forced-colors: none) {
+  .contour-background {
+    position: fixed;
+    inset: 0;
+    overflow: hidden;
+    z-index: -1;
+    pointer-events: none;
+  }
+
+  .contour-background::before {
+    content: "";
+    position: absolute;
+    top: 4rem;
+    right: -4rem;
+    width: calc(min(64vw, 55rem) + 4rem);
+    height: min(80vh, 48rem);
+    background:
+      radial-gradient(ellipse at 104% 4%,
+        transparent calc(46% - 1px), rgb(229 171 126 / .27) 46%, transparent calc(46% + 1px),
+        transparent calc(50% - 1px), rgb(229 171 126 / .18) 50%, transparent calc(50% + 1px),
+        transparent calc(57% - 1px), rgb(229 171 126 / .11) 57%, transparent calc(57% + 1px)),
+      radial-gradient(ellipse at 104% 4%, rgb(178 112 72 / .13), transparent 68%);
+    mask-image: radial-gradient(ellipse at 91% 42%, black 12%, transparent 75%);
+    transform-origin: right center;
+  }
+}
+
+@media screen and (forced-colors: none) {
+  .contour-background.is-moving::before {
+    animation: contour-drift 7s ease-in-out -3s infinite alternate;
+    translate: var(--contour-x, 0px) var(--contour-y, 0px);
+    transition: translate 240ms ease-out;
+  }
+}
+
+@keyframes contour-drift {
+  from { transform: translateY(-4vh) scale(.82, .94); }
+  to { transform: translateY(5vh) scale(1.08, 1.06); }
+}
+
 @media (hover: hover) and (pointer: fine) and (forced-colors: none) {
   :root {
     --cursor-default: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath d='M12 4v5m0 6v5M4 12h5m6 0h5' stroke='%23151311' stroke-width='3.5' stroke-linecap='round'/%3E%3Cpath d='M12 4v5m0 6v5M4 12h5m6 0h5' stroke='%23e5ab7e' stroke-width='1.8' stroke-linecap='round'/%3E%3C/svg%3E") 12 12;

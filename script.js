@@ -1,4 +1,5 @@
 document.addEventListener("DOMContentLoaded", () => {
+  setupContourMotion();
   renderProfile();
   renderExperience();
   renderProjects();
@@ -7,6 +8,41 @@ document.addEventListener("DOMContentLoaded", () => {
   setupSnakeGame();
   initCodingActivity();
 });
+
+function setupContourMotion() {
+  const backdrop = document.querySelector(".contour-background");
+  const motion = window.matchMedia("screen and (prefers-reduced-motion: no-preference) and (forced-colors: none)");
+  const previewMotion = ["127.0.0.1", "localhost"].includes(location.hostname)
+    && new URLSearchParams(location.search).get("motion") === "on";
+  let pointerX = 0;
+  let pointerY = 0;
+  let frame = 0;
+
+  function update() {
+    frame = 0;
+    const scrollOffset = 55 * Math.sin(window.scrollY / 320);
+    backdrop.style.setProperty("--contour-x", `${pointerX}px`);
+    backdrop.style.setProperty("--contour-y", `${pointerY + scrollOffset}px`);
+  }
+
+  function queueUpdate() {
+    if ((previewMotion || motion.matches) && !frame) frame = requestAnimationFrame(update);
+  }
+
+  window.addEventListener("pointermove", event => {
+    if ((!previewMotion && !motion.matches) || event.pointerType === "touch") return;
+    pointerX = (event.clientX / window.innerWidth - 0.5) * 120;
+    pointerY = (event.clientY / window.innerHeight - 0.5) * 90;
+    queueUpdate();
+  }, { passive: true });
+  window.addEventListener("scroll", queueUpdate, { passive: true });
+  function syncMotion() {
+    backdrop.classList.toggle("is-moving", previewMotion || motion.matches);
+    queueUpdate();
+  }
+  motion.addEventListener("change", syncMotion);
+  syncMotion();
+}
 
 function renderProfile() {
   const { profile } = portfolioData;
