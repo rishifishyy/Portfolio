@@ -46,32 +46,14 @@ body {
     mask-image: radial-gradient(ellipse at 91% 42%, black 12%, transparent 75%);
     transform-origin: right center;
     animation: contour-drift 5s ease-in-out -2s infinite alternate;
-  }
-
-  .contour-background.is-moving::before {
     translate: var(--contour-x, 0px) var(--contour-y, 0px);
     transition: translate 240ms ease-out;
-  }
-
-  .contour-background.is-paused::before {
-    animation: none;
-  }
-}
-
-@media screen and (prefers-reduced-motion: reduce) and (forced-colors: none) {
-  .contour-background:not(.is-moving, .is-paused)::before {
-    animation: contour-fade 4s ease-out both;
   }
 }
 
 @keyframes contour-drift {
   from { transform: translateY(-6vh) scale(.78, .94); opacity: .72; }
   to { transform: translateY(8vh) scale(1.12, 1.06); opacity: 1; }
-}
-
-@keyframes contour-fade {
-  from { opacity: .42; }
-  to { opacity: 1; }
 }
 
 @media (hover: hover) and (pointer: fine) and (forced-colors: none) {
